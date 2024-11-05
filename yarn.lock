@@ -839,6 +839,7 @@ __metadata:
     graphql-scalars: "npm:^1.24.0"
     graphql-upload: "npm:^17.0.0"
     html-validate: "npm:^9.0.0"
+    htmlrewriter: "npm:^0.0.12"
     ioredis: "npm:^5.4.1"
     is-mobile: "npm:^5.0.0"
     keyv: "npm:^5.2.2"
@@ -865,6 +866,7 @@ __metadata:
     socket.io: "npm:^4.8.1"
     stripe: "npm:^17.4.0"
     supertest: "npm:^7.0.0"
+    tldts: "npm:^6.1.68"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.7.2"
     winston: "npm:^3.17.0"
@@ -23539,6 +23541,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"htmlrewriter@npm:^0.0.12":
+  version: 0.0.12
+  resolution: "htmlrewriter@npm:0.0.12"
+  checksum: 10/8e1b39c52957c42fbf989f805504c92821fddcd7d3b42a0de0ac87dedaf3f45df1c2d4e4d47c371ff0395471faf6fe67c70d0c9b871787842a4ce19261dfd8a1
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.0.0, http-cache-semantics@npm:^4.1.0, http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -24848,12 +24857,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsesc@npm:^3.0.2":
-  version: 3.1.0
-  resolution: "jsesc@npm:3.1.0"
+"jsesc@npm:^3.0.2, jsesc@npm:~3.0.2":
+  version: 3.0.2
+  resolution: "jsesc@npm:3.0.2"
   bin:
     jsesc: bin/jsesc
-  checksum: 10/20bd37a142eca5d1794f354db8f1c9aeb54d85e1f5c247b371de05d23a9751ecd7bd3a9c4fc5298ea6fa09a100dafb4190fa5c98c6610b75952c3487f3ce7967
+  checksum: 10/8e5a7de6b70a8bd71f9cb0b5a7ade6a73ae6ab55e697c74cc997cede97417a3a65ed86c36f7dd6125fe49766e8386c845023d9e213916ca92c9dfdd56e2babf3
   languageName: node
   linkType: hard
 
@@ -24863,15 +24872,6 @@ __metadata:
   bin:
     jsesc: bin/jsesc
   checksum: 10/fab949f585c71e169c5cbe00f049f20de74f067081bbd64a55443bad1c71e1b5a5b448f2359bf2fe06f5ed7c07e2e4a9101843b01c823c30b6afc11f5bfaf724
-  languageName: node
-  linkType: hard
-
-"jsesc@npm:~3.0.2":
-  version: 3.0.2
-  resolution: "jsesc@npm:3.0.2"
-  bin:
-    jsesc: bin/jsesc
-  checksum: 10/8e5a7de6b70a8bd71f9cb0b5a7ade6a73ae6ab55e697c74cc997cede97417a3a65ed86c36f7dd6125fe49766e8386c845023d9e213916ca92c9dfdd56e2babf3
   languageName: node
   linkType: hard
 
@@ -33145,6 +33145,24 @@ __metadata:
   dependencies:
     tslib: "npm:^2.0.3"
   checksum: 10/369fe90f650a66205c34ebef63a69c6d1fd411ae3aad23db0aae165ddb881af50e67c6ea6800d605bc2b9e0ab5f22dada58fe97a1a7e7f3131ee0ef176cc65ec
+  languageName: node
+  linkType: hard
+
+"tldts-core@npm:^6.1.68":
+  version: 6.1.68
+  resolution: "tldts-core@npm:6.1.68"
+  checksum: 10/6cd30acd54a6cd402afb75d4d034ca008ab06b8d254efaa976e38814b7d0095f2fdfda2e33c162085d2f45b2b7b8b5724384192c2268930e63bee886241e399f
+  languageName: node
+  linkType: hard
+
+"tldts@npm:^6.1.68":
+  version: 6.1.68
+  resolution: "tldts@npm:6.1.68"
+  dependencies:
+    tldts-core: "npm:^6.1.68"
+  bin:
+    tldts: bin/cli.js
+  checksum: 10/5e28d274ba7364c80f4d81d922427cfae6081b2f33b27a81eab05f5e62f650daef7f8037aae489407f6b1cf997cb3aa353d41cd6bbce75758af44b1ae8b3cfc5
   languageName: node
   linkType: hard
 
