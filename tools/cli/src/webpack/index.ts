@@ -361,12 +361,6 @@ export function createWebpackConfig(
         },
       ],
       proxy: [
-        {
-          context: '/api/worker/',
-          target: 'https://affine.fail',
-          changeOrigin: true,
-          secure: false,
-        },
         { context: '/api', target: 'http://localhost:3010' },
         { context: '/socket.io', target: 'http://localhost:3010', ws: true },
         { context: '/graphql', target: 'http://localhost:3010' },
