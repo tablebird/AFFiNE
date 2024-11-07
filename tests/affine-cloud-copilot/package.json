@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "e2e": "yarn playwright test"
+    "test:e2e": "yarn playwright test"
   },
   "devDependencies": {
     "@affine-test/kit": "workspace:*",
