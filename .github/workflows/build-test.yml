@@ -527,7 +527,7 @@ jobs:
           filters: |
             changed:
               - 'packages/backend/server/src/plugins/copilot/**'
-              - 'packages/backend/server/tests/copilot.*'
+              - 'packages/backend/server/tests/copilot*'
               - 'tests/affine-cloud-copilot/**'
 
       - name: Setup Node.js
@@ -641,7 +641,7 @@ jobs:
         if: ${{ steps.check-blocksuite-update.outputs.skip != 'true' || steps.e2efilter.outputs.changed == 'true' }}
         uses: ./.github/actions/copilot-test
         with:
-          script: yarn affine @affine-test/affine-cloud-copilot test:e2e --forbid-only --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+          script: yarn affine @affine-test/affine-cloud-copilot e2e --forbid-only --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
           openai-key: ${{ secrets.COPILOT_OPENAI_API_KEY }}
           fal-key: ${{ secrets.COPILOT_FAL_API_KEY }}
           perplexity-key: ${{ secrets.COPILOT_PERPLEXITY_API_KEY }}
