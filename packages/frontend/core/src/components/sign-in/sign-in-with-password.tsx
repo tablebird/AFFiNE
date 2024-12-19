@@ -13,11 +13,16 @@ import {
 } from '@affine/core/modules/cloud';
 import type { AuthSessionStatus } from '@affine/core/modules/cloud/entities/session';
 import { Unreachable } from '@affine/env/constant';
-import { ServerDeploymentType } from '@affine/graphql';
+import {
+  ErrorNames,
+  ServerDeploymentType,
+  UserFriendlyError,
+} from '@affine/graphql';
 import { useI18n } from '@affine/i18n';
 import { useLiveData, useService } from '@toeverything/infra';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import type { SignInState } from '.';
 import { Captcha } from './captcha';
@@ -60,6 +65,7 @@ export const SignInWithPasswordStep = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const loginStatus = useLiveData(authService.session.status$);
+  const nav = useNavigate();
 
   useEffect(() => {
     if (loginStatus === 'authenticated') {
@@ -85,6 +91,14 @@ export const SignInWithPasswordStep = ({
       });
     } catch (err) {
       console.error(err);
+      const userFriendlyError = UserFriendlyError.fromAnyError(err);
+      if (userFriendlyError.name === ErrorNames.UNSUPPORTED_CLIENT_VERSION) {
+        const { action } = userFriendlyError.args;
+        nav(
+          `/sign-in?error=${encodeURIComponent(userFriendlyError.message)}&action=${encodeURIComponent(action as string)}`
+        );
+        return;
+      }
       setPasswordError(true);
     } finally {
       setIsLoading(false);
@@ -98,6 +112,7 @@ export const SignInWithPasswordStep = ({
     email,
     password,
     challenge,
+    nav,
   ]);
 
   const sendMagicLink = useCallback(() => {

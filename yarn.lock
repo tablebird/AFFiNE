@@ -824,6 +824,7 @@ __metadata:
     "@types/on-headers": "npm:^1.0.3"
     "@types/react": "npm:^19.0.1"
     "@types/react-dom": "npm:^19.0.2"
+    "@types/semver": "npm:^7.5.8"
     "@types/sinon": "npm:^17.0.3"
     "@types/supertest": "npm:^6.0.2"
     ava: "npm:^6.2.0"
@@ -860,6 +861,7 @@ __metadata:
     react-email: "npm:3.0.6"
     reflect-metadata: "npm:^0.2.2"
     rxjs: "npm:^7.8.1"
+    semver: "npm:^7.6.3"
     ses: "npm:^1.10.0"
     sinon: "npm:^19.0.2"
     socket.io: "npm:^4.8.1"
@@ -15477,6 +15479,13 @@ __metadata:
   version: 0.12.2
   resolution: "@types/retry@npm:0.12.2"
   checksum: 10/e5675035717b39ce4f42f339657cae9637cf0c0051cf54314a6a2c44d38d91f6544be9ddc0280587789b6afd056be5d99dbe3e9f4df68c286c36321579b1bf4a
+  languageName: node
+  linkType: hard
+
+"@types/semver@npm:^7.5.8":
+  version: 7.5.8
+  resolution: "@types/semver@npm:7.5.8"
+  checksum: 10/3496808818ddb36deabfe4974fd343a78101fa242c4690044ccdc3b95dcf8785b494f5d628f2f47f38a702f8db9c53c67f47d7818f2be1b79f2efb09692e1178
   languageName: node
   linkType: hard
 

@@ -1833,5 +1833,10 @@
   "error.LICENSE_NOT_FOUND": "License not found.",
   "error.INVALID_LICENSE_TO_ACTIVATE": "Invalid license to activate.",
   "error.INVALID_LICENSE_UPDATE_PARAMS": "Invalid license update params. {{reason}}",
-  "error.WORKSPACE_MEMBERS_EXCEED_LIMIT_TO_DOWNGRADE": "You cannot downgrade the workspace from team workspace because there are more than {{limit}} members that are currently active."
+  "error.WORKSPACE_MEMBERS_EXCEED_LIMIT_TO_DOWNGRADE": "You cannot downgrade the workspace from team workspace because there are more than {{limit}} members that are currently active.",
+  "com.affine.minimum-client.title": "Client is outdated",
+  "com.affine.minimum-client.outdated.message": "This client is outdated, for the security of your data, please update the client, before accessing the data, or visit our web app.",
+  "com.affine.minimum-client.advanced.message": "This client app is not supported by the server yet, for the security of your data, please download the matching client, before accessing the data, or visit our web app.",
+  "com.affine.minimum-client.outdated.button": "Update client",
+  "com.affine.minimum-client.advanced.button": "Download client"
 }

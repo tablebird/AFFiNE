@@ -98,10 +98,6 @@ export class AuthStore extends Store {
       },
     });
 
-    if (!res.ok) {
-      throw new Error(`Failed to check user by email: ${email}`);
-    }
-
     const data = (await res.json()) as {
       registered: boolean;
       hasPassword: boolean;

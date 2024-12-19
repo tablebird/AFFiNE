@@ -16,6 +16,7 @@ import {
   OauthAccountAlreadyConnected,
   OauthStateExpired,
   UnknownOauthProvider,
+  UseNamedGuard,
 } from '../../base';
 import { AuthService, Public } from '../../core/auth';
 import { Models } from '../../models';
@@ -34,6 +35,7 @@ export class OAuthController {
   ) {}
 
   @Public()
+  @UseNamedGuard('version')
   @Post('/preflight')
   @HttpCode(HttpStatus.OK)
   async preflight(
@@ -63,6 +65,7 @@ export class OAuthController {
   }
 
   @Public()
+  @UseNamedGuard('version')
   @Post('/callback')
   @HttpCode(HttpStatus.OK)
   async callback(
