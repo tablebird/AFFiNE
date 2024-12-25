@@ -364,8 +364,13 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
+module.exports.Application = nativeBinding.Application
+module.exports.ApplicationListChangedSubscriber = nativeBinding.ApplicationListChangedSubscriber
+module.exports.ApplicationStateChangedSubscriber = nativeBinding.ApplicationStateChangedSubscriber
+module.exports.AudioTapStream = nativeBinding.AudioTapStream
 module.exports.DocStorage = nativeBinding.DocStorage
 module.exports.DocStoragePool = nativeBinding.DocStoragePool
+module.exports.ShareableContent = nativeBinding.ShareableContent
 module.exports.SqliteConnection = nativeBinding.SqliteConnection
 module.exports.mintChallengeResponse = nativeBinding.mintChallengeResponse
 module.exports.ValidationResult = nativeBinding.ValidationResult

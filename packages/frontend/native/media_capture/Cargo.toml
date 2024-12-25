@@ -1,0 +1,26 @@
+[package]
+edition = "2021"
+name    = "affine_media_capture"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+napi        = { workspace = true, features = ["napi4"] }
+napi-derive = { workspace = true, features = ["type-def"] }
+rubato      = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+block2           = { workspace = true }
+core-foundation  = { workspace = true, features = ["with-uuid"] }
+coreaudio-rs     = { workspace = true }
+dispatch2        = { workspace = true }
+objc2            = { workspace = true }
+objc2-foundation = { workspace = true }
+screencapturekit = { workspace = true }
+thiserror        = { workspace = true }
+uuid             = { workspace = true, features = ["v4"] }
+
+[build-dependencies]
+napi-build = { workspace = true }
