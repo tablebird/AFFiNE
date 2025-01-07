@@ -32,6 +32,7 @@
     { "path": "../affine/widget-frame-title" },
     { "path": "../affine/widget-remote-selection" },
     { "path": "../affine/widget-scroll-anchoring" },
+    { "path": "../affine/widget-toolbar" },
     { "path": "../framework/block-std" },
     { "path": "../affine/data-view" },
     { "path": "../framework/global" },

@@ -77,6 +77,7 @@
     { "path": "./blocksuite/affine/widget-frame-title" },
     { "path": "./blocksuite/affine/widget-remote-selection" },
     { "path": "./blocksuite/affine/widget-scroll-anchoring" },
+    { "path": "./blocksuite/affine/widget-toolbar" },
     { "path": "./blocksuite/blocks" },
     { "path": "./blocksuite/framework/block-std" },
     { "path": "./blocksuite/framework/global" },
