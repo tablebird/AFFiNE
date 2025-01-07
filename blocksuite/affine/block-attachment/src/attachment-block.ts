@@ -1,6 +1,5 @@
 import { getEmbedCardIcons } from '@blocksuite/affine-block-embed';
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
-import { HoverController } from '@blocksuite/affine-components/hover';
 import {
   AttachmentIcon16,
   getAttachmentFileIcon,
@@ -16,19 +15,16 @@ import {
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';
 import { humanFileSize } from '@blocksuite/affine-shared/utils';
-import { BlockSelection, TextSelection } from '@blocksuite/block-std';
+import { BlockSelection } from '@blocksuite/block-std';
 import { Slice } from '@blocksuite/store';
-import { flip, offset } from '@floating-ui/dom';
-import { html, nothing } from 'lit';
+import { html } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import { AttachmentOptionsTemplate } from './components/options.js';
-import { AttachmentEmbedProvider } from './embed.js';
-import { styles } from './styles.js';
-import { checkAttachmentBlob, downloadAttachmentBlob } from './utils.js';
+import { AttachmentEmbedProvider } from './embed';
+import { styles } from './styles';
+import { checkAttachmentBlob, downloadAttachmentBlob } from './utils';
 
 @Peekable()
 export class AttachmentBlockComponent extends CaptionedBlockComponent<AttachmentBlockModel> {
@@ -39,43 +35,6 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<Attachment
   protected _isResizing = false;
 
   protected _isSelected = false;
-
-  protected _whenHover: HoverController | null = new HoverController(
-    this,
-    ({ abortController }) => {
-      const selection = this.host.selection;
-      const textSelection = selection.find(TextSelection);
-      if (
-        !!textSelection &&
-        (!!textSelection.to || !!textSelection.from.length)
-      ) {
-        return null;
-      }
-
-      const blockSelections = selection.filter(BlockSelection);
-      if (
-        blockSelections.length > 1 ||
-        (blockSelections.length === 1 &&
-          blockSelections[0].blockId !== this.blockId)
-      ) {
-        return null;
-      }
-
-      return {
-        template: AttachmentOptionsTemplate({
-          block: this,
-          model: this.model,
-          abortController,
-        }),
-        computePosition: {
-          referenceElement: this,
-          placement: 'top-start',
-          middleware: [flip(), offset(4)],
-          autoUpdate: true,
-        },
-      };
-    }
-  );
 
   blockDraggable = true;
 
@@ -225,11 +184,7 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<Attachment
     const embedView = this.embedView;
 
     return html`
-      <div
-        ${this._whenHover ? ref(this._whenHover.setReference) : nothing}
-        class="affine-attachment-container"
-        style=${this.containerStyleMap}
-      >
+      <div class="affine-attachment-container" style=${this.containerStyleMap}>
         ${embedView
           ? html`<div class="affine-attachment-embed-container">
               ${embedView}

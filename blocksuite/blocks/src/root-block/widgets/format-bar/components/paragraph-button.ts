@@ -35,7 +35,7 @@ const ParagraphPanel = ({
     item => html`
       <editor-menu-action
         data-testid="${item.id}"
-        @click="${() => item.action(formatBar.std.command.chain(), formatBar)}"
+        @click=${() => item.action(formatBar.std.command.chain(), formatBar)}
       >
         ${typeof item.icon === 'function' ? item.icon() : item.icon}
         ${item.name}

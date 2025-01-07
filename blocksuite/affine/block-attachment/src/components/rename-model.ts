@@ -5,7 +5,7 @@ import type { EditorHost } from '@blocksuite/block-std';
 import { html } from 'lit';
 import { createRef, ref } from 'lit/directives/ref.js';
 
-import { renameStyles } from './styles.js';
+import { renameStyles } from './styles';
 
 export const RenameModal = ({
   editorHost,
@@ -34,6 +34,7 @@ export const RenameModal = ({
   let fileName = includeExtension ? nameWithoutExtension : originalName;
   const extension = includeExtension ? originalExtension : '';
 
+  const abort = () => abortController.abort();
   const onConfirm = () => {
     const newFileName = fileName + extension;
     if (!newFileName) {
@@ -43,7 +44,7 @@ export const RenameModal = ({
     model.doc.updateBlock(model, {
       name: newFileName,
     });
-    abortController.abort();
+    abort();
   };
   const onInput = (e: InputEvent) => {
     fileName = (e.target as HTMLInputElement).value;
@@ -52,7 +53,7 @@ export const RenameModal = ({
     e.stopPropagation();
 
     if (e.key === 'Escape' && !e.isComposing) {
-      abortController.abort();
+      abort();
       return;
     }
     if (e.key === 'Enter' && !e.isComposing) {
@@ -65,14 +66,12 @@ export const RenameModal = ({
     <style>
       ${renameStyles}
     </style>
-    <div
-      class="affine-attachment-rename-overlay-mask"
-      @click="${() => abortController.abort()}"
-    ></div>
+    <div class="affine-attachment-rename-overlay-mask" @click="${abort}"></div>
     <div class="affine-attachment-rename-container">
       <div class="affine-attachment-rename-input-wrapper">
         <input
           ${ref(inputRef)}
+          autofocus
           type="text"
           .value=${fileName}
           @input=${onInput}

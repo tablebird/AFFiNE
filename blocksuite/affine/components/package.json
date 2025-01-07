@@ -63,7 +63,11 @@
     "./block-zero-width": "./src/block-zero-width/index.ts",
     "./block-selection": "./src/block-selection/index.ts",
     "./doc-title": "./src/doc-title/index.ts",
-    "./embed-card-modal": "./src/embed-card-modal/index.ts"
+    "./embed-card-modal": "./src/embed-card-modal/index.ts",
+    "./view-dropdown": "./src/view-dropdown/index.ts",
+    "./card-style-dropdown": "./src/card-style-dropdown/index.ts",
+    "./link-preview": "./src/link-preview/index.ts",
+    "./linked-doc-title": "./src/linked-doc-title/index.ts"
   },
   "files": [
     "src",

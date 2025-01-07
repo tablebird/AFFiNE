@@ -1,6 +1,6 @@
 import {
   type AttachmentBlockComponent,
-  attachmentViewToggleMenu,
+  // attachmentViewToggleMenu,
 } from '@blocksuite/affine-block-attachment';
 import { getEmbedCardIcons } from '@blocksuite/affine-block-embed';
 import {
@@ -78,16 +78,16 @@ export class EdgelessChangeAttachmentButton extends WithDisposable(LitElement) {
     return this.edgeless.std;
   }
 
-  get viewToggleMenu() {
-    const block = this._block;
-    const model = this.model;
-    if (!block || !model) return nothing;
+  // get viewToggleMenu() {
+  //   const block = this._block;
+  //   const model = this.model;
+  //   if (!block || !model) return nothing;
 
-    return attachmentViewToggleMenu({
-      block,
-      callback: () => this.requestUpdate(),
-    });
-  }
+  //   return attachmentViewToggleMenu({
+  //     block,
+  //     callback: () => this.requestUpdate(),
+  //   });
+  // }
 
   override render() {
     return join(
@@ -114,7 +114,7 @@ export class EdgelessChangeAttachmentButton extends WithDisposable(LitElement) {
                 </card-style-panel>
               </editor-menu-button>
             `,
-        this.viewToggleMenu,
+        // this.viewToggleMenu,
         html`
           <editor-icon-button
             aria-label="Download"

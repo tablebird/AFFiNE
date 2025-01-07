@@ -1,4 +1,5 @@
 import {
+  BlockFlavourIdentifier,
   BlockServiceWatcher,
   WidgetViewMapIdentifier,
 } from '@blocksuite/affine/block-std';
@@ -20,6 +21,7 @@ import {
   pageRootWidgetViewMap,
   ParagraphBlockService,
   ParagraphBlockSpec,
+  ToolbarModuleExtension,
 } from '@blocksuite/affine/blocks';
 import { assertInstanceOf } from '@blocksuite/affine/global/utils';
 import type { ExtensionType } from '@blocksuite/affine/store';
@@ -32,7 +34,10 @@ import {
   setupEdgelessCopilot,
   setupEdgelessElementToolbarAIEntry,
 } from './entries/edgeless/index';
-import { setupFormatBarAIEntry } from './entries/format-bar/setup-format-bar';
+import {
+  setupFormatBarAIEntry,
+  toolbarAIEntryConfig,
+} from './entries/format-bar/setup-format-bar';
 import { setupImageToolbarAIEntry } from './entries/image-toolbar/setup-image-toolbar';
 import { setupSlashMenuAIEntry } from './entries/slash-menu/setup-slash-menu';
 import { setupSpaceAIEntry } from './entries/space/setup-space';
@@ -81,6 +86,10 @@ export function createAIPageRootBlockSpec(
         });
       },
     },
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:note'),
+      config: toolbarAIEntryConfig(),
+    }),
   ];
 }
 
@@ -139,6 +148,10 @@ export function createAIEdgelessRootBlockSpec(
         });
       },
     },
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:note'),
+      config: toolbarAIEntryConfig(),
+    }),
   ];
 }
 

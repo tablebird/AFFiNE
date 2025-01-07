@@ -1,4 +1,9 @@
-import { BlockViewExtension, FlavourExtension } from '@blocksuite/block-std';
+import { ToolbarModuleExtension } from '@blocksuite/affine-shared/services';
+import {
+  BlockFlavourIdentifier,
+  BlockViewExtension,
+  FlavourExtension,
+} from '@blocksuite/block-std';
 import type { ExtensionType } from '@blocksuite/store';
 import { literal } from 'lit/static-html.js';
 
@@ -6,6 +11,7 @@ import {
   DocNoteBlockAdapterExtensions,
   EdgelessNoteBlockAdapterExtensions,
 } from './adapters/index.js';
+import { builtinToolbarConfig } from './configs/toolbar.js';
 import { NoteBlockService } from './note-service.js';
 
 export const NoteBlockSpec: ExtensionType[] = [
@@ -13,6 +19,10 @@ export const NoteBlockSpec: ExtensionType[] = [
   NoteBlockService,
   BlockViewExtension('affine:note', literal`affine-note`),
   DocNoteBlockAdapterExtensions,
+  ToolbarModuleExtension({
+    id: BlockFlavourIdentifier('affine:note'),
+    config: builtinToolbarConfig,
+  }),
 ].flat();
 
 export const EdgelessNoteBlockSpec: ExtensionType[] = [
@@ -20,4 +30,8 @@ export const EdgelessNoteBlockSpec: ExtensionType[] = [
   NoteBlockService,
   BlockViewExtension('affine:note', literal`affine-edgeless-note`),
   EdgelessNoteBlockAdapterExtensions,
+  ToolbarModuleExtension({
+    id: BlockFlavourIdentifier('affine:note'),
+    config: builtinToolbarConfig,
+  }),
 ].flat();

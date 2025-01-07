@@ -48,7 +48,6 @@ export function ConfigRenderer(formatBar: AffineFormatBarWidget) {
                 .tooltip=${item.name}
                 @click=${() => {
                   item.action(formatBar.std.command.chain(), formatBar);
-                  formatBar.requestUpdate();
                 }}
               >
                 ${typeof item.icon === 'function' ? item.icon() : item.icon}

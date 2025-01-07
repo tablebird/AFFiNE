@@ -57,43 +57,6 @@ export const renameStyles = css`
   }
 `;
 
-export const moreMenuStyles = css`
-  .affine-attachment-options-more {
-    box-sizing: border-box;
-    padding-bottom: 4px;
-  }
-
-  .affine-attachment-options-more-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--affine-text-primary-color);
-
-    border-radius: 8px;
-    padding: 8px;
-    background: var(--affine-background-overlay-panel-color);
-    box-shadow: var(--affine-shadow-2);
-  }
-
-  .affine-attachment-options-more-container > icon-button {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    gap: 8px;
-  }
-  .affine-attachment-options-more-container > icon-button[hidden] {
-    display: none;
-  }
-
-  .affine-attachment-options-more-container > icon-button:hover.danger {
-    background: var(--affine-background-error-color);
-    color: var(--affine-error-color);
-  }
-  .affine-attachment-options-more-container > icon-button:hover.danger > svg {
-    color: var(--affine-error-color);
-  }
-`;
-
 export const styles = css`
   :host {
     z-index: 1;

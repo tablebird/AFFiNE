@@ -3251,7 +3251,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/types@npm:^7.0.0, @babel/types@npm:^7.16.8, @babel/types@npm:^7.18.13, @babel/types@npm:^7.18.9, @babel/types@npm:^7.20.7, @babel/types@npm:^7.24.5, @babel/types@npm:^7.25.4, @babel/types@npm:^7.25.9, @babel/types@npm:^7.26.0, @babel/types@npm:^7.26.5, @babel/types@npm:^7.26.7, @babel/types@npm:^7.4.4, @babel/types@npm:^7.8.3":
+"@babel/types@npm:^7.0.0, @babel/types@npm:^7.16.8, @babel/types@npm:^7.18.13, @babel/types@npm:^7.18.9, @babel/types@npm:^7.20.7, @babel/types@npm:^7.24.5, @babel/types@npm:^7.25.4, @babel/types@npm:^7.25.9, @babel/types@npm:^7.26.0, @babel/types@npm:^7.26.5, @babel/types@npm:^7.4.4, @babel/types@npm:^7.8.3":
+  version: 7.26.5
+  resolution: "@babel/types@npm:7.26.5"
+  dependencies:
+    "@babel/helper-string-parser": "npm:^7.25.9"
+    "@babel/helper-validator-identifier": "npm:^7.25.9"
+  checksum: 10/148f6bead7bc39371176ba681873c930087503a8bfd2b0dab5090de32752241806c95f4e87cee8b2976bb0277c6cbc150f16c333fc90269634b711d3711c0f18
+  languageName: node
+  linkType: hard
+
+"@babel/types@npm:^7.26.7":
   version: 7.26.7
   resolution: "@babel/types@npm:7.26.7"
   dependencies:
@@ -3312,6 +3322,7 @@ __metadata:
     "@toeverything/theme": "npm:^1.1.7"
     lit: "npm:^3.2.0"
     minimatch: "npm:^10.0.1"
+    yjs: "npm:^13.6.23"
     zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
@@ -3560,12 +3571,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksuite/affine-block-note@workspace:blocksuite/affine/block-note"
   dependencies:
+    "@blocksuite/affine-block-database": "workspace:*"
     "@blocksuite/affine-block-embed": "workspace:*"
     "@blocksuite/affine-block-surface": "workspace:*"
     "@blocksuite/affine-components": "workspace:*"
     "@blocksuite/affine-model": "workspace:*"
     "@blocksuite/affine-shared": "workspace:*"
     "@blocksuite/block-std": "workspace:*"
+    "@blocksuite/data-view": "workspace:*"
     "@blocksuite/global": "workspace:*"
     "@blocksuite/icons": "npm:^2.2.1"
     "@blocksuite/inline": "workspace:*"
@@ -3862,13 +3875,27 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksuite/affine-widget-toolbar@workspace:blocksuite/affine/widget-toolbar"
   dependencies:
+    "@blocksuite/affine-block-database": "workspace:*"
+    "@blocksuite/affine-components": "workspace:*"
     "@blocksuite/affine-model": "workspace:*"
     "@blocksuite/affine-shared": "workspace:*"
     "@blocksuite/block-std": "workspace:*"
     "@blocksuite/global": "workspace:*"
+    "@blocksuite/icons": "npm:^2.2.1"
+    "@floating-ui/dom": "npm:^1.6.10"
     "@preact/signals-core": "npm:^1.8.0"
     "@toeverything/theme": "npm:^1.1.3"
+    "@types/lodash.groupby": "npm:^4"
+    "@types/lodash.mergewith": "npm:^4"
+    "@types/lodash.orderby": "npm:^4"
+    "@types/lodash.partition": "npm:^4"
+    "@types/lodash.topairs": "npm:^4"
     lit: "npm:^3.2.0"
+    lodash.groupby: "npm:^4.6.0"
+    lodash.mergewith: "npm:^4.6.2"
+    lodash.orderby: "npm:^4.6.0"
+    lodash.partition: "npm:^4.6.0"
+    lodash.topairs: "npm:^4.3.0"
   languageName: unknown
   linkType: soft
 
@@ -14542,7 +14569,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@toeverything/theme@npm:^1.1.7":
+"@toeverything/theme@npm:^1.1.3, @toeverything/theme@npm:^1.1.7":
   version: 1.1.8
   resolution: "@toeverything/theme@npm:1.1.8"
   checksum: 10/0a4d61b624a18681ee4c2169992e0a59552da131419f10ec2e4c8141d12c2591ac2323ddcb26366ae6785c6715a480b3cc728527025c5deaaed0a8d1f431ed26
@@ -15179,6 +15206,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash.groupby@npm:^4":
+  version: 4.6.9
+  resolution: "@types/lodash.groupby@npm:4.6.9"
+  dependencies:
+    "@types/lodash": "npm:*"
+  checksum: 10/b8310a9f89badc42a504887ca0b9619c2a284b3fec8dc505cf72508eb6beba47b822df939c7d57c0f69bc685f51ff5a232e0480ecad6b18b7ab76fecc1d74691
+  languageName: node
+  linkType: hard
+
 "@types/lodash.ismatch@npm:^4.4.9":
   version: 4.4.9
   resolution: "@types/lodash.ismatch@npm:4.4.9"
@@ -15203,6 +15239,33 @@ __metadata:
   dependencies:
     "@types/lodash": "npm:*"
   checksum: 10/c5a67e83040103decfd37090127118f5758773d0ce2a1756d442b371721737c7752f48f62544cc970f44abec8471f260cc4c844e1a4fdef8b76cb96bdec8a595
+  languageName: node
+  linkType: hard
+
+"@types/lodash.orderby@npm:^4":
+  version: 4.6.9
+  resolution: "@types/lodash.orderby@npm:4.6.9"
+  dependencies:
+    "@types/lodash": "npm:*"
+  checksum: 10/f3ca3a6ba09caef431955f3110a6704e25c90934fb70973e2ed1f4dd9aa48c4776c7e8b909b78f9ae1fb169e437497f8fe8e60fafb5c74ede49c36739ac44c3e
+  languageName: node
+  linkType: hard
+
+"@types/lodash.partition@npm:^4":
+  version: 4.6.9
+  resolution: "@types/lodash.partition@npm:4.6.9"
+  dependencies:
+    "@types/lodash": "npm:*"
+  checksum: 10/29d1fead7f9a71af8279ceb6c1b08128c7f05f06a72ed60fea02a7c010f69006a4e3dc24afb9c4a3187a033b918a1b3dcf611004781f927ff573b104bdf34060
+  languageName: node
+  linkType: hard
+
+"@types/lodash.topairs@npm:^4":
+  version: 4.3.9
+  resolution: "@types/lodash.topairs@npm:4.3.9"
+  dependencies:
+    "@types/lodash": "npm:*"
+  checksum: 10/8d4d9cb7be1c333b70b8d035d0673ef41158bfe24e06616046879149a15438af89673fe21abe1b1e62ddbc00eae5fe4c3795649de8a98742771ba8949100a300
   languageName: node
   linkType: hard
 
@@ -25344,6 +25407,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.groupby@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "lodash.groupby@npm:4.6.0"
+  checksum: 10/98bd04e58ce4cebb2273010352508b5ea12025e94fcfd70c84c8082ef3b0689178e8e6dd53bff919f525fae9bd67b4aba228d606b75a967f30e84ec9610b5de1
+  languageName: node
+  linkType: hard
+
 "lodash.isarguments@npm:^3.1.0":
   version: 3.1.0
   resolution: "lodash.isarguments@npm:3.1.0"
@@ -25407,6 +25477,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.orderby@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "lodash.orderby@npm:4.6.0"
+  checksum: 10/48da21dcdc25c837f7390cb94062ed6ca6ee8a6bce5bf4ebb6ba118dbb0138f976725efa3d560958d7b3d7339daa1eb31a1223caa38788dd632304cf1450c5ca
+  languageName: node
+  linkType: hard
+
+"lodash.partition@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "lodash.partition@npm:4.6.0"
+  checksum: 10/6912bdf8006e1389242d35dc670570c470c93822c6859f5e0c18426be519e9ebba576969443fca256ef5913d12319ffa1a1eb870ac403978089cc1c703d705c2
+  languageName: node
+  linkType: hard
+
 "lodash.snakecase@npm:^4.1.1":
   version: 4.1.1
   resolution: "lodash.snakecase@npm:4.1.1"
@@ -25425,6 +25509,13 @@ __metadata:
   version: 4.4.0
   resolution: "lodash.startcase@npm:4.4.0"
   checksum: 10/3091048a54a2f92bcf2c6441d2bd9a706fb133d5f461ae7c310d6dca1530338a06c91e9e42a5b14b12e875ddae1814d448050dc02afe2cec09b3995d8e836837
+  languageName: node
+  linkType: hard
+
+"lodash.topairs@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "lodash.topairs@npm:4.3.0"
+  checksum: 10/32a0e8654e025676288310e0c1401edd8a4255ed6413693e62f38dac68c24f547734df51893ea44a5e5b2d67e99f0f77f014090de5e3b747e6129650257b4871
   languageName: node
   linkType: hard
 

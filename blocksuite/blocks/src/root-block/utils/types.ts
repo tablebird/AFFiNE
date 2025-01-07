@@ -7,25 +7,12 @@ import {
   EmbedLoomBlockComponent,
   EmbedSyncedDocBlockComponent,
   EmbedYoutubeBlockComponent,
+  type LinkableEmbedBlockComponent,
 } from '@blocksuite/affine-block-embed';
 import type { BlockComponent } from '@blocksuite/block-std';
 
-export type ExternalEmbedBlockComponent =
-  | BookmarkBlockComponent
-  | EmbedFigmaBlockComponent
-  | EmbedGithubBlockComponent
-  | EmbedLoomBlockComponent
-  | EmbedYoutubeBlockComponent;
-
-export type InternalEmbedBlockComponent =
-  | EmbedLinkedDocBlockComponent
-  | EmbedSyncedDocBlockComponent;
-
-export type LinkableEmbedBlockComponent =
-  | ExternalEmbedBlockComponent
-  | InternalEmbedBlockComponent;
-
 export type BuiltInEmbedBlockComponent =
+  | BookmarkBlockComponent
   | LinkableEmbedBlockComponent
   | EmbedHtmlBlockComponent;
 

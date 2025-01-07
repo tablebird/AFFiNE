@@ -9,11 +9,14 @@ import { EmbedSyncedDocBlockSpec } from './embed-synced-doc-block';
 import { EmbedYoutubeBlockSpec } from './embed-youtube-block';
 
 export const EmbedExtensions: ExtensionType[] = [
+  // External embed blocks
   EmbedFigmaBlockSpec,
   EmbedGithubBlockSpec,
-  EmbedHtmlBlockSpec,
   EmbedLoomBlockSpec,
   EmbedYoutubeBlockSpec,
+
+  // Internal embed blocks
+  EmbedHtmlBlockSpec,
   EmbedLinkedDocBlockSpec,
   EmbedSyncedDocBlockSpec,
 ].flat();
@@ -22,7 +25,7 @@ export { createEmbedBlockHtmlAdapterMatcher } from './common/adapters/html';
 export { createEmbedBlockMarkdownAdapterMatcher } from './common/adapters/markdown';
 export { createEmbedBlockPlainTextAdapterMatcher } from './common/adapters/plain-text';
 export { EmbedBlockComponent } from './common/embed-block-element';
-export { insertEmbedCard } from './common/insert-embed-card.js';
+export { insertEmbedCard } from './common/insert-embed-card';
 export * from './common/render-linked-doc';
 export { toEdgelessEmbedBlock } from './common/to-edgeless-embed-block';
 export * from './common/utils';
@@ -33,3 +36,4 @@ export * from './embed-linked-doc-block';
 export * from './embed-loom-block';
 export * from './embed-synced-doc-block';
 export * from './embed-youtube-block';
+export * from './types';

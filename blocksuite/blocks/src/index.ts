@@ -97,6 +97,8 @@ export {
   renderToolbarSeparator,
   Tooltip,
 } from '@blocksuite/affine-components/toolbar';
+export { notifyLinkedDocClearedAliases, notifyLinkedDocSwitchedToCard, notifyLinkedDocSwitchedToEmbed } from '@blocksuite/affine-components/notification';
+export { toggleEmbedCardEditModal } from '@blocksuite/affine-components/embed-card-modal';
 export * from '@blocksuite/affine-model';
 export {
   AttachmentAdapter,

@@ -23,6 +23,7 @@ import {
   RefNodeSlotsExtension,
   RichTextExtensions,
   TableBlockSpec,
+  ToolbarRegistryExtension,
 } from '@blocksuite/affine/blocks';
 import type { ExtensionType } from '@blocksuite/affine/store';
 
@@ -42,6 +43,7 @@ const CommonBlockSpecs: ExtensionType[] = [
   AdapterFactoryExtensions,
   FontLoaderService,
   DefaultOpenDocExtension,
+  ToolbarRegistryExtension,
 ].flat();
 
 export const DefaultBlockSpecs: ExtensionType[] = [

@@ -55,7 +55,7 @@ import {
   TelemetryProvider,
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';
-import { getHostName, referenceToNode } from '@blocksuite/affine-shared/utils';
+import { referenceToNode } from '@blocksuite/affine-shared/utils';
 import {
   BlockSelection,
   type BlockStdScope,
@@ -799,16 +799,7 @@ export class EmbedCardToolbar extends WidgetComponent<
       this._openMenuButton(),
 
       hasUrl
-        ? html`
-            <a
-              class="affine-link-preview"
-              href=${model.url}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              <span>${getHostName(model.url)}</span>
-            </a>
-          `
+        ? html`<affine-link-preview .url=${model.url}></affine-link-preview>`
         : nothing,
 
       // internal embed model

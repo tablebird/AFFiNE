@@ -19,6 +19,7 @@ import { effects as componentAiItemEffects } from '@blocksuite/affine-components
 import { BlockSelection } from '@blocksuite/affine-components/block-selection';
 import { BlockZeroWidth } from '@blocksuite/affine-components/block-zero-width';
 import { effects as componentCaptionEffects } from '@blocksuite/affine-components/caption';
+import { effects as componentCardStyleDropdownEffects } from '@blocksuite/affine-components/card-style-dropdown';
 import { effects as componentColorPickerEffects } from '@blocksuite/affine-components/color-picker';
 import { effects as componentContextMenuEffects } from '@blocksuite/affine-components/context-menu';
 import { effects as componentDatePickerEffects } from '@blocksuite/affine-components/date-picker';
@@ -26,12 +27,15 @@ import { effects as componentDropIndicatorEffects } from '@blocksuite/affine-com
 import { effects as componentEmbedCardModalEffects } from '@blocksuite/affine-components/embed-card-modal';
 import { FilterableListComponent } from '@blocksuite/affine-components/filterable-list';
 import { IconButton } from '@blocksuite/affine-components/icon-button';
+import { effects as componentLinkPreviewEffects } from '@blocksuite/affine-components/link-preview';
+import { effects as componentLinkedDocTitleEffects } from '@blocksuite/affine-components/linked-doc-title';
 import { effects as componentPortalEffects } from '@blocksuite/affine-components/portal';
 import { effects as componentRichTextEffects } from '@blocksuite/affine-components/rich-text';
 import { SmoothCorner } from '@blocksuite/affine-components/smooth-corner';
 import { effects as componentToggleButtonEffects } from '@blocksuite/affine-components/toggle-button';
 import { ToggleSwitch } from '@blocksuite/affine-components/toggle-switch';
 import { effects as componentToolbarEffects } from '@blocksuite/affine-components/toolbar';
+import { effects as componentViewDropdownEffects } from '@blocksuite/affine-components/view-dropdown';
 import { effects as widgetDragHandleEffects } from '@blocksuite/affine-widget-drag-handle/effects';
 import { effects as widgetEdgelessAutoConnectEffects } from '@blocksuite/affine-widget-edgeless-auto-connect/effects';
 import { effects as widgetFrameTitleEffects } from '@blocksuite/affine-widget-frame-title/effects';
@@ -215,6 +219,10 @@ export function effects() {
   componentAiItemEffects();
   componentColorPickerEffects();
   componentEmbedCardModalEffects();
+  componentViewDropdownEffects();
+  componentCardStyleDropdownEffects();
+  componentLinkPreviewEffects(),
+  componentLinkedDocTitleEffects(),
 
   widgetScrollAnchoringEffects();
   widgetMobileToolbarEffects();

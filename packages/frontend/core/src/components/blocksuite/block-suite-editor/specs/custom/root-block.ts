@@ -10,6 +10,7 @@ import { EditorSettingService } from '@affine/core/modules/editor-setting';
 import { AppThemeService } from '@affine/core/modules/theme';
 import { mixpanel } from '@affine/track';
 import {
+  BlockFlavourIdentifier,
   ConfigExtension,
   LifeCycleWatcher,
   StdIdentifier,
@@ -24,17 +25,23 @@ import type {
   ThemeExtension,
 } from '@blocksuite/affine/blocks';
 import {
+  BookmarkBlockComponent,
   CodeBlockSpec,
   ColorScheme,
   createSignalFromObservable,
   DocDisplayMetaProvider,
   EditorSettingExtension,
+  EmbedFigmaBlockComponent,
+  EmbedGithubBlockComponent,
+  EmbedLoomBlockComponent,
+  EmbedYoutubeBlockComponent,
   ImageBlockSpec,
   ParagraphBlockSpec,
   referenceToNode,
   SpecProvider,
   TelemetryProvider,
   ThemeExtensionIdentifier,
+  ToolbarModuleExtension,
 } from '@blocksuite/affine/blocks';
 import type { Container } from '@blocksuite/affine/global/di';
 import type { ExtensionType } from '@blocksuite/affine/store';
@@ -47,7 +54,13 @@ import { combineLatest, map } from 'rxjs';
 import { getFontConfigExtension } from '../font-extension';
 import { createDatabaseOptionsConfig } from './database-block';
 import { createLinkedWidgetConfig } from './widgets/linked';
-import { createToolbarMoreMenuConfig } from './widgets/toolbar';
+import {
+  createExternalLinkableToolbarConfig,
+  createToolbarMoreMenuConfig,
+  embedLinkedDocToolbarConfig,
+  embedSyncedDocToolbarConfig,
+  toolbarMoreMenuConfig,
+} from './widgets/toolbar';
 
 function getTelemetryExtension(): ExtensionType {
   return {
@@ -236,6 +249,46 @@ function getEditorConfigExtension(
       linkedWidget: createLinkedWidgetConfig(framework),
       toolbarMoreMenu: createToolbarMoreMenuConfig(framework),
     } satisfies RootBlockConfig),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:*'),
+      config: toolbarMoreMenuConfig,
+    }),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:bookmark'),
+      config: createExternalLinkableToolbarConfig(BookmarkBlockComponent),
+    }),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:embed-figma'),
+      config: createExternalLinkableToolbarConfig(EmbedFigmaBlockComponent),
+    }),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:embed-github'),
+      config: createExternalLinkableToolbarConfig(EmbedGithubBlockComponent),
+    }),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:embed-loom'),
+      config: createExternalLinkableToolbarConfig(EmbedLoomBlockComponent),
+    }),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:embed-youtube'),
+      config: createExternalLinkableToolbarConfig(EmbedYoutubeBlockComponent),
+    }),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:embed-linked-doc'),
+      config: embedLinkedDocToolbarConfig,
+    }),
+
+    ToolbarModuleExtension({
+      id: BlockFlavourIdentifier('custom:affine:embed-synced-doc'),
+      config: embedSyncedDocToolbarConfig,
+    }),
   ];
 }
 

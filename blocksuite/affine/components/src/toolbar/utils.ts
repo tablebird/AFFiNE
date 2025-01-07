@@ -105,8 +105,10 @@ export function renderGroups<T>(groups: MenuItemGroup<T>[], context: T) {
   return renderActions(groupsToActions(groups, context));
 }
 
-export function renderToolbarSeparator() {
-  return html`<editor-toolbar-separator></editor-toolbar-separator>`;
+export function renderToolbarSeparator(orientation?: 'horizontal') {
+  return html`<editor-toolbar-separator
+    data-orientation=${ifDefined(orientation)}
+  ></editor-toolbar-separator>`;
 }
 
 export function getMoreMenuConfig(std: BlockStdScope): ToolbarMoreMenuConfig {

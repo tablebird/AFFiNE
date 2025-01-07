@@ -1,5 +1,4 @@
 import { EdgelessLegacySlotIdentifier } from '@blocksuite/affine-block-surface';
-import type { HoverController } from '@blocksuite/affine-components/hover';
 import { AttachmentBlockStyles } from '@blocksuite/affine-model';
 import {
   EMBED_CARD_HEIGHT,
@@ -13,8 +12,6 @@ import { AttachmentBlockComponent } from './attachment-block.js';
 export class AttachmentEdgelessBlockComponent extends toGfxBlockComponent(
   AttachmentBlockComponent
 ) {
-  protected override _whenHover: HoverController | null = null;
-
   override blockDraggable = false;
 
   get slots() {

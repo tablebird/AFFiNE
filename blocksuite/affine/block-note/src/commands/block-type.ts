@@ -131,6 +131,7 @@ export const updateBlockType: Command<
     );
     const selectionManager = host.selection;
     const textSelection = selectionManager.find(TextSelection);
+    console.log('change', textSelection?.isCollapsed());
     if (!textSelection) {
       return false;
     }

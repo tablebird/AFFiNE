@@ -91,7 +91,7 @@ export class AttachmentEmbedService extends Extension {
   // Converts to embed view.
   convertTo(model: AttachmentBlockModel, maxFileSize = this._maxFileSize) {
     const config = this.values.find(config => config.check(model, maxFileSize));
-    if (!config || !config.action) {
+    if (!config?.action) {
       model.doc.updateBlock(model, { embed: true });
       return;
     }

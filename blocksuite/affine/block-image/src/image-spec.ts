@@ -1,4 +1,6 @@
+import { ToolbarModuleExtension } from '@blocksuite/affine-shared/services';
 import {
+  BlockFlavourIdentifier,
   BlockViewExtension,
   FlavourExtension,
   WidgetViewMapExtension,
@@ -6,14 +8,17 @@ import {
 import type { ExtensionType } from '@blocksuite/store';
 import { literal } from 'lit/static-html.js';
 
-import { ImageBlockAdapterExtensions } from './adapters/extension.js';
-import { ImageProxyService } from './image-proxy-service.js';
-import { ImageBlockService, ImageDropOption } from './image-service.js';
+import { ImageBlockAdapterExtensions } from './adapters/extension';
+import { ImageProxyService } from './image-proxy-service';
+import { builtinToolbarConfig } from './configs/toolbar';
+import { ImageBlockService, ImageDropOption } from './image-service';
+
+const flavour = 'affine:image';
 
 export const ImageBlockSpec: ExtensionType[] = [
-  FlavourExtension('affine:image'),
+  FlavourExtension(flavour),
   ImageBlockService,
-  BlockViewExtension('affine:image', model => {
+  BlockViewExtension(flavour, model => {
     const parent = model.doc.getParent(model.id);
 
     if (parent?.flavour === 'affine:surface') {
@@ -22,11 +27,15 @@ export const ImageBlockSpec: ExtensionType[] = [
 
     return literal`affine-image`;
   }),
-  WidgetViewMapExtension('affine:image', {
+  WidgetViewMapExtension(flavour, {
     imageToolbar: literal`affine-image-toolbar-widget`,
   }),
   ImageDropOption,
   ImageBlockAdapterExtensions,
+  ToolbarModuleExtension({
+    id: BlockFlavourIdentifier(flavour),
+    config: builtinToolbarConfig,
+  }),
 ].flat();
 
 export const ImageStoreSpec: ExtensionType[] = [ImageProxyService].flat();
