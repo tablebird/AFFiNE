@@ -739,11 +739,6 @@ export const PackageList = [
     name: '@affine-tools/utils',
     workspaceDependencies: [],
   },
-  {
-    location: 'tools/workers',
-    name: '@affine/workers',
-    workspaceDependencies: [],
-  },
 ];
 
 export type PackageName =
@@ -819,5 +814,4 @@ export type PackageName =
   | '@affine/commitlint-config'
   | '@affine/copilot-result'
   | '@affine/playstore-auto-bump'
-  | '@affine-tools/utils'
-  | '@affine/workers';
+  | '@affine-tools/utils';

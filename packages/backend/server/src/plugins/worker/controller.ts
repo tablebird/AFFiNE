@@ -10,7 +10,7 @@ import {
 import type { Request, Response } from 'express';
 import { HTMLRewriter } from 'htmlrewriter';
 
-import { BadRequest, Cache, Config, URLHelper } from '../../fundamentals';
+import { BadRequest, Cache, Config, URLHelper } from '../../base';
 import type { LinkPreviewRequest, LinkPreviewResponse } from './types';
 import {
   appendUrl,

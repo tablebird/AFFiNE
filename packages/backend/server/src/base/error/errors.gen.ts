@@ -21,6 +21,12 @@ export class NotFound extends UserFriendlyError {
     super('resource_not_found', 'not_found', message);
   }
 }
+
+export class BadRequest extends UserFriendlyError {
+  constructor(message?: string) {
+    super('bad_request', 'bad_request', message);
+  }
+}
 @ObjectType()
 class QueryTooLongDataType {
   @Field() max!: number
@@ -726,6 +732,7 @@ export enum ErrorNames {
   INTERNAL_SERVER_ERROR,
   TOO_MANY_REQUEST,
   NOT_FOUND,
+  BAD_REQUEST,
   QUERY_TOO_LONG,
   USER_NOT_FOUND,
   USER_AVATAR_NOT_FOUND,
