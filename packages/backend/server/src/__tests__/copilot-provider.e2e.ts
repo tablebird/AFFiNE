@@ -50,17 +50,11 @@ const runIfCopilotConfigured = test.macro(
 export const runPrisma = async <T>(
   cb: (
     prisma: InstanceType<
-      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      typeof import('../../../../packages/backend/server/node_modules/@prisma/client').PrismaClient
+      typeof import('../../node_modules/@prisma/client').PrismaClient
     >
   ) => Promise<T>
 ): Promise<T> => {
-  const {
-    PrismaClient,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-  } = await import(
-    '../../../../packages/backend/server/node_modules/@prisma/client'
-  );
+  const { PrismaClient } = await import('../../node_modules/@prisma/client');
   const client = new PrismaClient();
   await client.$connect();
   try {
