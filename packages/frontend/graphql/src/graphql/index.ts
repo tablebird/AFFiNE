@@ -198,6 +198,79 @@ mutation removeContextDoc($options: RemoveContextFileInput!) {
 }`,
 };
 
+export const addContextFileMutation = {
+  id: 'addContextFileMutation' as const,
+  operationName: 'addContextFile',
+  definitionName: 'addContextFile',
+  containsFile: true,
+  query: `
+mutation addContextFile($content: Upload!, $options: AddContextFileInput!) {
+  addContextFile(content: $content, options: $options) {
+    id
+    createdAt
+    name
+    chunk_size
+    status
+    blobId
+  }
+}`,
+};
+
+export const listContextFilesQuery = {
+  id: 'listContextFilesQuery' as const,
+  operationName: 'listContextFiles',
+  definitionName: 'currentUser',
+  containsFile: false,
+  query: `
+query listContextFiles($workspaceId: String!, $sessionId: String!, $contextId: String!) {
+  currentUser {
+    copilot(workspaceId: $workspaceId) {
+      contexts(sessionId: $sessionId, contextId: $contextId) {
+        docs {
+          id
+          createdAt
+        }
+        files {
+          id
+          name
+          blobId
+          chunk_size
+          status
+          createdAt
+        }
+      }
+    }
+  }
+}`,
+};
+
+export const matchContextMutation = {
+  id: 'matchContextMutation' as const,
+  operationName: 'matchContext',
+  definitionName: 'matchContext',
+  containsFile: false,
+  query: `
+mutation matchContext($contextId: String!, $content: String!, $limit: SafeInt) {
+  matchContext(contextId: $contextId, content: $content, limit: $limit) {
+    fileId
+    chunk
+    content
+    distance
+  }
+}`,
+};
+
+export const removeContextFileMutation = {
+  id: 'removeContextFileMutation' as const,
+  operationName: 'removeContextFile',
+  definitionName: 'removeContextFile',
+  containsFile: false,
+  query: `
+mutation removeContextFile($options: RemoveContextFileInput!) {
+  removeContextFile(options: $options)
+}`,
+};
+
 export const listContextQuery = {
   id: 'listContextQuery' as const,
   operationName: 'listContext',
@@ -209,9 +282,51 @@ query listContext($workspaceId: String!, $sessionId: String!) {
     copilot(workspaceId: $workspaceId) {
       contexts(sessionId: $sessionId) {
         id
+        createdAt
       }
     }
   }
+}`,
+};
+
+export const matchWorkspaceContextMutation = {
+  id: 'matchWorkspaceContextMutation' as const,
+  operationName: 'matchWorkspaceContext',
+  definitionName: 'matchWorkspaceContext',
+  containsFile: false,
+  query: `
+mutation matchWorkspaceContext($contextId: String!, $content: String!, $limit: SafeInt) {
+  matchWorkspaceContext(contextId: $contextId, content: $content, limit: $limit) {
+    docId
+    chunk
+    content
+    distance
+  }
+}`,
+};
+
+export const getWorkspaceEmbeddingStatusQuery = {
+  id: 'getWorkspaceEmbeddingStatusQuery' as const,
+  operationName: 'getWorkspaceEmbeddingStatus',
+  definitionName: 'queryWorkspaceEmbeddingStatus',
+  containsFile: false,
+  query: `
+query getWorkspaceEmbeddingStatus($workspaceId: String!) {
+  queryWorkspaceEmbeddingStatus(workspaceId: $workspaceId) {
+    total
+    embedded
+  }
+}`,
+};
+
+export const queueWorkspaceEmbeddingMutation = {
+  id: 'queueWorkspaceEmbeddingMutation' as const,
+  operationName: 'queueWorkspaceEmbedding',
+  definitionName: 'queueWorkspaceEmbedding',
+  containsFile: false,
+  query: `
+mutation queueWorkspaceEmbedding($workspaceId: String!, $docId: [String!]!) {
+  queueWorkspaceEmbedding(workspaceId: $workspaceId, docId: $docId)
 }`,
 };
 

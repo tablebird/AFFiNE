@@ -1,4 +1,8 @@
+import { File } from 'node:buffer';
+
 import { z } from 'zod';
+
+import { parseDoc } from '../../../native';
 
 declare global {
   interface Events {
@@ -67,3 +71,26 @@ export type Embedding = {
   content: string;
   embedding: Array<number>;
 };
+
+export abstract class EmbeddingClient {
+  async getFileEmbeddings(
+    file: File,
+    signal?: AbortSignal
+  ): Promise<Embedding[] | undefined> {
+    if (signal?.aborted) return;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const doc = await parseDoc(file.name, buffer);
+    if (doc && !signal?.aborted) {
+      const input = doc.chunks
+        .toSorted((a, b) => a.index - b.index)
+        .map(chunk => chunk.content);
+      return await this.getEmbeddings(input, signal);
+    }
+    return;
+  }
+
+  abstract getEmbeddings(
+    input: string[],
+    signal?: AbortSignal
+  ): Promise<Embedding[]>;
+}

@@ -9,6 +9,7 @@ import { AuthService } from '../core/auth';
 import { QuotaModule } from '../core/quota';
 import { CopilotModule } from '../plugins/copilot';
 import { CopilotContextService } from '../plugins/copilot/context';
+import { MockEmbeddingClient } from '../plugins/copilot/context/embedding';
 import { prompts, PromptService } from '../plugins/copilot/prompt';
 import {
   CopilotProviderService,
@@ -1268,6 +1269,9 @@ test('should be able to manage context', async t => {
     promptName: 'prompt',
   });
 
+  // use mocked embedding client
+  Sinon.stub(context, 'embeddingClient').get(() => new MockEmbeddingClient());
+
   {
     await t.throwsAsync(
       context.create(randomUUID()),
@@ -1290,8 +1294,27 @@ test('should be able to manage context', async t => {
     );
   }
 
+  const fs = await import('node:fs');
+  const buffer = fs.readFileSync(
+    new URL('../../../../common/native/fixtures/sample.pdf', import.meta.url)
+  );
+  const file = new File([buffer], 'sample.pdf', { type: 'application/pdf' });
+
   {
     const session = await context.create(chatSession);
+
+    const [{ id: fileId }] = (await session.addFile(file, randomUUID())) || [];
+    const list = session.listFiles();
+    t.deepEqual(
+      list.map(f => f.chunk_size),
+      [3],
+      'should split file correctly'
+    );
+    t.deepEqual(
+      list.map(f => f.id),
+      [fileId],
+      'should list file id'
+    );
 
     const docId = randomUUID();
     await session.addDocRecord(docId);
@@ -1300,5 +1323,9 @@ test('should be able to manage context', async t => {
 
     await session.removeDocRecord(docId);
     t.deepEqual(session.listDocs(), [], 'should remove doc id');
+
+    const result = await session.matchFileChunks('test', 2);
+    t.is(result.length, 2, 'should match context');
+    t.is(result[0].fileId, fileId!, 'should match file id');
   }
 });

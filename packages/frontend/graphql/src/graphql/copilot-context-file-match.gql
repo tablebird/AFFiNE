@@ -1,0 +1,8 @@
+mutation matchContext($contextId: String!, $content: String!, $limit: SafeInt) {
+  matchContext(contextId: $contextId, content: $content, limit: $limit) {
+    fileId
+    chunk
+    content
+    distance
+  }
+}

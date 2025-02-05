@@ -1,12 +1,13 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["native", "debian-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
-  previewFeatures = ["metrics", "relationJoins", "nativeDistinct"]
+  previewFeatures = ["metrics", "relationJoins", "nativeDistinct", "postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
 }
 
 model User {
@@ -272,6 +273,8 @@ model Snapshot {
   // we need to clear all hanging updates and snapshots before enable the foreign key on workspaceId
   // workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
+  embedding AiWorkspaceEmbedding?
+
   @@id([workspaceId, id])
   @@index([workspaceId, updatedAt])
   @@map("snapshots")
@@ -417,9 +420,49 @@ model AiContext {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  session AiSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  embeddings AiContextEmbedding[]
+  session    AiSession            @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@map("ai_contexts")
+}
+
+model AiContextEmbedding {
+  id        String                     @id @default(uuid()) @db.VarChar
+  contextId String                     @map("context_id") @db.VarChar
+  fileId    String                     @map("file_id") @db.VarChar
+  // a file can be divided into multiple chunks and embedded separately.
+  chunk     Int                        @db.Integer
+  content   String                     @db.VarChar
+  embedding Unsupported("vector(512)")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  context AiContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
+
+  @@unique([contextId, fileId, chunk])
+  @@index([embedding], map: "ai_context_embeddings_idx")
+  @@map("ai_context_embeddings")
+}
+
+model AiWorkspaceEmbedding {
+  workspaceId String                     @map("workspace_id") @db.VarChar
+  docId       String                     @map("doc_id") @db.VarChar
+  // a doc can be divided into multiple chunks and embedded separately.
+  chunk       Int                        @db.Integer
+  content     String                     @db.VarChar
+  embedding   Unsupported("vector(512)")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  // workspace level search not available for non-cloud workspaces
+  // so we can match this record with the snapshot one by one
+  snapshot Snapshot @relation(fields: [workspaceId, docId], references: [workspaceId, id], onDelete: Cascade)
+
+  @@id([workspaceId, docId])
+  @@index([embedding], map: "ai_workspace_embeddings_idx")
+  @@map("ai_workspace_embeddings")
 }
 
 model DataMigration {

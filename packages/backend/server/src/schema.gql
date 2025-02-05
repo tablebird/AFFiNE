@@ -7,6 +7,12 @@ input AddContextDocInput {
   docId: String!
 }
 
+input AddContextFileInput {
+  blobId: String!
+  contextId: String!
+  fileName: String!
+}
+
 type AlreadyInSpaceDataType {
   spaceId: String!
 }
@@ -36,6 +42,25 @@ enum ContextFileStatus {
   processing
 }
 
+type ContextMatchedDocChunk {
+  chunk: SafeInt!
+  content: String!
+  distance: Float
+  docId: String!
+}
+
+type ContextMatchedFileChunk {
+  chunk: SafeInt!
+  content: String!
+  distance: Float
+  fileId: String!
+}
+
+type ContextWorkspaceEmbeddingStatus {
+  embedded: SafeInt!
+  total: SafeInt!
+}
+
 type Copilot {
   """Get the session list of actions in the workspace"""
   actions: [String!]!
@@ -53,13 +78,14 @@ type Copilot {
 }
 
 type CopilotContext {
+  createdAt: SafeInt!
+
   """list files in context"""
   docs: [CopilotContextDoc!]!
 
   """list files in context"""
   files: [CopilotContextFile!]!
   id: ID!
-  workspaceId: String!
 }
 
 type CopilotContextDoc {
@@ -648,6 +674,9 @@ type Mutation {
 
   """add a doc to context"""
   addContextDoc(options: AddContextDocInput!): [CopilotContextListItem!]!
+
+  """add a file to context"""
+  addContextFile(content: Upload!, options: AddContextFileInput!): [CopilotContextListItem!]!
   addWorkspaceFeature(feature: FeatureType!, workspaceId: String!): Boolean!
   approveMember(userId: String!, workspaceId: String!): String!
   cancelSubscription(idempotencyKey: String @deprecated(reason: "use header `Idempotency-Key`"), plan: SubscriptionPlan = Pro, workspaceId: String): SubscriptionType!
@@ -701,8 +730,17 @@ type Mutation {
   invite(email: String!, permission: Permission @deprecated(reason: "never used"), sendInviteMail: Boolean, workspaceId: String!): String!
   inviteBatch(emails: [String!]!, sendInviteMail: Boolean, workspaceId: String!): [InviteResult!]!
   leaveWorkspace(sendLeaveMail: Boolean, workspaceId: String!, workspaceName: String @deprecated(reason: "no longer used")): Boolean!
+
+  """remove a file from context"""
+  matchContext(content: String!, contextId: String!, limit: SafeInt): [ContextMatchedFileChunk!]!
+
+  """match workspace doc"""
+  matchWorkspaceContext(content: String!, contextId: String!, limit: SafeInt): ContextMatchedDocChunk!
   publishDoc(docId: String!, mode: PublicDocMode = Page, workspaceId: String!): DocType!
   publishPage(mode: PublicDocMode = Page, pageId: String!, workspaceId: String!): DocType! @deprecated(reason: "use publishDoc instead")
+
+  """queue workspace doc embedding"""
+  queueWorkspaceEmbedding(docId: [String!]!, workspaceId: String!): Boolean!
   recoverDoc(guid: String!, timestamp: DateTime!, workspaceId: String!): DateTime!
   releaseDeletedBlobs(workspaceId: String!): Boolean!
 
@@ -711,6 +749,9 @@ type Mutation {
 
   """remove a doc from context"""
   removeContextDoc(options: RemoveContextFileInput!): Boolean!
+
+  """remove a file from context"""
+  removeContextFile(options: RemoveContextFileInput!): Boolean!
   removeWorkspaceFeature(feature: FeatureType!, workspaceId: String!): Boolean!
   resumeSubscription(idempotencyKey: String @deprecated(reason: "use header `Idempotency-Key`"), plan: SubscriptionPlan = Pro, workspaceId: String): SubscriptionType!
   revoke(userId: String!, workspaceId: String!): Boolean!
@@ -837,6 +878,9 @@ type Query {
   """List all copilot prompts"""
   listCopilotPrompts: [CopilotPromptType!]!
   prices: [SubscriptionPrice!]!
+
+  """query workspace embedding status"""
+  queryWorkspaceEmbeddingStatus(workspaceId: String!): ContextWorkspaceEmbeddingStatus!
 
   """server config"""
   serverConfig: ServerConfigType!

@@ -1,0 +1,8 @@
+mutation matchWorkspaceContext($contextId: String!, $content: String!, $limit: SafeInt) {
+  matchWorkspaceContext(contextId: $contextId, content: $content, limit: $limit) {
+    docId
+    chunk
+    content
+    distance
+  }
+}

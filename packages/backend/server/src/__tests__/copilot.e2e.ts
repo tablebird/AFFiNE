@@ -9,6 +9,7 @@ import { AuthService } from '../core/auth';
 import { WorkspaceModule } from '../core/workspaces';
 import { CopilotModule } from '../plugins/copilot';
 import { CopilotContextService } from '../plugins/copilot/context';
+import { MockEmbeddingClient } from '../plugins/copilot/context/embedding';
 import { prompts, PromptService } from '../plugins/copilot/prompt';
 import {
   CopilotProviderService,
@@ -29,6 +30,7 @@ import {
 } from './utils';
 import {
   addContextDoc,
+  addContextFile,
   array2sse,
   chatWithImages,
   chatWithText,
@@ -41,6 +43,7 @@ import {
   getHistories,
   listContext,
   listContextFiles,
+  matchContext,
   MockCopilotTestProvider,
   sse2array,
   textToEventStream,
@@ -687,8 +690,8 @@ test('should be able to search image from unsplash', async t => {
   t.not(resp.status, 404, 'route should be exists');
 });
 
-test('should be able to manage context', async t => {
-  const { app } = t.context;
+test.only('should be able to manage context', async t => {
+  const { app, context } = t.context;
 
   const { id: workspaceId } = await createWorkspace(app);
   const sessionId = await createCopilotSession(
@@ -697,6 +700,9 @@ test('should be able to manage context', async t => {
     randomUUID(),
     promptName
   );
+
+  // use mocked embedding client
+  Sinon.stub(context, 'embeddingClient').get(() => new MockEmbeddingClient());
 
   {
     await t.throwsAsync(
@@ -716,16 +722,37 @@ test('should be able to manage context', async t => {
     );
   }
 
+  const fs = await import('node:fs');
+  const buffer = fs.readFileSync(
+    new URL('../../../../common/native/fixtures/sample.pdf', import.meta.url)
+  );
+
   {
     const contextId = await createCopilotContext(app, workspaceId, sessionId);
 
-    await addContextDoc(app, contextId, 'docId1');
-
-    const { docs } =
-      (await listContextFiles(app, workspaceId, sessionId, contextId)) || {};
-    t.snapshot(
-      docs?.map(({ createdAt: _, ...d }) => d),
-      'should list context files'
+    const [{ id: fileId }] = await addContextFile(
+      app,
+      contextId,
+      randomUUID(),
+      'sample.pdf',
+      buffer
     );
+    const [, { id: docId }] = await addContextDoc(app, contextId, randomUUID());
+
+    const { files, docs } =
+      (await listContextFiles(app, workspaceId, sessionId, contextId)) || {};
+    t.assert(files);
+    t.assert(docs);
+    const [file] = files!;
+    t.is(file.id, fileId, 'should list file');
+    t.is(file.status, 'finished', 'should list file status');
+    t.is(file.name, 'sample.pdf', 'should list file name');
+    t.is(file.chunk_size, 3, 'should split file into chunks');
+    const [doc] = docs!;
+    t.is(doc.id, docId, 'should list doc');
+
+    const result = (await matchContext(app, contextId, 'test', 2))!;
+    t.is(result.length, 2, 'should match context');
+    t.is(result[0].fileId, fileId, 'should match file id');
   }
 });

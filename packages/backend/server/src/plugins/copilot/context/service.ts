@@ -1,30 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import OpenAI from 'openai';
 
 import {
   Cache,
+  Config,
   CopilotInvalidContext,
   CopilotSessionNotFound,
+  NoCopilotProviderAvailable,
+  PrismaTransaction,
 } from '../../../base';
+import { OpenAIEmbeddingClient } from './embedding';
 import { ContextSession } from './session';
-import { ContextConfig, ContextConfigSchema } from './types';
+import { ContextConfig, ContextConfigSchema, EmbeddingClient } from './types';
 
 const CONTEXT_SESSION_KEY = 'context-session';
 
 @Injectable()
 export class CopilotContextService {
+  private readonly client: EmbeddingClient | undefined;
+
   constructor(
+    config: Config,
     private readonly cache: Cache,
     private readonly db: PrismaClient
-  ) {}
+  ) {
+    const configure = config.plugins.copilot.openai;
+    if (configure) {
+      this.client = new OpenAIEmbeddingClient(new OpenAI(configure));
+    }
+  }
+
+  // public this client to allow overriding in tests
+  get embeddingClient() {
+    return this.client as EmbeddingClient;
+  }
 
   private async saveConfig(
     contextId: string,
     config: ContextConfig,
+    tx?: PrismaTransaction,
     refreshCache = false
   ): Promise<void> {
     if (!refreshCache) {
-      await this.db.aiContext.update({
+      const executor = tx || this.db;
+      await executor.aiContext.update({
         where: { id: contextId },
         data: { config },
       });
@@ -42,8 +62,10 @@ export class CopilotContextService {
       const config = ContextConfigSchema.safeParse(cachedSession);
       if (config.success) {
         return new ContextSession(
+          this.embeddingClient,
           contextId,
           config.data,
+          this.db,
           this.saveConfig.bind(this, contextId)
         );
       }
@@ -60,8 +82,14 @@ export class CopilotContextService {
     config: ContextConfig
   ): Promise<ContextSession> {
     const dispatcher = this.saveConfig.bind(this, contextId);
-    await dispatcher(config, true);
-    return new ContextSession(contextId, config, dispatcher);
+    await dispatcher(config, undefined, true);
+    return new ContextSession(
+      this.embeddingClient,
+      contextId,
+      config,
+      this.db,
+      dispatcher
+    );
   }
 
   async create(sessionId: string): Promise<ContextSession> {
@@ -72,10 +100,6 @@ export class CopilotContextService {
     if (!session) {
       throw new CopilotSessionNotFound();
     }
-
-    // keep the context unique per session
-    const existsContext = await this.getBySessionId(sessionId);
-    if (existsContext) return existsContext;
 
     const context = await this.db.aiContext.create({
       data: {
@@ -89,6 +113,10 @@ export class CopilotContextService {
   }
 
   async get(id: string): Promise<ContextSession> {
+    if (!this.embeddingClient) {
+      throw new NoCopilotProviderAvailable('embedding client not configured');
+    }
+
     const context = await this.getCachedSession(id);
     if (context) return context;
     const ret = await this.db.aiContext.findUnique({
@@ -102,12 +130,14 @@ export class CopilotContextService {
     throw new CopilotInvalidContext({ contextId: id });
   }
 
-  async getBySessionId(sessionId: string): Promise<ContextSession | null> {
-    const existsContext = await this.db.aiContext.findFirst({
+  async list(sessionId: string): Promise<{ id: string; createdAt: number }[]> {
+    const contexts = await this.db.aiContext.findMany({
       where: { sessionId },
-      select: { id: true },
+      select: { id: true, createdAt: true },
     });
-    if (existsContext) return this.get(existsContext.id);
-    return null;
+    return contexts.map(c => ({
+      id: c.id,
+      createdAt: c.createdAt.getTime(),
+    }));
   }
 }
