@@ -204,13 +204,13 @@ test.describe('edgeless text block', () => {
       )!;
       return container.getBoundingClientRect();
     });
-    const model = await page.evaluate(() => {
+    const modelXYWH = await page.evaluate(() => {
       const block = window.host.view.getBlock(
         '4'
       ) as EdgelessTextBlockComponent;
-      return block.model;
+      return block.model.xywh;
     });
-    const bound = Bound.deserialize(model.xywh);
+    const bound = Bound.deserialize(modelXYWH);
     expect(rect.width).toBeCloseTo(bound.w);
     expect(rect.height).toBeCloseTo(bound.h);
   });

@@ -433,6 +433,10 @@ export class SurfaceBlockModel extends BlockModel<SurfaceBlockProps> {
     this._watchGroupRelationChange();
   }
 
+  getConstructor(type: string) {
+    return this._elementCtorMap[type];
+  }
+
   addElement<T extends object = Record<string, unknown>>(
     props: Partial<T> & { type: string }
   ) {

@@ -2,6 +2,7 @@ import type { Slot } from '@blocksuite/global/utils';
 
 import type { DraftModel, Store } from '../model/index.js';
 import type { AssetsManager } from './assets.js';
+import type { BaseBlockTransformer } from './base.js';
 import type { Slice } from './slice.js';
 import type {
   BlockSnapshot,
@@ -35,6 +36,8 @@ export type BeforeExportPayload =
   | {
       model: DraftModel;
       type: 'block';
+      action: 'default' | 'skip';
+      transformer: BaseBlockTransformer;
     }
   | {
       page: Store;

@@ -15,7 +15,7 @@ import {
 
 export class RectHelper {
   private readonly _getHoveredBlocks = (): BlockComponent[] => {
-    if (!this.widget.isHoverDragHandleVisible || !this.widget.anchorBlockId)
+    if (!this.widget.isBlockDragHandleVisible || !this.widget.anchorBlockId)
       return [];
 
     const hoverBlock = this.widget.anchorBlockComponent.peek();

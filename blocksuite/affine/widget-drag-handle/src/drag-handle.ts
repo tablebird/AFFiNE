@@ -4,10 +4,9 @@ import { DocModeProvider } from '@blocksuite/affine-shared/services';
 import {
   isInsideEdgelessEditor,
   isInsidePageEditor,
-  isTopLevelBlock,
 } from '@blocksuite/affine-shared/utils';
 import { type BlockComponent, WidgetComponent } from '@blocksuite/block-std';
-import type { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
+import type { GfxModel } from '@blocksuite/block-std/gfx';
 import {
   DisposableGroup,
   type IVec,
@@ -15,8 +14,9 @@ import {
   type Rect,
 } from '@blocksuite/global/utils';
 import { computed, type ReadonlySignal, signal } from '@preact/signals-core';
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { query, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { AFFINE_DRAG_HANDLE_WIDGET } from './consts.js';
@@ -53,11 +53,12 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     this.dragHoverRect = null;
     this.anchorBlockId.value = null;
     this.isDragHandleHovered = false;
-    this.isHoverDragHandleVisible = false;
-    this.isTopLevelDragHandleVisible = false;
 
     this.pointerEventWatcher.reset();
   };
+
+  @state()
+  accessor activeDragHandle: 'block' | 'gfx' | null = null;
 
   anchorBlockId = signal<string | null>(null);
 
@@ -67,16 +68,14 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     return this.std.view.getBlock(this.anchorBlockId.value);
   });
 
-  anchorEdgelessElement: ReadonlySignal<GfxBlockElementModel | null> = computed(
-    () => {
-      if (!this.anchorBlockId.value) return null;
-      if (this.mode === 'page') return null;
+  anchorEdgelessElement: ReadonlySignal<GfxModel | null> = computed(() => {
+    if (!this.anchorBlockId.value) return null;
+    if (this.mode === 'page') return null;
 
-      const crud = this.std.get(EdgelessCRUDIdentifier);
-      const edgelessElement = crud.getElementById(this.anchorBlockId.value);
-      return isTopLevelBlock(edgelessElement) ? edgelessElement : null;
-    }
-  );
+    const crud = this.std.get(EdgelessCRUDIdentifier);
+    const edgelessElement = crud.getElementById(this.anchorBlockId.value);
+    return edgelessElement;
+  });
 
   // Single block: drag handle should show on the vertical middle of the first line of element
   center: IVec = [0, 0];
@@ -115,14 +114,17 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     if (this.dragging && !force) return;
     updateDragHandleClassName();
 
-    this.isHoverDragHandleVisible = false;
-    this.isTopLevelDragHandleVisible = false;
     this.isDragHandleHovered = false;
 
     this.anchorBlockId.value = null;
+    this.activeDragHandle = null;
 
     if (this.dragHandleContainer) {
+      this.dragHandleContainer.removeAttribute('style');
       this.dragHandleContainer.style.display = 'none';
+    }
+    if (this.dragHandleGrabber) {
+      this.dragHandleGrabber.removeAttribute('style');
     }
 
     if (force) {
@@ -132,9 +134,13 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   isDragHandleHovered = false;
 
-  isHoverDragHandleVisible = false;
+  get isBlockDragHandleVisible() {
+    return this.activeDragHandle === 'block';
+  }
 
-  isTopLevelDragHandleVisible = false;
+  get isGfxDragHandleVisible() {
+    return this.activeDragHandle === 'gfx';
+  }
 
   noteScale = signal(1);
 
@@ -190,7 +196,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   override render() {
     const hoverRectStyle = styleMap(
-      this.dragHoverRect
+      this.dragHoverRect && this.activeDragHandle
         ? {
             width: `${this.dragHoverRect.width}px`,
             height: `${this.dragHoverRect.height}px`,
@@ -201,11 +207,27 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
             display: 'none',
           }
     );
+    const isGfx = this.activeDragHandle === 'gfx';
+    const classes = {
+      'affine-drag-handle-grabber': true,
+      dots: isGfx ? true : false,
+    };
 
     return html`
       <div class="affine-drag-handle-widget">
-        <div class="affine-drag-handle-container" draggable="true">
-          <div class="affine-drag-handle-grabber"></div>
+        <div class="affine-drag-handle-container">
+          <div class=${classMap(classes)}>
+            ${isGfx
+              ? html`
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                `
+              : nothing}
+          </div>
         </div>
         <div class="affine-drag-hover-rect" style=${hoverRectStyle}></div>
       </div>

@@ -151,7 +151,7 @@ export const isOutOfNoteBlock = (
 };
 
 export const getParentNoteBlock = (blockComponent: BlockComponent) => {
-  return blockComponent.closest('affine-note') ?? null;
+  return blockComponent.closest('affine-note, affine-edgeless-note') ?? null;
 };
 
 export const getClosestNoteBlock = (

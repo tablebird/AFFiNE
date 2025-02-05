@@ -1,17 +1,16 @@
 import { ParagraphBlockComponent } from '@blocksuite/affine-block-paragraph';
-import {
-  addNoteAtPoint,
-  getSurfaceBlock,
-  SurfaceBlockModel,
-} from '@blocksuite/affine-block-surface';
+import { SurfaceBlockModel } from '@blocksuite/affine-block-surface';
 import { DropIndicator } from '@blocksuite/affine-components/drop-indicator';
 import {
   AttachmentBlockModel,
   BookmarkBlockModel,
   DatabaseBlockModel,
+  DEFAULT_NOTE_HEIGHT,
+  DEFAULT_NOTE_WIDTH,
   type EmbedCardStyle,
   ListBlockModel,
   NoteBlockModel,
+  RootBlockModel,
 } from '@blocksuite/affine-model';
 import {
   BLOCK_CHILDREN_CONTAINER_PADDING_LEFT,
@@ -31,19 +30,38 @@ import {
   matchFlavours,
 } from '@blocksuite/affine-shared/utils';
 import {
-  type BlockComponent,
+  BlockComponent,
   type BlockStdScope,
   type DragFromBlockSuite,
   type DragPayload,
   type DropPayload,
-  isGfxBlockComponent,
 } from '@blocksuite/block-std';
-import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
-import { Bound, last, Point, Rect } from '@blocksuite/global/utils';
-import { Slice, type SliceSnapshot } from '@blocksuite/store';
+import {
+  GfxControllerIdentifier,
+  GfxGroupLikeElementModel,
+  type GfxModel,
+  GfxPrimitiveElementModel,
+  isGfxGroupCompatibleModel,
+} from '@blocksuite/block-std/gfx';
+import {
+  assertType,
+  Bound,
+  groupBy,
+  last,
+  Point,
+  Rect,
+  type SerializedXYWH,
+} from '@blocksuite/global/utils';
+import {
+  type BlockModel,
+  type BlockSnapshot,
+  Slice,
+  type SliceSnapshot,
+} from '@blocksuite/store';
 
 import type { AffineDragHandleWidget } from '../drag-handle.js';
 import { PreviewHelper } from '../helpers/preview-helper.js';
+import { gfxBlocksFilter } from '../middleware/blocks-filter.js';
 import { newIdCrossDoc } from '../middleware/new-id-cross-doc.js';
 import { reorderList } from '../middleware/reorder-list';
 import { surfaceRefToEmbed } from '../middleware/surface-ref-to-embed.js';
@@ -57,6 +75,10 @@ import {
 
 export type DragBlockEntity = {
   type: 'blocks';
+  /**
+   * The mode that the blocks are dragged from
+   */
+  fromMode: 'block' | 'gfx';
   snapshot?: SliceSnapshot;
   modelIds: string[];
 };
@@ -87,34 +109,9 @@ export class DragEventWatcher {
     return this.widget.std;
   }
 
-  private get _gfx() {
+  get gfx() {
     return this.widget.std.get(GfxControllerIdentifier);
   }
-
-  private readonly _computeEdgelessBound = (
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ) => {
-    const border = 2;
-    const noteScale = this.widget.noteScale.peek();
-    const { viewport } = this._gfx;
-    const { left: viewportLeft, top: viewportTop } = viewport;
-    const currentViewBound = new Bound(
-      x - viewportLeft,
-      y - viewportTop,
-      width + border / noteScale,
-      height + border / noteScale
-    );
-    const currentModelBound = viewport.toModelBound(currentViewBound);
-    return new Bound(
-      currentModelBound.x,
-      currentModelBound.y,
-      width * noteScale,
-      height * noteScale
-    );
-  };
 
   private readonly _createDropIndicator = () => {
     if (!this.dropIndicator) {
@@ -146,6 +143,23 @@ export class DragEventWatcher {
     this._updateDropIndicator(point, payload, dropPayload, block);
   };
 
+  private readonly _getFallbackInsertPlace = (block: BlockModel) => {
+    const store = this.std.store;
+    let curBlock: BlockModel | null = block;
+
+    while (curBlock) {
+      const parent = store.getParent(curBlock);
+
+      if (parent && matchFlavours(parent, [NoteBlockModel])) {
+        return curBlock;
+      }
+
+      curBlock = parent;
+    }
+
+    return null;
+  };
+
   /**
    * When dragging, should update indicator position and target drop block id
    */
@@ -167,36 +181,63 @@ export class DragEventWatcher {
 
     const isDropOnNoteBlock = matchFlavours(model, [NoteBlockModel]);
 
+    const schema = this.std.store.schema;
     const edge = dropPayload.edge;
     const scale = this.widget.scale.peek();
-    let result: DropResult;
+    let result: DropResult | null = null;
 
     if (edge === 'right' && matchFlavours(dropBlock.model, [ListBlockModel])) {
       const domRect = getRectByBlockComponent(dropBlock);
       const placement = 'in';
-      const rect = Rect.fromLWTH(
-        domRect.left + BLOCK_CHILDREN_CONTAINER_PADDING_LEFT,
-        domRect.width - BLOCK_CHILDREN_CONTAINER_PADDING_LEFT,
-        domRect.top + domRect.height,
-        3 * scale
-      );
 
-      result = {
-        placement,
-        rect,
-        modelState: {
-          model: dropBlock.model,
-          rect: domRect,
-          element: dropBlock,
-        },
-      };
+      if (
+        snapshot.content.every(block =>
+          schema.safeValidate(block.flavour, 'affine:list')
+        )
+      ) {
+        const rect = Rect.fromLWTH(
+          domRect.left + BLOCK_CHILDREN_CONTAINER_PADDING_LEFT,
+          domRect.width - BLOCK_CHILDREN_CONTAINER_PADDING_LEFT,
+          domRect.top + domRect.height,
+          3 * scale
+        );
+
+        result = {
+          placement,
+          rect,
+          modelState: {
+            model: dropBlock.model,
+            rect: domRect,
+            element: dropBlock,
+          },
+        };
+      } else {
+        const fallbackModel = this._getFallbackInsertPlace(dropBlock.model);
+
+        if (fallbackModel) {
+          const fallbackModelView = this.std.view.getBlock(fallbackModel.id)!;
+          const domRect = fallbackModelView?.getBoundingClientRect();
+
+          result = {
+            placement: 'after',
+            rect: Rect.fromLWTH(
+              domRect.left,
+              domRect.width,
+              domRect.top + domRect.height,
+              3 * scale
+            ),
+            modelState: {
+              model: fallbackModel,
+              rect: domRect,
+              element: fallbackModelView,
+            },
+          };
+        }
+      }
     } else {
       const placement =
         isDropOnNoteBlock &&
-        this.widget.doc.schema.safeValidate(
-          snapshot.content[0].flavour,
-          'affine:note'
-        )
+        schema.safeValidate(snapshot.content[0].flavour, 'affine:note')
           ? 'in'
           : edge === 'top'
             ? 'before'
@@ -266,16 +307,86 @@ export class DragEventWatcher {
     }
   };
 
-  private readonly _getSnapshotFromHoveredBlocks = () => {
-    const hoverBlock = this.widget.anchorBlockComponent.peek()!;
-    const isInSurface = isGfxBlockComponent(hoverBlock);
+  private readonly _getSnapshotFromSelectedGfxElms = () => {
+    const selectedElmId = this.widget.anchorBlockId.peek()!;
+    const selectedElm = this.gfx.getElementById(selectedElmId);
 
-    if (isInSurface) {
+    if (!selectedElm) {
       return {
-        models: [hoverBlock.model],
-        snapshot: this._toSnapshot([hoverBlock]),
+        snapshot: undefined,
       };
     }
+
+    const getElementsInContainer = (
+      elem: GfxModel,
+      selectedElements: string[] = []
+    ) => {
+      selectedElements.push(elem.id);
+
+      if (isGfxGroupCompatibleModel(elem)) {
+        elem.childElements.forEach(child => {
+          getElementsInContainer(child, selectedElements);
+        });
+      }
+
+      return selectedElements;
+    };
+    const toSnapshotRequiredBlocks = (models: string[]) => {
+      let surfaceAdded = false;
+      const blocks: BlockModel[] = [];
+
+      models.forEach(id => {
+        const model = this.gfx.getElementById(id);
+
+        if (!model) {
+          return;
+        }
+
+        if (model instanceof GfxPrimitiveElementModel) {
+          if (surfaceAdded) return;
+          surfaceAdded = true;
+          blocks.push(this.gfx.surface!);
+        } else {
+          const parentModel = this.std.store.getParent(model);
+
+          if (matchFlavours(parentModel, [SurfaceBlockModel])) {
+            if (surfaceAdded) return;
+            surfaceAdded = true;
+            blocks.push(this.gfx.surface!);
+          } else {
+            blocks.push(model);
+          }
+        }
+      });
+
+      return blocks;
+    };
+
+    const selectedElements = getElementsInContainer(
+      selectedElm as GfxModel,
+      []
+    );
+    const blocksOfSnapshot = toSnapshotRequiredBlocks(selectedElements);
+
+    return {
+      snapshot: this._toSnapshot(blocksOfSnapshot, [selectedElmId]),
+    };
+  };
+
+  private readonly _getDraggedSnapshot = () => {
+    const { snapshot } =
+      this.widget.activeDragHandle === 'block'
+        ? this._getSnapshotFromHoveredBlocks()
+        : this._getSnapshotFromSelectedGfxElms();
+
+    return {
+      fromMode: this.widget.activeDragHandle!,
+      snapshot,
+    };
+  };
+
+  private readonly _getSnapshotFromHoveredBlocks = () => {
+    const hoverBlock = this.widget.anchorBlockComponent.peek()!;
 
     let selections = this.widget.selectionHelper.selectedBlocks;
 
@@ -338,51 +449,194 @@ export class DragEventWatcher {
     ) as BlockComponent[];
 
     return {
-      models: blocksExcludingChildren.map(block => block.model),
       snapshot: this._toSnapshot(blocksExcludingChildren),
     };
   };
 
-  private readonly _onDrop = (
+  private readonly _onEdgelessDrop = (
     dropBlock: BlockComponent,
     dragPayload: DragBlockPayload,
     dropPayload: DropPayload,
     point: Point
+  ) => {
+    /**
+     * When drag gfx elements from edgeless editor to other editor, there's some limitation:
+     * - when drop on the place other than note block, edgeless content can't be drag and drop within the same doc
+     * - when drop on note block, handle the drop data in the same way as it in page editor,
+     *   and it will filter out the block that can't be placed under note block
+     * - drop data will be wrapped in a note block if it can't be placed under surface block or root block
+     */
+    if (matchFlavours(dropBlock.model, [RootBlockModel])) {
+      // can't drop edgeless content on the same doc
+      if (
+        dragPayload.bsEntity?.fromMode === 'gfx' &&
+        dragPayload.from?.docId === this.widget.doc.id
+      ) {
+        return;
+      }
+
+      const surfaceBlockModel = this.gfx.surface;
+      const snapshot = dragPayload?.bsEntity?.snapshot;
+
+      if (!snapshot || !surfaceBlockModel) {
+        return;
+      }
+
+      if (dragPayload.bsEntity?.fromMode === 'gfx') {
+        this._mergeSnapshotToCurDoc(snapshot, point).catch(console.error);
+      } else {
+        this._dropAsGfxBlock(snapshot, point);
+      }
+    } else {
+      this._onPageDrop(dropBlock, dragPayload, dropPayload, point);
+    }
+  };
+
+  private readonly _onPageDrop = (
+    dropBlock: BlockComponent,
+    dragPayload: DragBlockPayload,
+    dropPayload: DropPayload,
+    _: Point
   ) => {
     const result = this._getDropResult(dropBlock, dragPayload, dropPayload);
     const snapshot = dragPayload?.bsEntity?.snapshot;
 
     if (!result || !snapshot || snapshot.content.length === 0) return;
 
-    {
-      const isEdgelessContainer = dropBlock.closest('.edgeless-container');
-      if (isEdgelessContainer) {
-        // drop to edgeless container
-        this._onDropOnEdgelessCanvas(
-          dropBlock,
-          dragPayload,
-          dropPayload,
-          point
-        );
-        return;
-      }
-    }
-
+    const store = this.std.store;
+    const schema = store.schema;
     const model = result.modelState.model;
     const parent =
-      result.placement === 'in' ? model : this.std.store.getParent(model);
-
-    if (!parent) return;
-    if (matchFlavours(parent, [SurfaceBlockModel])) {
-      return;
-    }
-
+      result.placement === 'in' ? model : this.std.store.getParent(model)!;
     const index =
       result.placement === 'in'
         ? 0
         : parent.children.indexOf(model) +
           (result.placement === 'before' ? 0 : 1);
 
+    if (!parent) return;
+
+    if (dragPayload.bsEntity?.fromMode === 'gfx') {
+      if (!matchFlavours(parent, [NoteBlockModel])) {
+        return;
+      }
+
+      // if not all blocks can be dropped in note block, merge the snapshot to the current doc
+      if (
+        !snapshot.content.every(block =>
+          schema.safeValidate(block.flavour, 'affine:note')
+        ) &&
+        // if all blocks are note blocks, merge it to the current parent note
+        !snapshot.content.every(block => block.flavour === 'affine:note')
+      ) {
+        // merge the snapshot to the current doc if the snapshot comes from other doc
+        if (dragPayload.from?.docId !== this.widget.doc.id) {
+          this._mergeSnapshotToCurDoc(snapshot)
+            .then(idRemap => {
+              let largestElem!: {
+                size: number;
+                id: string;
+              };
+
+              idRemap.forEach(val => {
+                const gfxElement = this.gfx.getElementById(val) as GfxModel;
+
+                if (gfxElement?.elementBound) {
+                  const elemBound = gfxElement.elementBound;
+                  largestElem =
+                    (largestElem?.size ?? 0) < elemBound.w * elemBound.h
+                      ? { size: elemBound.w * elemBound.h, id: val }
+                      : largestElem;
+                }
+              });
+
+              if (!largestElem) {
+                store.addBlock(
+                  'affine:embed-linked-doc',
+                  {
+                    pageId: store.doc.id,
+                  },
+                  parent.id,
+                  index
+                );
+              } else {
+                store.addBlock(
+                  'affine:surface-ref',
+                  {
+                    reference: largestElem.id,
+                  },
+                  parent.id,
+                  index
+                );
+              }
+            })
+            .catch(console.error);
+        }
+        // otherwise, just to create a surface-ref block
+        else {
+          let largestElem!: {
+            size: number;
+            id: string;
+          };
+
+          const walk = (block: BlockSnapshot) => {
+            if (block.flavour === 'affine:surface') {
+              Object.values(
+                block.props.elements as Record<
+                  string,
+                  { id: string; xywh: SerializedXYWH }
+                >
+              ).forEach(elem => {
+                if (elem.xywh) {
+                  const bound = Bound.deserialize(elem.xywh);
+                  const size = bound.w * bound.h;
+                  if ((largestElem?.size ?? 0) < size) {
+                    largestElem = { size, id: elem.id };
+                  }
+                }
+              });
+              block.children.forEach(walk);
+            } else {
+              if (block.props.xywh) {
+                const bound = Bound.deserialize(
+                  block.props.xywh as SerializedXYWH
+                );
+                const size = bound.w * bound.h;
+                if ((largestElem?.size ?? 0) < size) {
+                  largestElem = { size, id: block.id };
+                }
+              }
+            }
+          };
+
+          snapshot.content.forEach(walk);
+
+          if (largestElem) {
+            store.addBlock(
+              'affine:surface-ref',
+              {
+                reference: largestElem.id,
+              },
+              parent.id,
+              index
+            );
+          } else {
+            store.addBlock(
+              'affine:embed-linked-doc',
+              {
+                pageId: store.doc.id,
+              },
+              parent.id,
+              index
+            );
+          }
+        }
+
+        return;
+      }
+    }
+
+    // drop a note on other note
     if (matchFlavours(parent, [NoteBlockModel])) {
       const [first] = snapshot.content;
       if (first.flavour === 'affine:note') {
@@ -393,6 +647,7 @@ export class DragEventWatcher {
       }
     }
 
+    // drop on the same place, do nothing
     if (
       (dragPayload.from?.docId === this.widget.doc.id &&
         result.placement === 'after' &&
@@ -404,6 +659,19 @@ export class DragEventWatcher {
     }
 
     this._dropToModel(snapshot, parent.id, index).catch(console.error);
+  };
+
+  private readonly _onDrop = (
+    dropBlock: BlockComponent,
+    dragPayload: DragBlockPayload,
+    dropPayload: DropPayload,
+    point: Point
+  ) => {
+    if (this.mode === 'edgeless') {
+      this._onEdgelessDrop(dropBlock, dragPayload, dropPayload, point);
+    } else {
+      this._onPageDrop(dropBlock, dragPayload, dropPayload, point);
+    }
   };
 
   private readonly _onDropNoteOnNote = (
@@ -431,117 +699,397 @@ export class DragEventWatcher {
       .catch(console.error);
   };
 
-  private readonly _onDropOnEdgelessCanvas = (
-    dropBlock: BlockComponent,
-    dragPayload: DragBlockPayload,
-    dropPayload: DropPayload,
-    point: Point
+  /**
+   * Merge the snapshot into the current existing surface model and page model.
+   * This method does the following:
+   * 1. Analyze the snapshot to build the container dependency tree
+   * 2. Merge the snapshot in the correct order to make sure all containers are created after their children
+   * @param snapshot
+   * @param point
+   */
+  private readonly _mergeSnapshotToCurDoc = async (
+    snapshot: SliceSnapshot,
+    point?: Point
   ) => {
-    const surfaceBlockModel = getSurfaceBlock(this.widget.doc);
-    const result = this._getDropResult(dropBlock, dragPayload, dropPayload);
-
-    const snapshot = dragPayload?.bsEntity?.snapshot;
-
-    if (!result || !snapshot || !surfaceBlockModel) {
-      return;
+    if (!point) {
+      const bound = this.gfx.elementsBound;
+      point = new Point(bound.x + bound.w, bound.y + bound.h / 2);
+    } else {
+      point = Point.from(
+        this.gfx.viewport.toModelCoordFromClientCoord([point.x, point.y])
+      );
     }
 
-    const [first] = snapshot.content;
-    if (first.flavour === 'affine:note') return;
+    this._rewriteSnapshotXYWH(snapshot, point);
 
-    if (snapshot.content.length === 1) {
-      const importToSurface = (
-        width: number,
-        height: number,
-        newBound: Bound
-      ) => {
-        first.props.xywh = newBound.serialize();
-        first.props.width = width;
-        first.props.height = height;
+    const surface = this.gfx.surface!;
+    const root = this.std.store.root!;
+    const schema = this.std.store.schema;
+    const containerTree: Record<string, Set<string>> = { root: new Set() };
+    const idRemap = new Map<string, string>();
+    let elemMap: Record<
+      string,
+      { type: string; children?: { json: Record<string, unknown> } }
+    > = {};
+    const blockMap: Record<
+      string,
+      {
+        surfaceChild: boolean;
+        snapshot: BlockSnapshot;
+      }
+    > = {};
 
-        const std = this.std;
-        const job = this._getJob();
-        job
-          .snapshotToSlice(snapshot, std.store, surfaceBlockModel.id)
-          .catch(console.error);
-      };
+    const isGroupLikeElem = (elem: { type: string }) => {
+      const constructor = surface.getConstructor(elem.type);
+      const isGroup = Object.isPrototypeOf.call(
+        GfxGroupLikeElementModel.prototype,
+        constructor
+      );
 
-      if (
-        ['affine:attachment', 'affine:bookmark'].includes(first.flavour) ||
-        first.flavour.startsWith('affine:embed-')
-      ) {
-        const style = (first.props.style ?? 'horizontal') as EmbedCardStyle;
-        const width = EMBED_CARD_WIDTH[style];
-        const height = EMBED_CARD_HEIGHT[style];
+      return isGroup;
+    };
+    const isGroupLikeBlock = (flavour: string) => {
+      const blockModel = schema.get(flavour)?.model.toModel?.();
 
-        const newBound = this._computeEdgelessBound(
-          point.x,
-          point.y,
-          width,
-          height
+      return blockModel && isGfxGroupCompatibleModel(blockModel);
+    };
+
+    // walk through the snapshot to build the container dependency tree
+    const buildContainerTree = (block: BlockSnapshot) => {
+      if (block.flavour === 'affine:surface') {
+        elemMap = (block.props.elements as typeof elemMap) ?? {};
+        Object.entries(elemMap).forEach(([elemId, elem]) => {
+          if (isGroupLikeElem(elem)) {
+            // only add the group to the root if it's not a child of any other element
+            if (
+              Object.values(containerTree).every(
+                childSet => !childSet.has(elemId)
+              )
+            ) {
+              containerTree['root'].add(elem.type);
+            }
+
+            Object.keys(elem.children?.json ?? {}).forEach(childId => {
+              containerTree[elemId] = containerTree[elemId] ?? new Set();
+              containerTree[elemId].add(childId);
+              // if the child was already added to the root, remove it
+              containerTree['root'].delete(childId);
+            });
+          } else {
+            containerTree['root'].add(elemId);
+          }
+        });
+
+        block.children?.forEach(buildContainerTree);
+      } else {
+        const isSurfaceChild = schema.safeValidate(
+          block.flavour,
+          'affine:surface'
         );
-        if (!newBound) return;
+        blockMap[block.id] = {
+          surfaceChild: isSurfaceChild,
+          snapshot: block,
+        };
 
-        if (first.flavour === 'affine:embed-linked-doc') {
-          this._trackLinkedDocCreated(first.id);
+        containerTree['root'].add(block.id);
+
+        if (isGroupLikeBlock(block.flavour)) {
+          Object.keys(block.props.childElementIds ?? {}).forEach(childId => {
+            containerTree[block.id] = containerTree[block.id] ?? new Set();
+            containerTree[block.id].add(childId);
+            // if the child was already added to the root, remove it
+            containerTree['root'].delete(childId);
+          });
+        }
+      }
+    };
+
+    snapshot.content.forEach(buildContainerTree);
+
+    const addInDependencyOrder = async (id: string) => {
+      if (containerTree[id]) {
+        for (const childId of containerTree[id]) {
+          await addInDependencyOrder(childId);
+        }
+      }
+
+      if (blockMap[id]) {
+        const { surfaceChild, snapshot: blockSnapshot } = blockMap[id];
+
+        if (isGroupLikeBlock(blockSnapshot.flavour)) {
+          Object.keys(blockSnapshot.props.childElementIds ?? {}).forEach(
+            childId => {
+              assertType<Record<string, unknown>>(
+                blockSnapshot.props.childElementIds
+              );
+
+              if (idRemap.has(childId)) {
+                const remappedId = idRemap.get(childId)!;
+                blockSnapshot.props.childElementIds[remappedId] =
+                  blockSnapshot.props.childElementIds[childId];
+                delete blockSnapshot.props.childElementIds[childId];
+              } else {
+                delete blockSnapshot.props.childElementIds[childId];
+              }
+            }
+          );
         }
 
-        importToSurface(width, height, newBound);
-        return;
-      }
-
-      if (first.flavour === 'affine:image') {
-        const noteScale = this.widget.noteScale.peek();
-        const width = Number(first.props.width || 100) * noteScale;
-        const height = Number(first.props.height || 100) * noteScale;
-
-        const newBound = this._computeEdgelessBound(
-          point.x,
-          point.y,
-          width,
-          height
+        const slices = await this._dropToModel(
+          {
+            ...snapshot,
+            content: [blockSnapshot],
+          },
+          surfaceChild ? surface.id : root.id
         );
-        if (!newBound) return;
 
-        importToSurface(width, height, newBound);
-        return;
+        if (slices) {
+          idRemap.set(id, slices.content[0].id);
+        }
+      } else if (elemMap[id]) {
+        if (elemMap[id].children) {
+          const childJson = elemMap[id].children.json;
+          Object.keys(childJson).forEach(childId => {
+            if (idRemap.has(childId)) {
+              const remappedId = idRemap.get(childId)!;
+              childJson[remappedId] = childJson[childId];
+              delete childJson[childId];
+            } else {
+              delete childJson[childId];
+            }
+          });
+        }
+        const newId = surface.addElement(elemMap[id]);
+        idRemap.set(id, newId);
       }
+    };
+
+    for (const id of containerTree['root']) {
+      await addInDependencyOrder(id);
     }
 
-    const newNoteId = addNoteAtPoint(
-      this.std,
-      Point.from(
-        this._gfx.viewport.toModelCoordFromClientCoord([point.x, point.y])
-      ),
-      {
-        scale: this.widget.noteScale.peek(),
-      }
-    );
-    const newNoteBlock = this.widget.doc.getBlock(newNoteId)?.model as
-      | NoteBlockModel
-      | undefined;
-    if (!newNoteBlock) return;
-
-    const bound = Bound.deserialize(newNoteBlock.xywh);
-    bound.h *= this.widget.noteScale.peek();
-    bound.w *= this.widget.noteScale.peek();
-    this.widget.doc.updateBlock(newNoteBlock, {
-      xywh: bound.serialize(),
-      edgeless: {
-        ...newNoteBlock.edgeless,
-        scale: this.widget.noteScale.peek(),
-      },
-    });
-
-    this._dropToModel(snapshot, newNoteId).catch(console.error);
+    return idRemap;
   };
 
-  private readonly _toSnapshot = (blocks: BlockComponent[]) => {
+  private readonly _getSnapshotRect = (
+    snapshot: SliceSnapshot
+  ): Bound | null => {
+    let bound: Bound | null = null;
+
+    const getBound = (block: BlockSnapshot) => {
+      if (block.flavour === 'affine:surface') {
+        if (block.props.elements) {
+          Object.values(
+            block.props.elements as Record<string, { xywh: SerializedXYWH }>
+          ).forEach(elem => {
+            if (elem.xywh) {
+              bound = bound
+                ? bound.unite(Bound.deserialize(elem.xywh))
+                : Bound.deserialize(elem.xywh);
+            }
+          });
+        }
+
+        block.children.forEach(getBound);
+      } else if (block.props.xywh) {
+        bound = bound
+          ? bound.unite(Bound.deserialize(block.props.xywh as SerializedXYWH))
+          : Bound.deserialize(block.props.xywh as SerializedXYWH);
+      }
+    };
+
+    snapshot.content.forEach(getBound);
+
+    return bound;
+  };
+
+  /**
+   * Rewrite the xywh of the snapshot to make the top left corner of the snapshot align with the point
+   * @param snapshot
+   * @param point the point in model coordinate
+   * @returns
+   */
+  private readonly _rewriteSnapshotXYWH = (
+    snapshot: SliceSnapshot,
+    point: Point,
+    ignoreOriginalPos: boolean = true
+  ) => {
+    const rect = this._getSnapshotRect(snapshot);
+
+    if (!rect) return;
+    const { x: modelX, y: modelY } = point;
+
+    const rewrite = (block: BlockSnapshot) => {
+      if (block.flavour === 'affine:surface') {
+        if (block.props.elements) {
+          Object.values(
+            block.props.elements as Record<string, { xywh: SerializedXYWH }>
+          ).forEach(elem => {
+            if (elem.xywh) {
+              const elemBound = Bound.deserialize(elem.xywh);
+
+              if (ignoreOriginalPos) {
+                elemBound.x = modelX;
+                elemBound.y = modelY;
+                elem.xywh = elemBound.serialize();
+              } else {
+                elem.xywh = elemBound
+                  .moveDelta(-rect.x + modelX, -rect.y + modelY)
+                  .serialize();
+              }
+            }
+          });
+        }
+        block.children.forEach(rewrite);
+      } else if (block.props.xywh) {
+        const blockBound = Bound.deserialize(
+          block.props.xywh as SerializedXYWH
+        );
+
+        if (
+          block.flavour === 'affine:attachment' ||
+          block.flavour.startsWith('affine:embed-')
+        ) {
+          const style = (block.props.style ?? 'vertical') as EmbedCardStyle;
+          block.props.style = style;
+
+          blockBound.w = EMBED_CARD_WIDTH[style];
+          blockBound.h = EMBED_CARD_HEIGHT[style];
+        }
+
+        if (ignoreOriginalPos) {
+          blockBound.x = modelX;
+          blockBound.y = modelY;
+          block.props.xywh = blockBound.serialize();
+        } else {
+          block.props.xywh = blockBound
+            .moveDelta(-rect.x + modelX, -rect.y + modelY)
+            .serialize();
+        }
+      }
+    };
+
+    snapshot.content.forEach(rewrite);
+  };
+
+  private readonly _dropAsGfxBlock = (
+    snapshot: SliceSnapshot,
+    point: Point
+  ) => {
+    const store = this.widget.std.store;
+    const schema = store.schema;
+
+    point = Point.from(
+      this.gfx.viewport.toModelCoordFromClientCoord([point.x, point.y])
+    );
+
+    // check if all blocks can be dropped as gfx block
+    const groupByParent = groupBy(snapshot.content, block =>
+      schema.safeValidate(block.flavour, 'affine:surface')
+        ? 'affine:surface'
+        : schema.safeValidate(block.flavour, 'affine:page')
+          ? 'affine:page'
+          : // if the parent is not surface or page, it can't be dropped as gfx block
+            // mark it as empty
+            'empty'
+    );
+
+    // empty means all blocks can be dropped as gfx block
+    if (!groupByParent.empty?.length) {
+      // drop as children of surface or page
+
+      if (groupByParent['affine:surface']) {
+        const content = groupByParent['affine:surface'];
+        const surfaceSnapshot = {
+          ...snapshot,
+          content,
+        };
+
+        this._rewriteSnapshotXYWH(surfaceSnapshot, point, true);
+        this._dropToModel(surfaceSnapshot, this.gfx.surface!.id)
+          .then(slices => {
+            slices?.content.forEach((block, idx) => {
+              if (
+                block.flavour === 'affine:attachment' ||
+                block.flavour.startsWith('affine:embed-')
+              ) {
+                store.updateBlock(block as BlockModel, {
+                  xywh: content[idx].props.xywh,
+                  style: content[idx].props.style,
+                });
+              }
+            });
+          })
+          .catch(console.error);
+      }
+
+      if (groupByParent['affine:page']) {
+        const content = groupByParent['affine:page'];
+        const pageSnapshot = {
+          ...snapshot,
+          content,
+        };
+
+        this._rewriteSnapshotXYWH(pageSnapshot, point, true);
+        this._dropToModel(pageSnapshot, this.widget.doc.root!.id)
+          .then(slices => {
+            slices?.content.forEach((block, idx) => {
+              if (
+                block.flavour === 'affine:attachment' ||
+                block.flavour.startsWith('affine:embed-')
+              ) {
+                store.updateBlock(block as BlockModel, {
+                  xywh: content[idx].props.xywh,
+                  style: content[idx].props.style,
+                });
+              }
+            });
+          })
+          .catch(console.error);
+      }
+    } else {
+      const content = snapshot.content.filter(block =>
+        schema.safeValidate(block.flavour, 'affine:note')
+      );
+      // create note to wrap the snapshot
+      const pos = this.gfx.viewport.toModelCoordFromClientCoord([
+        point.x,
+        point.y,
+      ]);
+      const noteId = store.addBlock(
+        'affine:note',
+        {
+          xywh: new Bound(
+            pos[0],
+            pos[1],
+            DEFAULT_NOTE_WIDTH,
+            DEFAULT_NOTE_HEIGHT
+          ).serialize(),
+        },
+        this.widget.doc.root!
+      );
+
+      this._dropToModel(
+        {
+          ...snapshot,
+          content,
+        },
+        noteId
+      ).catch(console.error);
+    }
+  };
+
+  private readonly _toSnapshot = (
+    blocks: (BlockComponent | BlockModel)[],
+    selectedGfxElms?: string[]
+  ) => {
     const slice = Slice.fromModels(
       this.std.store,
-      blocks.map(block => block.model)
+      blocks.map(block =>
+        block instanceof BlockComponent ? block.model : block
+      )
     );
-    const job = this._getJob();
+    const job = this._getJob(selectedGfxElms);
 
     const snapshot = job.sliceToSnapshot(slice);
     if (!snapshot) return;
@@ -597,17 +1145,43 @@ export class DragEventWatcher {
     }
   }
 
-  private _getJob() {
+  private _getJob(selectedIds?: string[]) {
     const std = this.std;
-    return std.getTransformer([
+    const middlewares = [
       newIdCrossDoc(std),
       reorderList(std),
       surfaceRefToEmbed(std),
-    ]);
+    ];
+
+    if (selectedIds) {
+      middlewares.push(gfxBlocksFilter(selectedIds, std));
+    }
+
+    return std.getTransformer(middlewares);
   }
 
   private _isDropOnCurrentEditor(std?: BlockStdScope) {
     return std === this.std;
+  }
+
+  private _isUnderNoteBlock(model: BlockModel) {
+    let isUnderNote = false;
+    const store = this.std.store;
+
+    {
+      let curModel = store.getParent(model);
+
+      while (curModel) {
+        if (matchFlavours(curModel, [NoteBlockModel])) {
+          isUnderNote = true;
+          break;
+        }
+
+        curModel = store.getParent(curModel)!;
+      }
+    }
+
+    return isUnderNote;
   }
 
   private _makeDraggable(target: HTMLElement) {
@@ -615,17 +1189,14 @@ export class DragEventWatcher {
 
     return std.dnd.draggable<DragBlockEntity>({
       element: target,
-      canDrag: () => {
-        const hoverBlock = this.widget.anchorBlockComponent.peek();
-        return hoverBlock ? true : false;
-      },
+      canDrag: () => (this.widget.anchorBlockId.peek() ? true : false),
       onDragStart: () => {
         this.widget.dragging = true;
       },
       onDrop: () => {
         this._cleanup();
       },
-      setDragPreview: ({ source, container, setOffset }) => {
+      setDragPreview: ({ source, container }) => {
         if (!source.data?.bsEntity?.modelIds.length) {
           return;
         }
@@ -634,15 +1205,13 @@ export class DragEventWatcher {
           source.data?.bsEntity?.modelIds,
           container
         );
-
-        const rect = container.getBoundingClientRect();
-        setOffset({ x: rect.width / 2, y: rect.height / 2 });
       },
       setDragData: () => {
-        const { snapshot } = this._getSnapshotFromHoveredBlocks();
+        const { fromMode, snapshot } = this._getDraggedSnapshot();
 
         return {
           type: 'blocks',
+          fromMode,
           modelIds: snapshot ? extractIdsFromSnapshot(snapshot) : [],
           snapshot,
         };
@@ -651,7 +1220,19 @@ export class DragEventWatcher {
   }
 
   private _makeDropTarget(view: BlockComponent) {
-    if (view.model.role !== 'content' && view.model.role !== 'hub') {
+    const isUnderNote = this._isUnderNoteBlock(view.model);
+
+    if (
+      // affine:surface block can't be drop target in any modes
+      matchFlavours(view.model, [SurfaceBlockModel]) ||
+      // in page mode, blocks other than root block can be drop target
+      (this.mode === 'page' && view.model.role === 'root') ||
+      // in edgeless mode, only root and note block can be drop target
+      (this.mode === 'edgeless' &&
+        !matchFlavours(view.model, [NoteBlockModel]) &&
+        view.model.role !== 'root' &&
+        !isUnderNote)
+    ) {
       return;
     }
 
@@ -666,8 +1247,15 @@ export class DragEventWatcher {
         }
       >({
         element: view,
-        getIsSticky: () => true,
+        getIsSticky: () => {
+          const result = this.mode === 'page' || isUnderNote;
+          return result;
+        },
         canDrop: ({ source }) => {
+          /**
+           * general rules:
+           * 1. can't drop on the same block or its children
+           */
           if (source.data.bsEntity?.type === 'blocks') {
             return (
               source.data.from?.docId !== widget.doc.id ||
@@ -800,7 +1388,7 @@ export class DragEventWatcher {
     const disposables = widget.disposables;
     const scrollable = getScrollContainer(this.host);
 
-    if (scrollable) {
+    if (scrollable && this.mode === 'page') {
       disposables.add(
         std.dnd.autoScroll<DragBlockEntity>({
           element: scrollable,

@@ -12,6 +12,11 @@ const SURFACE_TEXT_UNIQ_IDENTIFIER = 'affine:surface:text';
 const SURFACE_YMAP_UNIQ_IDENTIFIER = 'affine:surface:ymap';
 
 export class SurfaceBlockTransformer extends BaseBlockTransformer<SurfaceBlockProps> {
+  /**
+   * When the selectedElements is defined, only the selected elements will be serialized.
+   */
+  selectedElements?: Set<string>;
+
   private _elementToJSON(element: Y.Map<unknown>) {
     const value: Record<string, unknown> = {};
     element.forEach((_value, _key) => {
@@ -94,7 +99,9 @@ export class SurfaceBlockTransformer extends BaseBlockTransformer<SurfaceBlockPr
     const value: Record<string, unknown> = {};
     if (elementsValue) {
       elementsValue.forEach((element, key) => {
-        value[key] = this._elementToJSON(element as Y.Map<unknown>);
+        if (this.selectedElements?.has(key) || !this.selectedElements) {
+          value[key] = this._elementToJSON(element as Y.Map<unknown>);
+        }
       });
     }
     snapshot.props = {

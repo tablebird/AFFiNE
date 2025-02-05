@@ -72,6 +72,11 @@ export class Transformer {
   blockToSnapshot = (model: DraftModel): BlockSnapshot | undefined => {
     try {
       const snapshot = this._blockToSnapshot(model);
+
+      if (!snapshot) {
+        return;
+      }
+
       BlockSnapshotSchema.parse(snapshot);
 
       return snapshot;
@@ -358,20 +363,31 @@ export class Transformer {
     });
   }
 
-  private _blockToSnapshot(model: DraftModel): BlockSnapshot {
-    this._slots.beforeExport.emit({
-      type: 'block',
-      model,
-    });
+  private _blockToSnapshot(model: DraftModel): BlockSnapshot | null {
     const schema = this._getSchema(model.flavour);
     const transformer = this._getTransformer(schema);
+    const payload: Extract<BeforeExportPayload, { type: 'block' }> = {
+      type: 'block',
+      model,
+      action: 'default',
+      transformer,
+    };
+
+    this._slots.beforeExport.emit(payload);
+
+    if (payload.action === 'skip') {
+      return null;
+    }
+
     const snapshotLeaf = transformer.toSnapshot({
       model,
       assets: this._assetsManager,
     });
-    const children = model.children.map(child => {
-      return this._blockToSnapshot(child);
-    });
+    const children = model.children
+      .map(child => {
+        return this._blockToSnapshot(child);
+      })
+      .filter(Boolean) as BlockSnapshot[];
     const snapshot: BlockSnapshot = {
       type: 'block',
       ...snapshotLeaf,

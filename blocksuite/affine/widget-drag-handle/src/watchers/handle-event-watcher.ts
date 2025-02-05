@@ -7,7 +7,7 @@ import type { AffineDragHandleWidget } from '../drag-handle.js';
 
 export class HandleEventWatcher {
   private readonly _onDragHandlePointerDown = () => {
-    if (!this.widget.isHoverDragHandleVisible || !this.widget.anchorBlockId)
+    if (!this.widget.isBlockDragHandleVisible || !this.widget.anchorBlockId)
       return;
 
     this.widget.dragHoverRect = this.widget.draggingAreaRect.value;
@@ -18,7 +18,7 @@ export class HandleEventWatcher {
     const grabber = this.widget.dragHandleGrabber;
     if (!container || !grabber) return;
 
-    if (this.widget.isHoverDragHandleVisible && this.widget.anchorBlockId) {
+    if (this.widget.isBlockDragHandleVisible && this.widget.anchorBlockId) {
       const block = this.widget.anchorBlockComponent;
       if (!block) return;
 
@@ -35,9 +35,9 @@ export class HandleEventWatcher {
       }px`;
 
       this.widget.isDragHandleHovered = true;
-    } else if (this.widget.isTopLevelDragHandleVisible) {
+    } else if (this.widget.isGfxDragHandleVisible) {
       this.widget.dragHoverRect =
-        this.widget.edgelessWatcher.hoverAreaRectTopLevelBlock;
+        this.widget.edgelessWatcher.hoveredElemAreaRect;
       this.widget.isDragHandleHovered = true;
     }
   };
@@ -46,7 +46,7 @@ export class HandleEventWatcher {
     this.widget.isDragHandleHovered = false;
     this.widget.dragHoverRect = null;
 
-    if (this.widget.isTopLevelDragHandleVisible) return;
+    if (this.widget.isGfxDragHandleVisible) return;
 
     if (this.widget.dragging) return;
 
@@ -54,7 +54,7 @@ export class HandleEventWatcher {
   };
 
   private readonly _onDragHandlePointerUp = () => {
-    if (!this.widget.isHoverDragHandleVisible) return;
+    if (!this.widget.isBlockDragHandleVisible) return;
     this.widget.dragHoverRect = null;
   };
 

@@ -2,10 +2,7 @@ import {
   EdgelessLegacySlotIdentifier,
   type SurfaceBlockComponent,
 } from '@blocksuite/affine-block-surface';
-import {
-  getSelectedRect,
-  isTopLevelBlock,
-} from '@blocksuite/affine-shared/utils';
+import { getSelectedRect } from '@blocksuite/affine-shared/utils';
 import {
   GfxControllerIdentifier,
   type GfxToolsFullOptionValue,
@@ -16,19 +13,23 @@ import { effect } from '@preact/signals-core';
 import {
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT_TOP_LEVEL,
   DRAG_HANDLE_CONTAINER_WIDTH_TOP_LEVEL,
-  DRAG_HANDLE_GRABBER_BORDER_RADIUS,
-  DRAG_HANDLE_GRABBER_WIDTH_HOVERED,
   HOVER_AREA_RECT_PADDING_TOP_LEVEL,
 } from '../config.js';
 import type { AffineDragHandleWidget } from '../drag-handle.js';
 
+/**
+ * Used to control the drag handle visibility in edgeless mode
+ *
+ * 1. Show drag handle on every block and gfx element
+ * 2. Multiple selection is not supported
+ */
 export class EdgelessWatcher {
   private readonly _handleEdgelessToolUpdated = (
     newTool: GfxToolsFullOptionValue
   ) => {
     // @ts-expect-error FIXME: resolve after gfx tool refactor
     if (newTool.type === 'default') {
-      this.checkTopLevelBlockSelection();
+      this.updateAnchorElement();
     } else {
       this.widget.hide();
     }
@@ -52,17 +53,15 @@ export class EdgelessWatcher {
       this.widget.center = [...center];
     }
 
-    if (this.widget.isTopLevelDragHandleVisible) {
-      this._showDragHandleOnTopLevelBlocks().catch(console.error);
+    if (this.widget.isGfxDragHandleVisible) {
+      this._showDragHandle().catch(console.error);
       this._updateDragHoverRectTopLevelBlock();
-    } else {
+    } else if (this.widget.activeDragHandle) {
       this.widget.hide();
     }
   };
 
-  private readonly _showDragHandleOnTopLevelBlocks = async () => {
-    if (this.widget.mode === 'page') return;
-
+  private readonly _showDragHandle = async () => {
     const surfaceModel = this.widget.doc.getBlockByFlavour('affine:surface');
     const surface = this.widget.std.view.getBlock(
       surfaceModel[0]!.id
@@ -75,84 +74,67 @@ export class EdgelessWatcher {
     const grabber = this.widget.dragHandleGrabber;
     if (!container || !grabber) return;
 
-    const area = this.hoverAreaTopLevelBlock;
+    const area = this.hoveredElemArea;
     if (!area) return;
-
-    const height = area.height;
-
-    const posLeft = area.left;
-
-    const posTop = (area.top += area.padding);
 
     container.style.transition = 'none';
     container.style.paddingTop = `0px`;
     container.style.paddingBottom = `0px`;
-    container.style.width = `${area.containerWidth}px`;
-    container.style.left = `${posLeft}px`;
-    container.style.top = `${posTop}px`;
+    container.style.left = `${area.left}px`;
+    container.style.top = `${area.top}px`;
     container.style.display = 'flex';
-    container.style.height = `${height}px`;
-
-    grabber.style.width = `${DRAG_HANDLE_GRABBER_WIDTH_HOVERED * this.widget.scale.peek()}px`;
-    grabber.style.borderRadius = `${
-      DRAG_HANDLE_GRABBER_BORDER_RADIUS * this.widget.scale.peek()
-    }px`;
 
     this.widget.handleAnchorModelDisposables();
 
-    this.widget.isTopLevelDragHandleVisible = true;
+    this.widget.activeDragHandle = 'gfx';
   };
 
   private readonly _updateDragHoverRectTopLevelBlock = () => {
     if (!this.widget.dragHoverRect) return;
 
-    this.widget.dragHoverRect = this.hoverAreaRectTopLevelBlock;
+    this.widget.dragHoverRect = this.hoveredElemAreaRect;
   };
 
-  checkTopLevelBlockSelection = () => {
-    if (!this.widget.isConnected) return;
+  get gfx() {
+    return this.widget.std.get(GfxControllerIdentifier);
+  }
 
+  updateAnchorElement = () => {
+    if (!this.widget.isConnected) return;
     if (this.widget.doc.readonly || this.widget.mode === 'page') {
       this.widget.hide();
       return;
     }
 
-    const { std } = this.widget;
-    const gfx = std.get(GfxControllerIdentifier);
-    const { selection } = gfx;
+    const { selection } = this.gfx;
     const editing = selection.editing;
     const selectedElements = selection.selectedElements;
-    if (editing || selectedElements.length !== 1) {
+
+    if (editing || selectedElements.length !== 1 || this.widget.doc.readonly) {
       this.widget.hide();
       return;
     }
 
     const selectedElement = selectedElements[0];
-    if (!isTopLevelBlock(selectedElement)) {
-      this.widget.hide();
-      return;
-    }
 
     this.widget.anchorBlockId.value = selectedElement.id;
 
-    this._showDragHandleOnTopLevelBlocks().catch(console.error);
+    this._showDragHandle().catch(console.error);
   };
 
-  get hoverAreaRectTopLevelBlock() {
-    const area = this.hoverAreaTopLevelBlock;
+  get hoveredElemAreaRect() {
+    const area = this.hoveredElemArea;
     if (!area) return null;
 
     return new Rect(area.left, area.top, area.right, area.bottom);
   }
 
-  get hoverAreaTopLevelBlock() {
+  get hoveredElemArea() {
     const edgelessElement = this.widget.anchorEdgelessElement.peek();
 
     if (!edgelessElement) return null;
 
-    const { std } = this.widget;
-    const gfx = std.get(GfxControllerIdentifier);
-    const { viewport } = gfx;
+    const { viewport } = this.gfx;
     const rect = getSelectedRect([edgelessElement]);
     let [left, top] = viewport.toViewCoord(rect.left, rect.top);
     const scale = this.widget.scale.peek();
@@ -186,6 +168,10 @@ export class EdgelessWatcher {
   constructor(readonly widget: AffineDragHandleWidget) {}
 
   watch() {
+    if (this.widget.mode === 'page') {
+      return;
+    }
+
     const { disposables, std } = this.widget;
     const gfx = std.get(GfxControllerIdentifier);
     const { viewport, selection, tool } = gfx;
@@ -197,7 +183,19 @@ export class EdgelessWatcher {
 
     disposables.add(
       selection.slots.updated.on(() => {
-        this.checkTopLevelBlockSelection();
+        this.updateAnchorElement();
+      })
+    );
+
+    disposables.add(
+      edgelessSlots.readonlyUpdated.on(() => {
+        this.updateAnchorElement();
+      })
+    );
+
+    disposables.add(
+      edgelessSlots.elementResizeEnd.on(() => {
+        this.updateAnchorElement();
       })
     );
 
@@ -210,20 +208,8 @@ export class EdgelessWatcher {
     );
 
     disposables.add(
-      edgelessSlots.readonlyUpdated.on(() => {
-        this.checkTopLevelBlockSelection();
-      })
-    );
-
-    disposables.add(
       edgelessSlots.elementResizeStart.on(() => {
         this.widget.hide();
-      })
-    );
-
-    disposables.add(
-      edgelessSlots.elementResizeEnd.on(() => {
-        this.checkTopLevelBlockSelection();
       })
     );
   }

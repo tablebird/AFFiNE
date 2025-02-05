@@ -29,6 +29,9 @@ import {
   updateDragHandleClassName,
 } from '../utils.js';
 
+/**
+ * Used to control the drag handle visibility in page mode
+ */
 export class PointerEventWatcher {
   private get _gfx() {
     return this.widget.std.get(GfxControllerIdentifier);
@@ -51,7 +54,7 @@ export class PointerEventWatcher {
    * Should clear selection if current block is the first selected block
    */
   private readonly _clickHandler: UIEventHandler = ctx => {
-    if (!this.widget.isHoverDragHandleVisible) return;
+    if (!this.widget.isBlockDragHandleVisible) return;
 
     const state = ctx.get('pointerState');
     const { target } = state.raw;
@@ -152,7 +155,7 @@ export class PointerEventWatcher {
    * And update hover block id and path
    */
   private readonly _pointerMoveOnBlock = (state: PointerEventState) => {
-    if (this.widget.isTopLevelDragHandleVisible) return;
+    if (this.widget.isGfxDragHandleVisible) return;
 
     const point = new Point(state.raw.x, state.raw.y);
     const closestBlock = getClosestBlockByPoint(
@@ -182,7 +185,7 @@ export class PointerEventWatcher {
           this.widget.anchorBlockId.peek(),
           this._lastHoveredBlockId
         ) ||
-        !this.widget.isHoverDragHandleVisible) &&
+        !this.widget.isBlockDragHandleVisible) &&
       !this.widget.isDragHandleHovered
     ) {
       this.showDragHandleOnHoverBlock();
@@ -224,7 +227,7 @@ export class PointerEventWatcher {
         this.widget.hide();
         return;
       }
-      if (this.widget.isTopLevelDragHandleVisible) return;
+      if (this.widget.isGfxDragHandleVisible) return;
 
       const state = ctx.get('pointerState');
       const { target } = state.raw;
@@ -263,7 +266,9 @@ export class PointerEventWatcher {
         return true;
       }
 
-      this.widget.hide();
+      if (this.widget.activeDragHandle) {
+        this.widget.hide();
+      }
       return false;
     },
     1000 / 60
@@ -278,7 +283,7 @@ export class PointerEventWatcher {
     const grabber = this.widget.dragHandleGrabber;
     if (!container || !grabber) return;
 
-    this.widget.isHoverDragHandleVisible = true;
+    this.widget.activeDragHandle = 'block';
 
     const draggingAreaRect = this.widget.draggingAreaRect.peek();
     if (!draggingAreaRect) return;

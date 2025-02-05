@@ -1,3 +1,4 @@
+import { unsafeCSSVarV2 } from '@blocksuite/affine-shared/theme';
 import { css } from 'lit';
 
 import { DRAG_HANDLE_CONTAINER_WIDTH } from './config.js';
@@ -33,6 +34,32 @@ export const styles = css`
     border-radius: 1px;
     background: var(--affine-placeholder-color);
     transition: width 0.25s ease;
+  }
+
+  .affine-drag-handle-grabber.dots {
+    width: 14px;
+    height: 26px;
+    box-sizing: border-box;
+    padding: 5px 2px;
+    border-radius: 4px;
+    gap: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: transparent;
+    transform: translateX(-100%);
+    transition: unset;
+  }
+
+  .affine-drag-handle-grabber.dots:hover {
+    background-color: ${unsafeCSSVarV2('layer/background/hoverOverlay')};
+  }
+
+  .affine-drag-handle-grabber.dots > .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    flex: 0 0 4px;
+    background-color: ${unsafeCSSVarV2('icon/secondary')};
   }
 
   @media print {
