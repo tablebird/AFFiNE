@@ -30,11 +30,11 @@ pub struct Doc {
 }
 
 impl Doc {
-  pub fn new(file_path: &str, doc: &[u8]) -> Option<Self> {
+  pub fn new(file_path: &str, doc: &[u8]) -> LoaderResult<Self> {
     Self::with_options(file_path, doc, DocOptions::default())
   }
 
-  pub fn with_options(file_path: &str, doc: &[u8], options: DocOptions) -> Option<Self> {
+  pub fn with_options(file_path: &str, doc: &[u8], options: DocOptions) -> LoaderResult<Self> {
     if let Some(kind) =
       infer::get(&doc[..4096.min(doc.len())]).or(infer::get_from_path(file_path).ok().flatten())
     {
@@ -58,25 +58,25 @@ impl Doc {
         "md" => {
           let loader = TextLoader::new(string);
           let splitter = MarkdownSplitter::default();
-          return Self::from_loader(file_path, loader, splitter).ok();
+          return Self::from_loader(file_path, loader, splitter);
         }
         "rs" | "c" | "cpp" | "h" | "hpp" | "js" | "ts" | "tsx" | "go" | "py" => {
           let name = path.full_str().to_string();
           let loader =
             SourceCodeLoader::from_string(string).with_parser_option(LanguageParserOptions {
-              language: get_language_by_filename(&name).ok()?,
+              language: get_language_by_filename(&name)?,
               parser_threshold: options.code_threshold,
             });
           let splitter = TokenSplitter::default();
-          return Self::from_loader(file_path, loader, splitter).ok();
+          return Self::from_loader(file_path, loader, splitter);
         }
         _ => {}
       }
       let loader = TextLoader::new(string);
       let splitter = TokenSplitter::default();
-      return Self::from_loader(file_path, loader, splitter).ok();
+      return Self::from_loader(file_path, loader, splitter);
     }
-    None
+    Err(LoaderError::Other("Failed to infer document type".into()))
   }
 
   fn from_loader(
@@ -107,27 +107,26 @@ impl Doc {
     )
   }
 
-  fn load_docx(file_path: &str, doc: &[u8]) -> Option<Self> {
-    let loader = DocxLoader::new(Cursor::new(doc))?;
+  fn load_docx(file_path: &str, doc: &[u8]) -> LoaderResult<Self> {
+    let loader = DocxLoader::new(Cursor::new(doc))
+      .ok_or(LoaderError::Other("Failed to parse docx document".into()))?;
     let splitter = TokenSplitter::default();
-    Self::from_loader(file_path, loader, splitter).ok()
+    Self::from_loader(file_path, loader, splitter)
   }
 
-  fn load_html(file_path: &str, doc: &[u8]) -> Option<Self> {
+  fn load_html(file_path: &str, doc: &[u8]) -> LoaderResult<Self> {
     let loader = HtmlLoader::from_string(
-      String::from_utf8(doc.to_vec()).ok()?,
-      Url::parse(file_path)
-        .or(Url::parse("https://example.com/"))
-        .ok()?,
+      String::from_utf8(doc.to_vec())?,
+      Url::parse(file_path).or(Url::parse("https://example.com/"))?,
     );
     let splitter = TokenSplitter::default();
-    Self::from_loader(file_path, loader, splitter).ok()
+    Self::from_loader(file_path, loader, splitter)
   }
 
-  fn load_pdf(file_path: &str, doc: &[u8]) -> Option<Self> {
-    let loader = PdfExtractLoader::new(Cursor::new(doc)).ok()?;
+  fn load_pdf(file_path: &str, doc: &[u8]) -> LoaderResult<Self> {
+    let loader = PdfExtractLoader::new(Cursor::new(doc))?;
     let splitter = TokenSplitter::default();
-    Self::from_loader(file_path, loader, splitter).ok()
+    Self::from_loader(file_path, loader, splitter)
   }
 }
 

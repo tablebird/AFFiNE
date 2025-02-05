@@ -10,36 +10,37 @@ use super::*;
 #[derive(Error, Debug)]
 pub enum LoaderError {
   #[error("{0}")]
-  TextSplitterError(#[from] TextSplitterError),
+  TextSplitter(#[from] TextSplitterError),
 
   #[error(transparent)]
-  IOError(#[from] io::Error),
+  IO(#[from] io::Error),
 
   #[error(transparent)]
-  Utf8Error(#[from] Utf8Error),
+  Utf8(#[from] Utf8Error),
 
   #[error(transparent)]
-  FromUtf8Error(#[from] FromUtf8Error),
-
-  #[cfg(feature = "pdf-extract")]
-  #[error(transparent)]
-  PdfExtractError(#[from] pdf_extract::Error),
-
-  #[cfg(feature = "pdf-extract")]
-  #[error(transparent)]
-  PdfExtractOutputError(#[from] pdf_extract::OutputError),
+  FromUtf8(#[from] FromUtf8Error),
 
   #[error("Unsupported PDF format: {0}")]
   UnsupportedPDFFormat(String),
 
   #[error(transparent)]
-  ReadabilityError(#[from] readability::error::Error),
+  PdfExtract(#[from] pdf_extract::Error),
+
+  #[error(transparent)]
+  PdfExtractOutput(#[from] pdf_extract::OutputError),
+
+  #[error(transparent)]
+  Readability(#[from] readability::error::Error),
+
+  #[error(transparent)]
+  UrlParse(#[from] url::ParseError),
 
   #[error("Unsupported source language")]
   UnsupportedLanguage,
 
   #[error("Error: {0}")]
-  OtherError(String),
+  Other(String),
 }
 
 pub type LoaderResult<T> = Result<T, LoaderError>;
