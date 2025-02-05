@@ -9,16 +9,16 @@ use super::*;
 use std::io::{Read, Seek};
 
 pub trait Loader: Send + Sync {
-  async fn load(self) -> Result<Vec<Document>, LoaderError>;
-  async fn load_and_split<TS: TextSplitter + 'static>(
+  fn load(self) -> Result<Vec<Document>, LoaderError>;
+  fn load_and_split<TS: TextSplitter + 'static>(
     self,
     splitter: TS,
   ) -> Result<Vec<Document>, LoaderError>
   where
     Self: Sized,
   {
-    let docs = self.load().await?;
-    Ok(splitter.split_documents(&docs).await?)
+    let docs = self.load()?;
+    Ok(splitter.split_documents(&docs)?)
   }
 }
 

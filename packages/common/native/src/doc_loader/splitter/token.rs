@@ -21,7 +21,7 @@ impl TokenSplitter {
 }
 
 impl TextSplitter for TokenSplitter {
-  async fn split_text(&self, text: &str) -> Result<Vec<String>, TextSplitterError> {
+  fn split_text(&self, text: &str) -> Result<Vec<String>, TextSplitterError> {
     let chunk_config = ChunkConfig::try_from(&self.splitter_options)?;
     Ok(
       text_splitter::TextSplitter::new(chunk_config)

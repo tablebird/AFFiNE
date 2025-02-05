@@ -23,7 +23,7 @@ impl<R: Read> HtmlLoader<R> {
 }
 
 impl<R: Read + Send + Sync + 'static> Loader for HtmlLoader<R> {
-  async fn load(mut self) -> Result<Vec<Document>, LoaderError> {
+  fn load(mut self) -> Result<Vec<Document>, LoaderError> {
     let cleaned_html = readability::extractor::extract(&mut self.html, &self.url)?;
     let doc =
       Document::new(format!("{}\n{}", cleaned_html.title, cleaned_html.text)).with_metadata(
@@ -38,8 +38,8 @@ impl<R: Read + Send + Sync + 'static> Loader for HtmlLoader<R> {
 mod tests {
   use super::*;
 
-  #[tokio::test]
-  async fn test_html_loader() {
+  #[test]
+  fn test_html_loader() {
     let input = "<p>Hello world!</p>";
 
     let html_loader = HtmlLoader::new(
@@ -47,7 +47,7 @@ mod tests {
       Url::parse("https://example.com/").unwrap(),
     );
 
-    let documents = html_loader.load().await.unwrap();
+    let documents = html_loader.load().unwrap();
 
     let expected = "\nHello world!";
 
@@ -59,15 +59,15 @@ mod tests {
     assert_eq!(documents[0].page_content, expected);
   }
 
-  #[tokio::test]
-  async fn test_html_load_from_path() {
+  #[test]
+  fn test_html_load_from_path() {
     let buffer = include_bytes!("../../../fixtures/sample.html");
     let html_loader = HtmlLoader::new(
       Cursor::new(buffer),
       Url::parse("https://example.com/").unwrap(),
     );
 
-    let documents = html_loader.load().await.unwrap();
+    let documents = html_loader.load().unwrap();
 
     let expected = "Example Domain\n\n        This domain is for use in illustrative examples in documents. You may\n        use this domain in literature without prior coordination or asking for\n        permission.\n      More information...";
 

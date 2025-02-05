@@ -29,7 +29,7 @@ impl PdfExtractLoader {
 }
 
 impl Loader for PdfExtractLoader {
-  async fn load(self) -> Result<Vec<Document>, LoaderError> {
+  fn load(self) -> Result<Vec<Document>, LoaderError> {
     let doc = self.extract_text_to_doc()?;
     Ok(vec![doc])
   }
@@ -40,15 +40,15 @@ mod tests {
   use super::*;
   use std::{fs::read, io::Cursor, path::PathBuf};
 
-  #[tokio::test]
-  async fn test_parse_pdf() {
+  #[test]
+  fn test_parse_pdf() {
     let fixtures = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("fixtures");
     let buffer = read(fixtures.join("sample.pdf")).unwrap();
 
     let reader = Cursor::new(buffer);
     let loader = PdfExtractLoader::new(reader).expect("Failed to create PdfExtractLoader");
 
-    let docs = loader.load().await.unwrap();
+    let docs = loader.load().unwrap();
 
     assert_eq!(docs.len(), 1);
     assert_eq!(&docs[0].page_content[..100], "\n\nSample PDF\nThis is a simple PDF ﬁle. Fun fun fun.\n\nLorem ipsum dolor  sit amet,  consectetuer  a");

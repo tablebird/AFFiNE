@@ -14,7 +14,7 @@ impl TextLoader {
 }
 
 impl Loader for TextLoader {
-  async fn load(self) -> Result<Vec<Document>, LoaderError> {
+  fn load(self) -> Result<Vec<Document>, LoaderError> {
     let doc = Document::new(self.content);
     Ok(vec![doc])
   }

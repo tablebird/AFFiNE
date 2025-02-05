@@ -46,7 +46,6 @@ dependencies = [
  "text-splitter",
  "thiserror 1.0.69",
  "tiktoken-rs",
- "tokio",
  "tree-sitter",
  "tree-sitter-c",
  "tree-sitter-c-sharp",

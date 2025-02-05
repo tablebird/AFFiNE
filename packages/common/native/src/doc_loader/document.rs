@@ -28,20 +28,20 @@ pub struct Doc {
 }
 
 impl Doc {
-  pub async fn new(file_path: &str, doc: &[u8]) -> Option<Self> {
-    Self::with_options(file_path, doc, DocOptions::default()).await
+  pub fn new(file_path: &str, doc: &[u8]) -> Option<Self> {
+    Self::with_options(file_path, doc, DocOptions::default())
   }
 
-  pub async fn with_options(file_path: &str, doc: &[u8], options: DocOptions) -> Option<Self> {
+  pub fn with_options(file_path: &str, doc: &[u8], options: DocOptions) -> Option<Self> {
     if let Some(kind) =
       infer::get(&doc[..4096.min(doc.len())]).or(infer::get_from_path(file_path).ok().flatten())
     {
       if kind.extension() == "pdf" {
-        return Self::load_pdf(file_path, doc).await;
+        return Self::load_pdf(file_path, doc);
       } else if kind.extension() == "docx" {
-        return Self::load_docx(file_path, doc).await;
+        return Self::load_docx(file_path, doc);
       } else if kind.extension() == "html" {
-        return Self::load_html(file_path, doc).await;
+        return Self::load_html(file_path, doc);
       }
     } else if let Ok(string) = String::from_utf8(doc.to_vec()).or_else(|_| {
       String::from_utf16(
@@ -56,7 +56,7 @@ impl Doc {
         "md" => {
           let loader = TextLoader::new(string);
           let splitter = MarkdownSplitter::default();
-          return Self::from_loader(file_path, loader, splitter).await.ok();
+          return Self::from_loader(file_path, loader, splitter).ok();
         }
         "rs" | "c" | "cpp" | "h" | "hpp" | "js" | "ts" | "tsx" | "go" | "py" => {
           let name = path.full_str().to_string();
@@ -66,32 +66,32 @@ impl Doc {
               parser_threshold: options.code_threshold,
             });
           let splitter = TokenSplitter::default();
-          return Self::from_loader(file_path, loader, splitter).await.ok();
+          return Self::from_loader(file_path, loader, splitter).ok();
         }
         _ => {}
       }
       let loader = TextLoader::new(string);
       let splitter = TokenSplitter::default();
-      return Self::from_loader(file_path, loader, splitter).await.ok();
+      return Self::from_loader(file_path, loader, splitter).ok();
     }
     None
   }
 
-  async fn from_loader(
+  fn from_loader(
     file_path: &str,
     loader: impl Loader,
     splitter: impl TextSplitter + 'static,
   ) -> Result<Doc, LoaderError> {
     let name = file_path.to_string();
-    let chunks = Self::get_chunks_from_loader(loader, splitter).await?;
+    let chunks = Self::get_chunks_from_loader(loader, splitter)?;
     Ok(Self { name, chunks })
   }
 
-  async fn get_chunks_from_loader(
+  fn get_chunks_from_loader(
     loader: impl Loader,
     splitter: impl TextSplitter + 'static,
   ) -> Result<Vec<Chunk>, LoaderError> {
-    let docs = loader.load_and_split(splitter).await?;
+    let docs = loader.load_and_split(splitter)?;
     Ok(
       docs
         .into_iter()
@@ -105,13 +105,13 @@ impl Doc {
     )
   }
 
-  async fn load_docx(file_path: &str, doc: &[u8]) -> Option<Self> {
+  fn load_docx(file_path: &str, doc: &[u8]) -> Option<Self> {
     let loader = DocxLoader::new(Cursor::new(doc))?;
     let splitter = TokenSplitter::default();
-    Self::from_loader(file_path, loader, splitter).await.ok()
+    Self::from_loader(file_path, loader, splitter).ok()
   }
 
-  async fn load_html(file_path: &str, doc: &[u8]) -> Option<Self> {
+  fn load_html(file_path: &str, doc: &[u8]) -> Option<Self> {
     let loader = HtmlLoader::from_string(
       String::from_utf8(doc.to_vec()).ok()?,
       Url::parse(file_path)
@@ -119,13 +119,13 @@ impl Doc {
         .ok()?,
     );
     let splitter = TokenSplitter::default();
-    Self::from_loader(file_path, loader, splitter).await.ok()
+    Self::from_loader(file_path, loader, splitter).ok()
   }
 
-  async fn load_pdf(file_path: &str, doc: &[u8]) -> Option<Self> {
+  fn load_pdf(file_path: &str, doc: &[u8]) -> Option<Self> {
     let loader = PdfExtractLoader::new(Cursor::new(doc)).ok()?;
     let splitter = TokenSplitter::default();
-    Self::from_loader(file_path, loader, splitter).await.ok()
+    Self::from_loader(file_path, loader, splitter).ok()
   }
 }
 
@@ -150,14 +150,12 @@ mod tests {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("fixtures")
   }
 
-  #[tokio::test]
-  async fn test_fixtures() {
+  #[test]
+  fn test_fixtures() {
     let fixtures = get_fixtures();
     for fixture in FIXTURES.iter() {
       let buffer = read(fixtures.join(fixture)).unwrap();
-      let doc = Doc::with_options(fixture, &buffer, DocOptions { code_threshold: 0 })
-        .await
-        .unwrap();
+      let doc = Doc::with_options(fixture, &buffer, DocOptions { code_threshold: 0 }).unwrap();
       for chunk in doc.chunks.iter() {
         let output =
           read_to_string(fixtures.join(format!("{}.{}.md", fixture, chunk.index))).unwrap();

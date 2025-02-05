@@ -23,7 +23,7 @@ impl DocxLoader {
 }
 
 impl Loader for DocxLoader {
-  async fn load(self) -> Result<Vec<Document>, LoaderError> {
+  fn load(self) -> Result<Vec<Document>, LoaderError> {
     let doc = self.extract_text_to_doc();
     Ok(vec![doc])
   }
@@ -38,15 +38,15 @@ mod tests {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("fixtures")
   }
 
-  #[tokio::test]
-  async fn test_parse_docx() {
+  #[test]
+  fn test_parse_docx() {
     let docx_buffer = include_bytes!("../../../fixtures/demo.docx");
     let parsed_buffer = include_str!("../../../fixtures/demo.docx.md");
 
     {
       let loader = DocxLoader::new(Cursor::new(docx_buffer)).unwrap();
 
-      let documents = loader.load().await.unwrap();
+      let documents = loader.load().unwrap();
 
       assert_eq!(documents.len(), 1);
       assert_eq!(documents[0].page_content, parsed_buffer);
@@ -54,10 +54,7 @@ mod tests {
 
     {
       let loader = DocxLoader::new(Cursor::new(docx_buffer)).unwrap();
-      let documents = loader
-        .load_and_split(TokenSplitter::default())
-        .await
-        .unwrap();
+      let documents = loader.load_and_split(TokenSplitter::default()).unwrap();
 
       for (idx, doc) in documents.into_iter().enumerate() {
         assert_eq!(

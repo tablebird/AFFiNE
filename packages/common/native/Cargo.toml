@@ -56,7 +56,6 @@ tiktoken-rs = { workspace = true }
 [dev-dependencies]
 criterion2 = { workspace = true }
 rayon      = { workspace = true }
-tokio      = { workspace = true, features = ["full"] }
 
 [build-dependencies]
 cc = { version = "1", optional = true }

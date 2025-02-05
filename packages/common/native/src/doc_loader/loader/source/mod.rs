@@ -27,7 +27,7 @@ impl SourceCodeLoader {
 }
 
 impl Loader for SourceCodeLoader {
-  async fn load(self) -> Result<Vec<Document>, LoaderError> {
+  fn load(self) -> Result<Vec<Document>, LoaderError> {
     let options = self.parser_option.clone();
 
     let docs = LanguageParser::from_language(options.language)
@@ -43,15 +43,15 @@ mod tests {
   use super::*;
   use parser::Language;
 
-  #[tokio::test]
-  async fn test_source_code_loader() {
+  #[test]
+  fn test_source_code_loader() {
     let content = include_str!("../../../../fixtures/sample.rs");
     let loader = SourceCodeLoader::from_string(content).with_parser_option(LanguageParserOptions {
       language: Language::Rust,
       ..Default::default()
     });
 
-    let documents_with_content = loader.load().await.unwrap();
+    let documents_with_content = loader.load().unwrap();
     assert_eq!(documents_with_content.len(), 1);
   }
 }
