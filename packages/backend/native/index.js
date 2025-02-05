@@ -12,3 +12,4 @@ export const getMime = binding.getMime;
 export const Tokenizer = binding.Tokenizer;
 export const fromModelName = binding.fromModelName;
 export const htmlSanitize = binding.htmlSanitize;
+export const parseDoc = binding.parseDoc;
