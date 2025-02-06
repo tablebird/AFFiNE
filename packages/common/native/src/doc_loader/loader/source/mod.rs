@@ -30,7 +30,7 @@ impl SourceCodeLoader {
 }
 
 impl Loader for SourceCodeLoader {
-  fn load(self) -> Result<Vec<Document>, LoaderError> {
+  fn load(self) -> LoaderResult<Vec<Document>> {
     let options = self.parser_option.clone();
 
     let docs = LanguageParser::from_language(options.language)

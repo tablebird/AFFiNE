@@ -24,7 +24,7 @@ impl DocxLoader {
 }
 
 impl Loader for DocxLoader {
-  fn load(self) -> Result<Vec<Document>, LoaderError> {
+  fn load(self) -> LoaderResult<Vec<Document>> {
     let doc = self.extract_text_to_doc();
     Ok(vec![doc])
   }

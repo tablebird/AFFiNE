@@ -10,11 +10,8 @@ use super::*;
 
 // modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/document_loaders
 pub trait Loader: Send + Sync {
-  fn load(self) -> Result<Vec<Document>, LoaderError>;
-  fn load_and_split<TS: TextSplitter + 'static>(
-    self,
-    splitter: TS,
-  ) -> Result<Vec<Document>, LoaderError>
+  fn load(self) -> LoaderResult<Vec<Document>>;
+  fn load_and_split<TS: TextSplitter + 'static>(self, splitter: TS) -> LoaderResult<Vec<Document>>
   where
     Self: Sized,
   {

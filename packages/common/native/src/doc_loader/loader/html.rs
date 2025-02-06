@@ -27,7 +27,7 @@ impl<R: Read> HtmlLoader<R> {
 }
 
 impl<R: Read + Send + Sync + 'static> Loader for HtmlLoader<R> {
-  fn load(mut self) -> Result<Vec<Document>, LoaderError> {
+  fn load(mut self) -> LoaderResult<Vec<Document>> {
     let cleaned_html = readability::extractor::extract(&mut self.html, &self.url)?;
     let doc =
       Document::new(format!("{}\n{}", cleaned_html.title, cleaned_html.text)).with_metadata(
