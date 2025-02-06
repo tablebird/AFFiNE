@@ -69,9 +69,12 @@ impl Clone for LanguageParser {
   }
 }
 
-pub fn get_language_by_filename(name: &String) -> Language {
-  let extension = name.split('.').last().unwrap();
-  match extension.to_lowercase().as_str() {
+pub fn get_language_by_filename(name: &String) -> LoaderResult<Language> {
+  let extension = name
+    .split('.')
+    .last()
+    .ok_or(LoaderError::UnsupportedLanguage)?;
+  let language = match extension.to_lowercase().as_str() {
     "rs" => Language::Rust,
     "c" => Language::C,
     "cpp" => Language::Cpp,
@@ -82,8 +85,9 @@ pub fn get_language_by_filename(name: &String) -> Language {
     "tsx" => Language::Typescript,
     "go" => Language::Go,
     "py" => Language::Python,
-    _ => panic!("Unsupported language"),
-  }
+    _ => return Err(LoaderError::UnsupportedLanguage),
+  };
+  Ok(language)
 }
 
 fn get_language_parser(language: &Language) -> Parser {
@@ -99,7 +103,7 @@ fn get_language_parser(language: &Language) -> Parser {
   };
   parser
     .set_language(&lang.into())
-    .expect("Error loading grammar");
+    .expect(format!("Error loading grammar for language: {:?}", language).as_str());
   parser
 }
 
@@ -121,10 +125,13 @@ impl LanguageParser {
 }
 
 impl LanguageParser {
-  pub fn parse_code(&mut self, code: &String) -> Vec<Document> {
-    let tree = self.parser.parse(code, None).unwrap();
+  pub fn parse_code(&mut self, code: &String) -> LoaderResult<Vec<Document>> {
+    let tree = self
+      .parser
+      .parse(code, None)
+      .ok_or(LoaderError::UnsupportedLanguage)?;
     if self.parser_options.parser_threshold > tree.root_node().end_position().row as u64 {
-      return vec![Document::new(code).with_metadata(HashMap::from([
+      return Ok(vec![Document::new(code).with_metadata(HashMap::from([
         (
           "content_type".to_string(),
           serde_json::Value::from(LanguageContentTypes::SimplifiedCode.to_string()),
@@ -133,18 +140,24 @@ impl LanguageParser {
           "language".to_string(),
           serde_json::Value::from(self.parser_options.language.to_string()),
         ),
-      ]))];
+      ]))]);
     }
     self.extract_functions_classes(tree, code)
   }
 
-  pub fn extract_functions_classes(&self, tree: Tree, code: &String) -> Vec<Document> {
+  pub fn extract_functions_classes(
+    &self,
+    tree: Tree,
+    code: &String,
+  ) -> LoaderResult<Vec<Document>> {
     let mut chunks = Vec::new();
 
     let count = tree.root_node().child_count();
     for i in 0..count {
-      let node = tree.root_node().child(i).unwrap();
-      let source_code = node.utf8_text(code.as_bytes()).unwrap().to_string();
+      let Some(node) = tree.root_node().child(i) else {
+        continue;
+      };
+      let source_code = node.utf8_text(code.as_bytes())?.to_string();
       let lang_meta = (
         "language".to_string(),
         serde_json::Value::from(self.parser_options.language.to_string()),
@@ -169,7 +182,7 @@ impl LanguageParser {
         chunks.push(doc);
       }
     }
-    chunks
+    Ok(chunks)
   }
 }
 
@@ -206,13 +219,13 @@ mod tests {
 
     let mut parser = LanguageParser::from_language(Language::Rust);
 
-    let documents = parser.parse_code(&code.to_string());
+    let documents = parser.parse_code(&code.to_string()).unwrap();
     assert_eq!(documents.len(), 1);
 
     // Set the parser threshold to 10 for testing
     let mut parser = parser.with_parser_threshold(10);
 
-    let documents = parser.parse_code(&code.to_string());
+    let documents = parser.parse_code(&code.to_string()).unwrap();
     assert_eq!(documents.len(), 3);
     assert_eq!(
       documents[0].page_content,

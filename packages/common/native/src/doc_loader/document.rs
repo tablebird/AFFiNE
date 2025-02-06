@@ -62,7 +62,7 @@ impl Doc {
           let name = path.full_str().to_string();
           let loader =
             SourceCodeLoader::from_string(string).with_parser_option(LanguageParserOptions {
-              language: get_language_by_filename(&name),
+              language: get_language_by_filename(&name).ok()?,
               parser_threshold: options.code_threshold,
             });
           let splitter = TokenSplitter::default();

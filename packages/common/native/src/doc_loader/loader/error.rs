@@ -1,5 +1,5 @@
 use super::*;
-use std::{io, string::FromUtf8Error};
+use std::{io, str::Utf8Error, string::FromUtf8Error};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -9,6 +9,9 @@ pub enum LoaderError {
 
   #[error(transparent)]
   IOError(#[from] io::Error),
+
+  #[error(transparent)]
+  Utf8Error(#[from] Utf8Error),
 
   #[error(transparent)]
   FromUtf8Error(#[from] FromUtf8Error),
@@ -24,6 +27,11 @@ pub enum LoaderError {
   #[error(transparent)]
   ReadabilityError(#[from] readability::error::Error),
 
+  #[error("Unsupported source language")]
+  UnsupportedLanguage,
+
   #[error("Error: {0}")]
   OtherError(String),
 }
+
+pub type LoaderResult<T> = Result<T, LoaderError>;

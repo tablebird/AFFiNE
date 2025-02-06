@@ -32,7 +32,7 @@ impl Loader for SourceCodeLoader {
 
     let docs = LanguageParser::from_language(options.language)
       .with_parser_threshold(options.parser_threshold)
-      .parse_code(&self.content);
+      .parse_code(&self.content)?;
 
     Ok(docs)
   }
