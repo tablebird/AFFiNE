@@ -1,7 +1,9 @@
+/**
+ * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/document_loaders
+ */
 use super::*;
 use serde_json::Value;
 use std::{collections::HashMap, io::Cursor};
-
 #[derive(Debug, Clone)]
 pub struct HtmlLoader<R> {
   html: R,

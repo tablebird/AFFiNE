@@ -1,3 +1,6 @@
+/**
+ * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/text_splitter
+ */
 mod error;
 mod markdown;
 mod options;

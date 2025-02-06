@@ -1,3 +1,6 @@
+/**
+ * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/text_splitter
+ */
 use text_splitter::ChunkConfig;
 use tiktoken_rs::{get_bpe_from_model, get_bpe_from_tokenizer, tokenizer::Tokenizer, CoreBPE};
 
