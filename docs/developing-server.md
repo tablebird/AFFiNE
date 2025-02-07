@@ -22,6 +22,10 @@ cp ./.docker/dev/.env.example ./.docker/dev/.env
 docker compose -f ./.docker/dev/compose.yml up
 ```
 
+#### Notify
+
+> Starting from AFFiNE 0.20, compose.yml includes a breaking change: the default database image has switched from `postgres:16` to `pgvector/pgvector:pg16`. If you were previously using another major version of Postgres, please change the number after `pgvector/pgvector:pg` to the major version you are using.
+
 ## Build native packages (you need to setup rust toolchain first)
 
 Server also requires native packages to be built, you can build them by running the following command:
