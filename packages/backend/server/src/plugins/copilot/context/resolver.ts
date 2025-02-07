@@ -77,8 +77,8 @@ export class CopilotContextType {
   @Field(() => ID)
   id!: string;
 
-  @Field(() => SafeIntResolver)
-  createdAt!: number;
+  @Field(() => String)
+  workspaceId!: string;
 }
 
 registerEnumType(ContextFileStatus, { name: 'ContextFileStatus' });
@@ -221,9 +221,11 @@ export class CopilotContextRootResolver {
     if (contextId) {
       const context = await this.context.get(contextId);
       if (context) return [context];
-      return [];
+    } else {
+      const context = await this.context.getBySessionId(sessionId);
+      if (context) return [context];
     }
-    return await this.context.list(sessionId);
+    return [];
   }
 
   @Mutation(() => String, {

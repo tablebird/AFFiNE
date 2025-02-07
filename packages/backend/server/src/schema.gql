@@ -78,14 +78,13 @@ type Copilot {
 }
 
 type CopilotContext {
-  createdAt: SafeInt!
-
   """list files in context"""
   docs: [CopilotContextDoc!]!
 
   """list files in context"""
   files: [CopilotContextFile!]!
   id: ID!
+  workspaceId: String!
 }
 
 type CopilotContextDoc {

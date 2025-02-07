@@ -101,6 +101,10 @@ export class CopilotContextService {
       throw new CopilotSessionNotFound();
     }
 
+    // keep the context unique per session
+    const existsContext = await this.getBySessionId(sessionId);
+    if (existsContext) return existsContext;
+
     const context = await this.db.aiContext.create({
       data: {
         sessionId,
@@ -130,14 +134,12 @@ export class CopilotContextService {
     throw new CopilotInvalidContext({ contextId: id });
   }
 
-  async list(sessionId: string): Promise<{ id: string; createdAt: number }[]> {
-    const contexts = await this.db.aiContext.findMany({
+  async getBySessionId(sessionId: string): Promise<ContextSession | null> {
+    const existsContext = await this.db.aiContext.findFirst({
       where: { sessionId },
-      select: { id: true, createdAt: true },
+      select: { id: true },
     });
-    return contexts.map(c => ({
-      id: c.id,
-      createdAt: c.createdAt.getTime(),
-    }));
+    if (existsContext) return this.get(existsContext.id);
+    return null;
   }
 }
