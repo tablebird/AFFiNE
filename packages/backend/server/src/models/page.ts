@@ -5,12 +5,11 @@ import {
   type WorkspaceDocUserPermission as PageUserPermission,
 } from '@prisma/client';
 
-import { WorkspaceRole } from '../core/permission';
 import { BaseModel } from './base';
-import { PublicPageMode } from './common';
+import { PublicDocMode, WorkspaceRole } from './common';
 export type { Page };
 export type UpdatePageInput = {
-  mode?: PublicPageMode;
+  mode?: PublicDocMode;
   public?: boolean;
 };
 

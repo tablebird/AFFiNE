@@ -3,12 +3,12 @@ import { type ConnectedAccount, Prisma, type User } from '@prisma/client';
 import { pick } from 'lodash-es';
 
 import {
-  CryptoHelper,
   EmailAlreadyUsed,
-  EventBus,
   WrongSignInCredentials,
   WrongSignInMethod,
-} from '../base';
+} from '../base/error';
+import { EventBus } from '../base/event';
+import { CryptoHelper } from '../base/helpers';
 import { BaseModel } from './base';
 import type { Workspace } from './workspace';
 

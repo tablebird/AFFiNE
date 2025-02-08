@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 
-import { ApplyType } from '../base';
+import { ApplyType } from '../base/utils';
 import { DocModel } from './doc';
 import { FeatureModel } from './feature';
 import { PageModel } from './page';

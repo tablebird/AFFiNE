@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { OneDay, OneGB, OneMB } from '../../base';
+import { OneDay, OneGB, OneMB } from '../../base/utils';
 
 const UserPlanQuotaConfig = z.object({
   // quota name
