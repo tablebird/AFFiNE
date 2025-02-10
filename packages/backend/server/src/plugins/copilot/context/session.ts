@@ -153,9 +153,18 @@ export class ContextSession implements AsyncDisposable {
     `;
   }
 
+  /**
+   *
+   * @param content input text to match
+   * @param topK number of similar chunks to return, default 5
+   * @param threshold relevance threshold for the similarity score, higher threshold means more similar chunks, default 0.7, good enough based on prior experiments
+   * @param signal abort signal
+   * @returns list of similar chunks
+   */
   async matchWorkspaceChunks(
     content: string,
     topK: number = 5,
+    threshold: number = 0.7,
     signal?: AbortSignal
   ): Promise<ChunkSimilarity[]> {
     const embedding = await this.client
@@ -163,9 +172,9 @@ export class ContextSession implements AsyncDisposable {
       .then(r => r?.[0]?.embedding);
     if (!embedding) return [];
     return await this.db.$queryRaw<Array<DocChunkSimilarity>>`
-      SELECT "doc_id" as "docId", "chunk", "content", "embedding" <=> ${embedding}::vector as "distance" 
+      SELECT "doc_id" as "docId", "chunk", "content", "embedding" <=> ${embedding}::vector as "distance"
       FROM "ai_workspace_embeddings"
-      WHERE "workspace_id" = ${this.workspaceId}
+      WHERE "workspace_id" = ${this.workspaceId} AND "distance" <= ${threshold}
       ORDER BY "distance" ASC
       LIMIT ${topK};
     `;
