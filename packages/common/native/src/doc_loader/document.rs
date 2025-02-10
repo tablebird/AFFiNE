@@ -1,6 +1,8 @@
-use super::*;
-use path_ext::PathExt;
 use std::{io::Cursor, path::PathBuf};
+
+use path_ext::PathExt;
+
+use super::*;
 
 #[derive(Clone, Default)]
 pub struct Chunk {
@@ -131,11 +133,12 @@ impl Doc {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
   use std::{
     fs::{read, read_to_string},
     path::PathBuf,
   };
+
+  use super::*;
 
   const FIXTURES: [&str; 6] = [
     "demo.docx",

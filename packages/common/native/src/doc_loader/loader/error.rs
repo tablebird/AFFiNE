@@ -1,9 +1,11 @@
+use std::{io, str::Utf8Error, string::FromUtf8Error};
+
+use thiserror::Error;
+
 /**
  * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/document_loaders
  */
 use super::*;
-use std::{io, str::Utf8Error, string::FromUtf8Error};
-use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum LoaderError {

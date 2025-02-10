@@ -3,9 +3,9 @@
  */
 mod parser;
 
-use super::*;
-
 pub use parser::{get_language_by_filename, LanguageParser, LanguageParserOptions};
+
+use super::*;
 
 #[derive(Debug, Clone)]
 pub struct SourceCodeLoader {
@@ -43,8 +43,9 @@ impl Loader for SourceCodeLoader {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
   use parser::Language;
+
+  use super::*;
 
   #[test]
   fn test_source_code_loader() {

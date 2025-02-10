@@ -6,14 +6,15 @@ mod markdown;
 mod options;
 mod token;
 
-use super::*;
-use options::SplitterOptions;
-use serde_json::Value;
 use std::collections::HashMap;
 
 pub use error::TextSplitterError;
 pub use markdown::MarkdownSplitter;
+use options::SplitterOptions;
+use serde_json::Value;
 pub use token::TokenSplitter;
+
+use super::*;
 
 pub trait TextSplitter: Send + Sync {
   fn split_text(&self, text: &str) -> Result<Vec<String>, TextSplitterError>;

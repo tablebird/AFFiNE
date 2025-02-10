@@ -1,9 +1,11 @@
+use std::{collections::HashMap, io::Cursor};
+
+use serde_json::Value;
+
 /**
  * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/document_loaders
  */
 use super::*;
-use serde_json::Value;
-use std::{collections::HashMap, io::Cursor};
 #[derive(Debug, Clone)]
 pub struct HtmlLoader<R> {
   html: R,
@@ -71,7 +73,9 @@ mod tests {
 
     let documents = html_loader.load().unwrap();
 
-    let expected = "Example Domain\n\n        This domain is for use in illustrative examples in documents. You may\n        use this domain in literature without prior coordination or asking for\n        permission.\n      More information...";
+    let expected = "Example Domain\n\n        This domain is for use in illustrative examples in \
+                    documents. You may\n        use this domain in literature without prior \
+                    coordination or asking for\n        permission.\n      More information...";
 
     assert_eq!(documents.len(), 1);
     assert_eq!(

@@ -1,8 +1,9 @@
+use text_splitter::ChunkConfig;
+
 /**
  * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/text_splitter
  */
 use super::*;
-use text_splitter::ChunkConfig;
 
 pub struct MarkdownSplitter {
   splitter_options: SplitterOptions,

@@ -1,5 +1,6 @@
-use super::*;
 use docx_parser::MarkdownDocument;
+
+use super::*;
 
 #[derive(Debug)]
 pub struct DocxLoader {
@@ -31,8 +32,9 @@ impl Loader for DocxLoader {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
   use std::{fs::read, io::Cursor, path::PathBuf};
+
+  use super::*;
 
   fn get_fixtures_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("fixtures")

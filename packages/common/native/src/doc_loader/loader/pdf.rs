@@ -1,8 +1,9 @@
+use pdf_extract::{output_doc, PlainTextOutput};
+
 /**
  * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/document_loaders
  */
 use super::*;
-use pdf_extract::{output_doc, PlainTextOutput};
 
 #[derive(Debug, Clone)]
 pub struct PdfExtractLoader {
@@ -40,8 +41,9 @@ impl Loader for PdfExtractLoader {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
   use std::{fs::read, io::Cursor, path::PathBuf};
+
+  use super::*;
 
   #[test]
   fn test_parse_pdf() {
@@ -54,6 +56,10 @@ mod tests {
     let docs = loader.load().unwrap();
 
     assert_eq!(docs.len(), 1);
-    assert_eq!(&docs[0].page_content[..100], "\n\nSample PDF\nThis is a simple PDF ﬁle. Fun fun fun.\n\nLorem ipsum dolor  sit amet,  consectetuer  a");
+    assert_eq!(
+      &docs[0].page_content[..100],
+      "\n\nSample PDF\nThis is a simple PDF ﬁle. Fun fun fun.\n\nLorem ipsum dolor  sit amet,  \
+       consectetuer  a"
+    );
   }
 }

@@ -1,12 +1,12 @@
+use std::{collections::HashMap, fmt::Debug, string::ToString};
+
+use strum_macros::Display;
+use tree_sitter::{Parser, Tree};
+
 /**
  * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/document_loaders
  */
 use super::*;
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::string::ToString;
-use strum_macros::Display;
-use tree_sitter::{Parser, Tree};
 
 #[derive(Display, Debug, Clone)]
 pub enum Language {
