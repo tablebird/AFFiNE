@@ -1,5 +1,33 @@
--- CreateExtension
-CREATE EXTENSION IF NOT EXISTS "vector";
+DO $$
+DECLARE error_message TEXT;
+BEGIN -- check if pgvector extension is installed
+  IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN
+    BEGIN
+      -- CreateExtension
+      CREATE EXTENSION IF NOT EXISTS "vector";
+    EXCEPTION
+      WHEN OTHERS THEN
+        -- if not found and cannot create extension, raise the exception
+        error_message := 'pgvector extension not found.' || E'\n' ||
+        '****************************************************************************' || E'\n' ||
+        '*                                                                          *' || E'\n' ||
+        '*   NOTICE: From AFFiNE 0.20 onwards, the server will depend on pgvector.  *' || E'\n' ||
+        '*                                                                          *' || E'\n' ||
+        '*   1. If you are using the official PostgreSQL Docker container,          *' || E'\n' ||
+        '*      please switch to the pgvector/pgvector:pg${VERSION} container,      *' || E'\n' ||
+        '*      where ${VERSION} is the major version of your PostgreSQL container. *' || E'\n' ||
+        '*                                                                          *' || E'\n' ||
+        '*   2. If you are using a self-installed PostgreSQL, please follow the     *' || E'\n' ||
+        '*      the official pgvector installation guide to install it into your    *' || E'\n' ||
+        '*      database: https://github.com/pgvector/pgvector?tab=readme-ov-       *' || E'\n' ||
+        '*      file#installation-notes---linux-and-mac                             *' || E'\n' ||
+        '*                                                                          *' || E'\n' ||
+        '****************************************************************************';
+
+        RAISE EXCEPTION '%', error_message;
+    END;
+  END IF;
+END $$;
 
 -- CreateTable
 CREATE TABLE "ai_context_embeddings" (
