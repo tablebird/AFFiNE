@@ -28,6 +28,7 @@ import {
   RequestMutex,
   Throttle,
   TooManyRequest,
+  UserFriendlyError,
 } from '../../../base';
 import { CurrentUser } from '../../../core/auth';
 import { PermissionService } from '../../../core/permission';
@@ -394,6 +395,10 @@ export class CopilotContextResolver {
         signal
       );
     } catch (e: any) {
+      // passthrough user friendly error
+      if (e instanceof UserFriendlyError) {
+        throw e;
+      }
       throw new CopilotFailedToModifyContext({
         contextId: options.contextId,
         message: e.message,

@@ -105,8 +105,7 @@ export class ContextSession implements AsyncDisposable {
     name: string,
     blobId: string,
     signal?: AbortSignal
-  ): Promise<ContextList | undefined> {
-    if (signal?.aborted) return;
+  ): Promise<ContextList> {
     const buffer = await this.readStream(readable, 50 * OneMB);
     const file = new File([buffer], name);
     return await this.addFile(file, blobId, signal);
@@ -116,13 +115,12 @@ export class ContextSession implements AsyncDisposable {
     file: File,
     blobId: string,
     signal?: AbortSignal
-  ): Promise<ContextList | undefined> {
+  ): Promise<ContextList> {
     const embeddings = await this.client.getFileEmbeddings(file, signal);
     if (embeddings && !signal?.aborted) {
       await this.insertEmbeddings(file.name, blobId, embeddings);
-      return this.sortedList;
     }
-    return undefined;
+    return this.sortedList;
   }
 
   async removeFile(fileId: string): Promise<boolean> {

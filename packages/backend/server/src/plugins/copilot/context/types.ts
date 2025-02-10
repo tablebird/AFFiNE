@@ -2,6 +2,7 @@ import { File } from 'node:buffer';
 
 import { z } from 'zod';
 
+import { CopilotContextFileNotSupported } from '../../../base';
 import { parseDoc } from '../../../native';
 
 declare global {
@@ -77,10 +78,23 @@ export abstract class EmbeddingClient {
     file: File,
     signal?: AbortSignal
   ): Promise<Embedding[] | undefined> {
-    if (signal?.aborted) return;
     const buffer = Buffer.from(await file.arrayBuffer());
-    const doc = await parseDoc(file.name, buffer);
+    let doc;
+    try {
+      doc = await parseDoc(file.name, buffer);
+    } catch (e: any) {
+      throw new CopilotContextFileNotSupported({
+        fileName: file.name,
+        message: e?.message || e?.toString?.() || 'format not supported',
+      });
+    }
     if (doc && !signal?.aborted) {
+      if (!doc.chunks.length) {
+        throw new CopilotContextFileNotSupported({
+          fileName: file.name,
+          message: 'no content found',
+        });
+      }
       const input = doc.chunks
         .toSorted((a, b) => a.index - b.index)
         .map(chunk => chunk.content);
