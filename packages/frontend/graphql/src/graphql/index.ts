@@ -768,6 +768,23 @@ query getWorkspaceInfo($workspaceId: String!) {
 }`,
 };
 
+export const getWorkspacePageByIdQuery = {
+  id: 'getWorkspacePageByIdQuery' as const,
+  operationName: 'getWorkspacePageById',
+  definitionName: 'workspace',
+  containsFile: false,
+  query: `
+query getWorkspacePageById($workspaceId: String!, $pageId: String!) {
+  workspace(id: $workspaceId) {
+    doc(docId: $pageId) {
+      id
+      mode
+      defaultRole
+    }
+  }
+}`,
+};
+
 export const getWorkspacePageMetaByIdQuery = {
   id: 'getWorkspacePageMetaByIdQuery' as const,
   operationName: 'getWorkspacePageMetaById',
@@ -801,22 +818,6 @@ export const getWorkspacePublicByIdQuery = {
 query getWorkspacePublicById($id: String!) {
   workspace(id: $id) {
     public
-  }
-}`,
-};
-
-export const getWorkspacePublicPageByIdQuery = {
-  id: 'getWorkspacePublicPageByIdQuery' as const,
-  operationName: 'getWorkspacePublicPageById',
-  definitionName: 'workspace',
-  containsFile: false,
-  query: `
-query getWorkspacePublicPageById($workspaceId: String!, $pageId: String!) {
-  workspace(id: $workspaceId) {
-    publicDoc(docId: $pageId) {
-      id
-      mode
-    }
   }
 }`,
 };

@@ -61,6 +61,9 @@ class DocType implements Partial<PrismaWorkspaceDoc> {
 
   @Field()
   public!: boolean;
+
+  @Field(() => DocRole)
+  defaultRole!: DocRole;
 }
 
 @InputType()
@@ -180,31 +183,13 @@ export class WorkspaceDocResolver {
     description: 'Get public page of a workspace by page id.',
     complexity: 2,
     nullable: true,
-    deprecationReason: 'use [WorkspaceType.publicDoc] instead',
+    deprecationReason: 'use [WorkspaceType.doc] instead',
   })
   async publicPage(
     @Parent() workspace: WorkspaceType,
     @Args('pageId') pageId: string
   ) {
-    return this.publicDoc(workspace, pageId);
-  }
-
-  @ResolveField(() => DocType, {
-    description: 'Get public page of a workspace by page id.',
-    complexity: 2,
-    nullable: true,
-  })
-  async publicDoc(
-    @Parent() workspace: WorkspaceType,
-    @Args('docId') docId: string
-  ) {
-    return this.prisma.workspaceDoc.findFirst({
-      where: {
-        workspaceId: workspace.id,
-        docId,
-        public: true,
-      },
-    });
+    return this.doc(workspace, pageId);
   }
 
   @ResolveField(() => DocType, {
@@ -215,21 +200,26 @@ export class WorkspaceDocResolver {
     @Parent() workspace: WorkspaceType,
     @Args('docId') docId: string
   ): Promise<DocType> {
-    const doc = await this.prisma.workspaceDoc.findFirst({
+    const doc = await this.prisma.workspaceDoc.findUnique({
       where: {
-        workspaceId: workspace.id,
-        docId,
+        workspaceId_docId: {
+          workspaceId: workspace.id,
+          docId,
+        },
       },
     });
 
-    return (
-      doc ?? {
+    if (!doc) {
+      return {
         docId,
         workspaceId: workspace.id,
-        public: false,
         mode: PublicDocMode.Page,
-      }
-    );
+        public: false,
+        defaultRole: DocRole.Manager,
+      };
+    }
+
+    return doc;
   }
 
   @Mutation(() => DocType, {

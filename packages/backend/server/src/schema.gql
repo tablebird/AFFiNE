@@ -230,6 +230,8 @@ enum DocRole {
 }
 
 type DocType {
+  defaultRole: DocRole!
+
   """paginated doc granted users list"""
   grantedUsersList(pagination: PaginationInput!): PaginatedGrantedDocUserType!
   id: String!
@@ -1234,14 +1236,11 @@ type WorkspaceType {
   """is Public workspace"""
   public: Boolean!
 
-  """Get public page of a workspace by page id."""
-  publicDoc(docId: String!): DocType
-
   """Get public docs of a workspace"""
   publicDocs: [DocType!]!
 
   """Get public page of a workspace by page id."""
-  publicPage(pageId: String!): DocType @deprecated(reason: "use [WorkspaceType.publicDoc] instead")
+  publicPage(pageId: String!): DocType @deprecated(reason: "use [WorkspaceType.doc] instead")
   publicPages: [DocType!]! @deprecated(reason: "use [WorkspaceType.publicDocs] instead")
 
   """quota of workspace"""

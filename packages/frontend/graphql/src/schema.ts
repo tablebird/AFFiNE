@@ -281,6 +281,7 @@ export enum DocRole {
 
 export interface DocType {
   __typename?: 'DocType';
+  defaultRole: DocRole;
   /** paginated doc granted users list */
   grantedUsersList: PaginatedGrantedDocUserType;
   id: Scalars['String']['output'];
@@ -1636,13 +1637,11 @@ export interface WorkspaceType {
   pageMeta: WorkspacePageMeta;
   /** is Public workspace */
   public: Scalars['Boolean']['output'];
-  /** Get public page of a workspace by page id. */
-  publicDoc: Maybe<DocType>;
   /** Get public docs of a workspace */
   publicDocs: Array<DocType>;
   /**
    * Get public page of a workspace by page id.
-   * @deprecated use [WorkspaceType.publicDoc] instead
+   * @deprecated use [WorkspaceType.doc] instead
    */
   publicPage: Maybe<DocType>;
   /** @deprecated use [WorkspaceType.publicDocs] instead */
@@ -1680,10 +1679,6 @@ export interface WorkspaceTypeMembersArgs {
 
 export interface WorkspaceTypePageMetaArgs {
   pageId: Scalars['String']['input'];
-}
-
-export interface WorkspaceTypePublicDocArgs {
-  docId: Scalars['String']['input'];
 }
 
 export interface WorkspaceTypePublicPageArgs {
@@ -2400,6 +2395,24 @@ export type GetWorkspaceInfoQuery = {
   workspace: { __typename?: 'WorkspaceType'; team: boolean };
 };
 
+export type GetWorkspacePageByIdQueryVariables = Exact<{
+  workspaceId: Scalars['String']['input'];
+  pageId: Scalars['String']['input'];
+}>;
+
+export type GetWorkspacePageByIdQuery = {
+  __typename?: 'Query';
+  workspace: {
+    __typename?: 'WorkspaceType';
+    doc: {
+      __typename?: 'DocType';
+      id: string;
+      mode: PublicDocMode;
+      defaultRole: DocRole;
+    };
+  };
+};
+
 export type GetWorkspacePageMetaByIdQueryVariables = Exact<{
   id: Scalars['String']['input'];
   pageId: Scalars['String']['input'];
@@ -2434,23 +2447,6 @@ export type GetWorkspacePublicByIdQueryVariables = Exact<{
 export type GetWorkspacePublicByIdQuery = {
   __typename?: 'Query';
   workspace: { __typename?: 'WorkspaceType'; public: boolean };
-};
-
-export type GetWorkspacePublicPageByIdQueryVariables = Exact<{
-  workspaceId: Scalars['String']['input'];
-  pageId: Scalars['String']['input'];
-}>;
-
-export type GetWorkspacePublicPageByIdQuery = {
-  __typename?: 'Query';
-  workspace: {
-    __typename?: 'WorkspaceType';
-    publicDoc: {
-      __typename?: 'DocType';
-      id: string;
-      mode: PublicDocMode;
-    } | null;
-  };
 };
 
 export type GetWorkspacePublicPagesQueryVariables = Exact<{
@@ -3306,6 +3302,11 @@ export type Queries =
       response: GetWorkspaceInfoQuery;
     }
   | {
+      name: 'getWorkspacePageByIdQuery';
+      variables: GetWorkspacePageByIdQueryVariables;
+      response: GetWorkspacePageByIdQuery;
+    }
+  | {
       name: 'getWorkspacePageMetaByIdQuery';
       variables: GetWorkspacePageMetaByIdQueryVariables;
       response: GetWorkspacePageMetaByIdQuery;
@@ -3314,11 +3315,6 @@ export type Queries =
       name: 'getWorkspacePublicByIdQuery';
       variables: GetWorkspacePublicByIdQueryVariables;
       response: GetWorkspacePublicByIdQuery;
-    }
-  | {
-      name: 'getWorkspacePublicPageByIdQuery';
-      variables: GetWorkspacePublicPageByIdQueryVariables;
-      response: GetWorkspacePublicPageByIdQuery;
     }
   | {
       name: 'getWorkspacePublicPagesQuery';
