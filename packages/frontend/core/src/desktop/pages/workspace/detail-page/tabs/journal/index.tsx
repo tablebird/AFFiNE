@@ -61,9 +61,7 @@ const PageItem = ({
 }: PageItemProps) => {
   const i18n = useI18n();
   const docDisplayMetaService = useService(DocDisplayMetaService);
-  const Icon = useLiveData(
-    docDisplayMetaService.icon$(docId, { compareDate: new Date() })
-  );
+  const Icon = useLiveData(docDisplayMetaService.icon$(docId));
   const title = useLiveData(docDisplayMetaService.title$(docId));
 
   return (

@@ -34,7 +34,6 @@ import type { JournalService } from '../../journal';
 type IconType = 'rc' | 'lit';
 interface DocDisplayIconOptions<T extends IconType> {
   type?: T;
-  compareDate?: Date | Dayjs;
   /**
    * Override the mode detected inside the hook:
    * by default, it will use the `primaryMode$` of the doc.

@@ -24,9 +24,7 @@ type Category = 'created' | 'updated';
 
 const DocItem = ({ docId }: { docId: string }) => {
   const docDisplayMetaService = useService(DocDisplayMetaService);
-  const Icon = useLiveData(
-    docDisplayMetaService.icon$(docId, { compareDate: new Date() })
-  );
+  const Icon = useLiveData(docDisplayMetaService.icon$(docId));
   const title = useLiveData(docDisplayMetaService.title$(docId));
   return (
     <WorkbenchLink aria-label={title} to={`/${docId}`}>
