@@ -25,6 +25,16 @@ type ChatMessage {
   role: String!
 }
 
+type CommentNotification {
+  createdAt: DateTime!
+  id: String!
+  level: NotificationLevel!
+  read: Boolean!
+  starred: Boolean!
+  type: NotificationType!
+  updatedAt: DateTime!
+}
+
 type Copilot {
   """Get the session list of actions in the workspace"""
   actions: [String!]!
@@ -567,6 +577,26 @@ type MemberNotFoundInSpaceDataType {
   spaceId: String!
 }
 
+type MentionNotification {
+  blockId: String!
+  createdAt: DateTime!
+  docId: String!
+  id: String!
+  level: NotificationLevel!
+  read: Boolean!
+  starred: Boolean!
+  type: NotificationType!
+  updatedAt: DateTime!
+  workspaceId: String!
+}
+
+input MentionNotificationInput {
+  blockId: String!
+  docId: String!
+  userId: String!
+  workspaceId: String!
+}
+
 type MissingOauthQueryParameterDataType {
   name: String!
 }
@@ -640,6 +670,9 @@ type Mutation {
   revokePublicPage(docId: String!, workspaceId: String!): DocType! @deprecated(reason: "use revokePublicDoc instead")
   sendChangeEmail(callbackUrl: String!, email: String): Boolean!
   sendChangePasswordEmail(callbackUrl: String!, email: String @deprecated(reason: "fetched from signed in user")): Boolean!
+
+  """Send mention notification to other user"""
+  sendMentionNotification(input: MentionNotificationInput!): MentionNotification!
   sendSetPasswordEmail(callbackUrl: String!, email: String @deprecated(reason: "fetched from signed in user")): Boolean!
   sendVerifyChangeEmail(callbackUrl: String!, email: String!, token: String!): Boolean!
   sendVerifyEmail(callbackUrl: String!): Boolean!
@@ -677,6 +710,23 @@ type Mutation {
 
 type NotInSpaceDataType {
   spaceId: String!
+}
+
+union Notification = CommentNotification | MentionNotification
+
+"""Notification level"""
+enum NotificationLevel {
+  Default
+  High
+  Low
+  Min
+  None
+}
+
+"""Notification type"""
+enum NotificationType {
+  Comment
+  Mention
 }
 
 enum OAuthProviderType {
@@ -756,6 +806,9 @@ type Query {
 
   """List all copilot prompts"""
   listCopilotPrompts: [CopilotPromptType!]!
+
+  """Get current user notifications"""
+  notifications(pagination: PaginationInput!): [Notification!]!
   prices: [SubscriptionPrice!]!
 
   """server config"""

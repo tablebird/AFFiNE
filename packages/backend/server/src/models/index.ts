@@ -9,6 +9,7 @@ import { ModuleRef } from '@nestjs/core';
 import { ApplyType } from '../base';
 import { DocModel } from './doc';
 import { FeatureModel } from './feature';
+import { NotificationModel } from './notification';
 import { PageModel } from './page';
 import { MODELS_SYMBOL } from './provider';
 import { SessionModel } from './session';
@@ -30,6 +31,7 @@ const MODELS = {
   workspaceFeature: WorkspaceFeatureModel,
   doc: DocModel,
   userDoc: UserDocModel,
+  notification: NotificationModel,
 };
 
 type ModelsType = {
@@ -84,6 +86,7 @@ export class ModelsModule {}
 export * from './common';
 export * from './doc';
 export * from './feature';
+export * from './notification';
 export * from './page';
 export * from './session';
 export * from './user';

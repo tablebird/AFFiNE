@@ -36,6 +36,7 @@ import { DocStorageModule } from './core/doc';
 import { DocRendererModule } from './core/doc-renderer';
 import { DocServiceModule } from './core/doc-service';
 import { FeatureModule } from './core/features';
+import { NotificationModule } from './core/notification';
 import { PermissionModule } from './core/permission';
 import { QuotaModule } from './core/quota';
 import { SelfhostModule } from './core/selfhost';
@@ -208,7 +209,7 @@ export function buildAppModule() {
     .use(UserModule, AuthModule, PermissionModule)
 
     // business modules
-    .use(FeatureModule, QuotaModule, DocStorageModule)
+    .use(FeatureModule, QuotaModule, DocStorageModule, NotificationModule)
 
     // sync server only
     .useIf(config => config.flavor.sync, SyncModule)
