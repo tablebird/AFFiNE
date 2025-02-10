@@ -82,7 +82,7 @@
     "nestjs-cls": "^5.0.0",
     "nodemailer": "^6.9.16",
     "on-headers": "^1.0.2",
-    "openai": "^4.76.2",
+    "openai": "^4.83.0",
     "piscina": "^5.0.0-alpha.0",
     "prisma": "^5.22.0",
     "react": "19.0.0",

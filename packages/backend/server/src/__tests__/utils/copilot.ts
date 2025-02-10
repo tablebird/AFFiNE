@@ -23,6 +23,7 @@ import {
   WorkflowNodeType,
   WorkflowParams,
 } from '../../plugins/copilot/workflow/types';
+import { gql } from './common';
 import { TestingApp } from './testing-app';
 import { sleep } from './utils';
 
@@ -207,6 +208,217 @@ export async function forkCopilotSession(
   );
 
   return res.forkCopilotSession;
+}
+
+export async function createCopilotContext(
+  app: TestingApp,
+  workspaceId: string,
+  sessionId: string
+): Promise<string> {
+  const res = await app.gql(`
+        mutation {
+          createCopilotContext(workspaceId: "${workspaceId}", sessionId: "${sessionId}")
+        }
+      `);
+
+  return res.body.data.createCopilotContext;
+}
+
+export async function matchContext(
+  app: TestingApp,
+  contextId: string,
+  content: string,
+  limit: number
+): Promise<
+  | {
+      fileId: string;
+      chunk: number;
+      content: string;
+      distance: number | null;
+    }[]
+  | undefined
+> {
+  const res = await app.gql(
+    `
+        mutation matchContext($content: String!, $contextId: String!, $limit: SafeInt) {
+          matchContext(content: $content, contextId: $contextId, limit: $limit) {
+            fileId
+            chunk
+            content
+            distance
+          }
+        }
+      `,
+    { contextId, content, limit }
+  );
+
+  return res.body.data.matchContext;
+}
+
+export async function listContext(
+  app: TestingApp,
+  workspaceId: string,
+  sessionId: string
+): Promise<
+  {
+    id: string;
+    workspaceId: string;
+  }[]
+> {
+  const res = await app.gql(`
+        query {
+          currentUser {
+            copilot(workspaceId: "${workspaceId}") {
+              contexts(sessionId: "${sessionId}") {
+                id
+                workspaceId
+              }
+            }
+          }
+        }
+      `);
+
+  return res.body.data.currentUser?.copilot?.contexts;
+}
+
+export async function addContextFile(
+  app: TestingApp,
+  contextId: string,
+  blobId: string,
+  fileName: string,
+  content: Buffer
+): Promise<{ id: string }[]> {
+  const res = await app
+    .POST(gql)
+    .set({ 'x-request-id': 'test', 'x-operation-name': 'test' })
+    .field(
+      'operations',
+      JSON.stringify({
+        query: `
+          mutation addContextFile($options: AddContextFileInput!, $content: Upload!) {
+            addContextFile(content: $content, options: $options) {
+              id
+            }
+          }
+        `,
+        variables: {
+          content: null,
+          options: { contextId, blobId, fileName },
+        },
+      })
+    )
+    .field('map', JSON.stringify({ '0': ['variables.content'] }))
+    .attach('0', content, {
+      filename: fileName,
+      contentType: 'application/octet-stream',
+    })
+    .expect(200);
+
+  return res.body.data.addContextFile;
+}
+
+export async function removeContextFile(
+  app: TestingApp,
+  contextId: string,
+  fileId: string
+): Promise<string> {
+  const res = await app.gql(
+    `
+        mutation removeContextFile($options: RemoveContextFileInput!) {
+          removeContextFile(options: $options)
+        }
+    `,
+    { options: { contextId, fileId } }
+  );
+
+  return res.body.data.removeContextFile;
+}
+
+export async function addContextDoc(
+  app: TestingApp,
+  contextId: string,
+  docId: string
+): Promise<{ id: string }[]> {
+  const res = await app.gql(
+    `
+          mutation addContextDoc($options: AddContextDocInput!) {
+            addContextDoc(options: $options) {
+              id
+            }
+          }
+        `,
+    { options: { contextId, docId } }
+  );
+
+  return res.body.data.addContextDoc;
+}
+
+export async function removeContextDoc(
+  app: TestingApp,
+  contextId: string,
+  docId: string
+): Promise<string> {
+  const res = await app.gql(
+    `
+      mutation removeContextDoc($options: RemoveContextFileInput!) {
+        removeContextDoc(options: $options)
+      }
+    `,
+    { options: { contextId, docId } }
+  );
+
+  return res.body.data.removeContextDoc;
+}
+
+export async function listContextFiles(
+  app: TestingApp,
+  workspaceId: string,
+  sessionId: string,
+  contextId: string
+): Promise<
+  | {
+      docs: {
+        id: string;
+        createdAt: number;
+      }[];
+      files: {
+        id: string;
+        name: string;
+        blobId: string;
+        chunk_size: number;
+        status: string;
+        createdAt: number;
+      }[];
+    }
+  | undefined
+> {
+  const res = await app.gql(`
+        query {
+          currentUser {
+            copilot(workspaceId: "${workspaceId}") {
+              contexts(sessionId: "${sessionId}", contextId: "${contextId}") {
+                docs {
+                  id
+                  createdAt
+                }
+                files {
+                  id
+                  name
+                  blobId
+                  chunk_size
+                  status
+                  createdAt
+                }
+              }
+            }
+          }
+        }
+      `);
+
+  const { docs, files } =
+    res.body.data.currentUser?.copilot?.contexts?.[0] || {};
+
+  return { docs, files };
 }
 
 export async function createCopilotMessage(

@@ -59,6 +59,7 @@ export class OpenAIProvider
 
   private readonly logger = new Logger(OpenAIProvider.type);
   private readonly instance: OpenAI;
+
   private existsModels: string[] | undefined;
 
   constructor(config: ClientOptions) {

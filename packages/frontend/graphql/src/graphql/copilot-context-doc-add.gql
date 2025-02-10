@@ -1,0 +1,10 @@
+mutation addContextDoc($options: AddContextDocInput!) {
+  addContextDoc(options: $options) {
+    id
+    createdAt
+    name
+    chunk_size
+    status
+    blobId
+  }
+}

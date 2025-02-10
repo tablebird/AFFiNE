@@ -8,6 +8,7 @@ import { ConfigModule } from '../base/config';
 import { AuthService } from '../core/auth';
 import { WorkspaceModule } from '../core/workspaces';
 import { CopilotModule } from '../plugins/copilot';
+import { CopilotContextService } from '../plugins/copilot/context';
 import { prompts, PromptService } from '../plugins/copilot/prompt';
 import {
   CopilotProviderService,
@@ -27,15 +28,19 @@ import {
   TestUser,
 } from './utils';
 import {
+  addContextDoc,
   array2sse,
   chatWithImages,
   chatWithText,
   chatWithTextStream,
   chatWithWorkflow,
+  createCopilotContext,
   createCopilotMessage,
   createCopilotSession,
   forkCopilotSession,
   getHistories,
+  listContext,
+  listContextFiles,
   MockCopilotTestProvider,
   sse2array,
   textToEventStream,
@@ -46,6 +51,7 @@ import {
 const test = ava as TestFn<{
   auth: AuthService;
   app: TestingApp;
+  context: CopilotContextService;
   prompt: PromptService;
   provider: CopilotProviderService;
   storage: CopilotStorage;
@@ -77,11 +83,13 @@ test.before(async t => {
   });
 
   const auth = app.get(AuthService);
+  const context = app.get(CopilotContextService);
   const prompt = app.get(PromptService);
   const storage = app.get(CopilotStorage);
 
   t.context.app = app;
   t.context.auth = auth;
+  t.context.context = context;
   t.context.prompt = prompt;
   t.context.storage = storage;
 });
@@ -677,4 +685,47 @@ test('should be able to search image from unsplash', async t => {
 
   const resp = await unsplashSearch(app);
   t.not(resp.status, 404, 'route should be exists');
+});
+
+test('should be able to manage context', async t => {
+  const { app } = t.context;
+
+  const { id: workspaceId } = await createWorkspace(app);
+  const sessionId = await createCopilotSession(
+    app,
+    workspaceId,
+    randomUUID(),
+    promptName
+  );
+
+  {
+    await t.throwsAsync(
+      createCopilotContext(app, workspaceId, randomUUID()),
+      { instanceOf: Error },
+      'should throw error if create context with invalid session id'
+    );
+
+    const context = createCopilotContext(app, workspaceId, sessionId);
+    await t.notThrowsAsync(context, 'should create context with chat session');
+
+    const list = await listContext(app, workspaceId, sessionId);
+    t.deepEqual(
+      list.map(f => ({ id: f.id })),
+      [{ id: await context }],
+      'should list context'
+    );
+  }
+
+  {
+    const contextId = await createCopilotContext(app, workspaceId, sessionId);
+
+    await addContextDoc(app, contextId, 'docId1');
+
+    const { docs } =
+      (await listContextFiles(app, workspaceId, sessionId, contextId)) || {};
+    t.snapshot(
+      docs?.map(({ createdAt: _, ...d }) => d),
+      'should list context files'
+    );
+  }
 });

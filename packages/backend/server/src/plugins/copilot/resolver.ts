@@ -23,7 +23,7 @@ import {
   CallMetric,
   CopilotFailedToCreateMessage,
   CopilotSessionNotFound,
-  FileUpload,
+  type FileUpload,
   RequestMutex,
   Throttle,
   TooManyRequest,

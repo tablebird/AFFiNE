@@ -198,6 +198,13 @@ const CopilotImageOptionsSchema = CopilotProviderOptionsSchema.merge(
 
 export type CopilotImageOptions = z.infer<typeof CopilotImageOptionsSchema>;
 
+export type CopilotContextFile = {
+  id: string; // fileId
+  created_at: number;
+  // embedding status
+  status: 'in_progress' | 'completed' | 'failed';
+};
+
 export interface CopilotProvider {
   readonly type: CopilotProviderType;
   getCapabilities(): CopilotCapability[];

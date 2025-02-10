@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddContextDocInput {
+  contextId: String!
+  docId: String!
+}
+
 type AlreadyInSpaceDataType {
   spaceId: String!
 }
@@ -25,17 +30,75 @@ type ChatMessage {
   role: String!
 }
 
+enum ContextFileStatus {
+  failed
+  finished
+  processing
+}
+
 type Copilot {
   """Get the session list of actions in the workspace"""
   actions: [String!]!
 
   """Get the session list of chats in the workspace"""
   chats: [String!]!
+
+  """Get the context list of a session"""
+  contexts(contextId: String, sessionId: String!): [CopilotContext!]!
   histories(docId: String, options: QueryChatHistoriesInput): [CopilotHistories!]!
 
   """Get the quota of the user in the workspace"""
   quota: CopilotQuota!
   workspaceId: ID
+}
+
+type CopilotContext {
+  """list files in context"""
+  docs: [CopilotContextDoc!]!
+
+  """list files in context"""
+  files: [CopilotContextFile!]!
+  id: ID!
+  workspaceId: String!
+}
+
+type CopilotContextDoc {
+  createdAt: SafeInt!
+  id: ID!
+}
+
+type CopilotContextFile {
+  blobId: String!
+  chunk_size: SafeInt!
+  createdAt: SafeInt!
+  id: ID!
+  name: String!
+  status: ContextFileStatus!
+}
+
+type CopilotContextFileNotSupportedDataType {
+  fileName: String!
+  message: String!
+}
+
+type CopilotContextListItem {
+  blobId: String
+  chunk_size: SafeInt
+  createdAt: SafeInt!
+  id: ID!
+  name: String
+  status: ContextFileStatus
+}
+
+type CopilotFailedToMatchContextDataType {
+  content: String!
+  contextId: String!
+  message: String!
+}
+
+type CopilotFailedToModifyContextDataType {
+  contextId: String!
+  message: String!
 }
 
 type CopilotHistories {
@@ -47,6 +110,10 @@ type CopilotHistories {
 
   """The number of tokens used in the session"""
   tokens: Int!
+}
+
+type CopilotInvalidContextDataType {
+  contextId: String!
 }
 
 type CopilotMessageNotFoundDataType {
@@ -244,7 +311,7 @@ type EditorType {
   name: String!
 }
 
-union ErrorDataUnion = AlreadyInSpaceDataType | BlobNotFoundDataType | CopilotMessageNotFoundDataType | CopilotPromptNotFoundDataType | CopilotProviderSideErrorDataType | DocAccessDeniedDataType | DocHistoryNotFoundDataType | DocNotFoundDataType | ExpectToGrantDocUserRolesDataType | ExpectToRevokeDocUserRolesDataType | ExpectToUpdateDocUserRoleDataType | InvalidEmailDataType | InvalidHistoryTimestampDataType | InvalidLicenseUpdateParamsDataType | InvalidPasswordLengthDataType | InvalidRuntimeConfigTypeDataType | MemberNotFoundInSpaceDataType | MissingOauthQueryParameterDataType | NotInSpaceDataType | QueryTooLongDataType | RuntimeConfigNotFoundDataType | SameSubscriptionRecurringDataType | SpaceAccessDeniedDataType | SpaceNotFoundDataType | SpaceOwnerNotFoundDataType | SpaceShouldHaveOnlyOneOwnerDataType | SubscriptionAlreadyExistsDataType | SubscriptionNotExistsDataType | SubscriptionPlanNotFoundDataType | UnknownOauthProviderDataType | UnsupportedSubscriptionPlanDataType | VersionRejectedDataType | WorkspaceMembersExceedLimitToDowngradeDataType | WorkspacePermissionNotFoundDataType | WrongSignInCredentialsDataType
+union ErrorDataUnion = AlreadyInSpaceDataType | BlobNotFoundDataType | CopilotContextFileNotSupportedDataType | CopilotFailedToMatchContextDataType | CopilotFailedToModifyContextDataType | CopilotInvalidContextDataType | CopilotMessageNotFoundDataType | CopilotPromptNotFoundDataType | CopilotProviderSideErrorDataType | DocAccessDeniedDataType | DocHistoryNotFoundDataType | DocNotFoundDataType | ExpectToGrantDocUserRolesDataType | ExpectToRevokeDocUserRolesDataType | ExpectToUpdateDocUserRoleDataType | InvalidEmailDataType | InvalidHistoryTimestampDataType | InvalidLicenseUpdateParamsDataType | InvalidPasswordLengthDataType | InvalidRuntimeConfigTypeDataType | MemberNotFoundInSpaceDataType | MissingOauthQueryParameterDataType | NotInSpaceDataType | QueryTooLongDataType | RuntimeConfigNotFoundDataType | SameSubscriptionRecurringDataType | SpaceAccessDeniedDataType | SpaceNotFoundDataType | SpaceOwnerNotFoundDataType | SpaceShouldHaveOnlyOneOwnerDataType | SubscriptionAlreadyExistsDataType | SubscriptionNotExistsDataType | SubscriptionPlanNotFoundDataType | UnknownOauthProviderDataType | UnsupportedSubscriptionPlanDataType | VersionRejectedDataType | WorkspaceMembersExceedLimitToDowngradeDataType | WorkspacePermissionNotFoundDataType | WrongSignInCredentialsDataType
 
 enum ErrorNames {
   ACCESS_DENIED
@@ -260,8 +327,12 @@ enum ErrorNames {
   CAN_NOT_BATCH_GRANT_DOC_OWNER_PERMISSIONS
   CAPTCHA_VERIFICATION_FAILED
   COPILOT_ACTION_TAKEN
+  COPILOT_CONTEXT_FILE_NOT_SUPPORTED
   COPILOT_FAILED_TO_CREATE_MESSAGE
   COPILOT_FAILED_TO_GENERATE_TEXT
+  COPILOT_FAILED_TO_MATCH_CONTEXT
+  COPILOT_FAILED_TO_MODIFY_CONTEXT
+  COPILOT_INVALID_CONTEXT
   COPILOT_MESSAGE_NOT_FOUND
   COPILOT_PROMPT_INVALID
   COPILOT_PROMPT_NOT_FOUND
@@ -574,6 +645,9 @@ type MissingOauthQueryParameterDataType {
 type Mutation {
   acceptInviteById(inviteId: String!, sendAcceptMail: Boolean, workspaceId: String!): Boolean!
   activateLicense(license: String!, workspaceId: String!): License!
+
+  """add a doc to context"""
+  addContextDoc(options: AddContextDocInput!): [CopilotContextListItem!]!
   addWorkspaceFeature(feature: FeatureType!, workspaceId: String!): Boolean!
   approveMember(userId: String!, workspaceId: String!): String!
   cancelSubscription(idempotencyKey: String @deprecated(reason: "use header `Idempotency-Key`"), plan: SubscriptionPlan = Pro, workspaceId: String): SubscriptionType!
@@ -588,6 +662,9 @@ type Mutation {
 
   """Create a subscription checkout link of stripe"""
   createCheckoutSession(input: CreateCheckoutSessionInput!): String!
+
+  """Create a context session"""
+  createCopilotContext(sessionId: String!, workspaceId: String!): String!
 
   """Create a chat message"""
   createCopilotMessage(options: CreateChatMessageInput!): String!
@@ -631,6 +708,9 @@ type Mutation {
 
   """Remove user avatar"""
   removeAvatar: RemoveAvatar!
+
+  """remove a doc from context"""
+  removeContextDoc(options: RemoveContextFileInput!): Boolean!
   removeWorkspaceFeature(feature: FeatureType!, workspaceId: String!): Boolean!
   resumeSubscription(idempotencyKey: String @deprecated(reason: "use header `Idempotency-Key`"), plan: SubscriptionPlan = Pro, workspaceId: String): SubscriptionType!
   revoke(userId: String!, workspaceId: String!): Boolean!
@@ -806,6 +886,11 @@ type QueryTooLongDataType {
 
 type RemoveAvatar {
   success: Boolean!
+}
+
+input RemoveContextFileInput {
+  contextId: String!
+  fileId: String!
 }
 
 input RevokeDocUserRoleInput {
