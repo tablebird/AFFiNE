@@ -264,6 +264,7 @@ export class EdgelessTextBlockComponent extends GfxBlockComponent<EdgelessTextBl
       boxShadow: editing ? '0px 0px 0px 2px rgba(30, 150, 235, 0.3)' : 'none',
       fontWeight: '400',
       lineHeight: 'var(--affine-line-height)',
+      minWidth: !hasMaxWidth ? '220px' : undefined,
     };
 
     return html`
