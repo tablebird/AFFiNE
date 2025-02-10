@@ -23,6 +23,7 @@ import {
 } from '../../base';
 import { CurrentUser } from '../auth';
 import {
+  DocReader,
   DocStorageAdapter,
   PgUserspaceDocStorageAdapter,
   PgWorkspaceDocStorageAdapter,
@@ -144,7 +145,8 @@ export class SpaceSyncGateway
     private readonly runtime: Runtime,
     private readonly permissions: PermissionService,
     private readonly workspace: PgWorkspaceDocStorageAdapter,
-    private readonly userspace: PgUserspaceDocStorageAdapter
+    private readonly userspace: PgUserspaceDocStorageAdapter,
+    private readonly docReader: DocReader
   ) {}
 
   handleConnection() {
@@ -167,7 +169,8 @@ export class SpaceSyncGateway
       const workspace = new WorkspaceSyncAdapter(
         client,
         this.workspace,
-        this.permissions
+        this.permissions,
+        this.docReader
       );
       const userspace = new UserspaceSyncAdapter(client, this.userspace);
 
@@ -671,7 +674,8 @@ class WorkspaceSyncAdapter extends SyncSocketAdapter {
   constructor(
     client: Socket,
     storage: DocStorageAdapter,
-    private readonly permission: PermissionService
+    private readonly permission: PermissionService,
+    private readonly docReader: DocReader
   ) {
     super(SpaceType.Workspace, client, storage);
   }
@@ -686,9 +690,13 @@ class WorkspaceSyncAdapter extends SyncSocketAdapter {
     return super.push(spaceId, id.guid, updates, editorId);
   }
 
-  override diff(spaceId: string, docId: string, stateVector?: Uint8Array) {
+  override async diff(
+    spaceId: string,
+    docId: string,
+    stateVector?: Uint8Array
+  ) {
     const id = new DocID(docId, spaceId);
-    return this.storage.getDocDiff(spaceId, id.guid, stateVector);
+    return await this.docReader.getDocDiff(spaceId, id.guid, stateVector);
   }
 
   async assertAccessible(

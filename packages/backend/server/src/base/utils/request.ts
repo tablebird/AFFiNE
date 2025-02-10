@@ -5,6 +5,7 @@ import type { ArgumentsHost, ExecutionContext } from '@nestjs/common';
 import type { GqlContextType } from '@nestjs/graphql';
 import { GqlArgumentsHost } from '@nestjs/graphql';
 import type { Request, Response } from 'express';
+import { ClsServiceManager } from 'nestjs-cls';
 import type { Socket } from 'socket.io';
 
 export function getRequestResponseFromHost(host: ArgumentsHost) {
@@ -87,9 +88,16 @@ export function parseCookies(
  * - `ws`: websocket request
  * - `se`: server event
  * - `job`: cron job
+ * - `rpc`: rpc request
  */
-export type RequestType = 'req' | 'ws' | 'se' | 'job';
+export type RequestType = 'req' | 'ws' | 'se' | 'job' | 'rpc';
 
 export function genRequestId(type: RequestType) {
   return `${AFFiNE.flavor.type}:${type}-${randomUUID()}`;
+}
+
+export function getOrGenRequestId(type: RequestType) {
+  // The request id must exist in a cls context,
+  // but it can be lost in unexpected scenarios, such as unit tests, where it is automatically generated.
+  return ClsServiceManager.getClsService()?.getId() ?? genRequestId(type);
 }

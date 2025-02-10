@@ -24,6 +24,10 @@ export async function createApp() {
     bufferLogs: true,
   });
 
+  if (AFFiNE.flavor.doc) {
+    app.useBodyParser('raw');
+  }
+
   app.useLogger(app.get(AFFiNELogger));
 
   if (AFFiNE.server.path) {

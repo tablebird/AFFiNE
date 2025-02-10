@@ -1,20 +1,18 @@
-import {
-  ConsoleLogger,
-  INestApplication,
-  ModuleMetadata,
-} from '@nestjs/common';
+import { INestApplication, ModuleMetadata } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { TestingModuleBuilder } from '@nestjs/testing';
 import { User } from '@prisma/client';
 import cookieParser from 'cookie-parser';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import supertest from 'supertest';
 
-import { ApplyType, GlobalExceptionFilter } from '../../base';
+import { AFFiNELogger, ApplyType, GlobalExceptionFilter } from '../../base';
 import { AuthService } from '../../core/auth';
 import { UserModel } from '../../models';
 import { createTestingModule } from './testing-module';
 import { initTestingDB, TEST_LOG_LEVEL } from './utils';
-interface TestingAppMeatdata extends ModuleMetadata {
+
+interface TestingAppMetadata extends ModuleMetadata {
   tapModule?(m: TestingModuleBuilder): void;
   tapApp?(app: INestApplication): void;
 }
@@ -22,16 +20,19 @@ interface TestingAppMeatdata extends ModuleMetadata {
 export type TestUser = Omit<User, 'password'> & { password: string };
 
 export async function createTestingApp(
-  moduleDef: TestingAppMeatdata = {}
+  moduleDef: TestingAppMetadata = {}
 ): Promise<TestingApp> {
   const module = await createTestingModule(moduleDef, false);
 
-  const app = module.createNestApplication({
+  const app = module.createNestApplication<NestExpressApplication>({
     cors: true,
     bodyParser: true,
     rawBody: true,
   });
-  const logger = new ConsoleLogger();
+  if (AFFiNE.flavor.doc) {
+    app.useBodyParser('raw');
+  }
+  const logger = new AFFiNELogger();
 
   logger.setLogLevels([TEST_LOG_LEVEL]);
   app.useLogger(logger);
