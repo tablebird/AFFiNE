@@ -134,48 +134,61 @@ export class ContextSession implements AsyncDisposable {
     });
   }
 
+  /**
+   * Match the input text with the file chunks
+   * @param content input text to match
+   * @param topK number of similar chunks to return, default 5
+   * @param signal abort signal
+   * @param threshold relevance threshold for the similarity score, higher threshold means more similar chunks, default 0.7, good enough based on prior experiments
+   * @returns list of similar chunks
+   */
   async matchFileChunks(
     content: string,
     topK: number = 5,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    threshold: number = 0.7
   ): Promise<FileChunkSimilarity[]> {
     const embedding = await this.client
       .getEmbeddings([content], signal)
       .then(r => r?.[0]?.embedding);
     if (!embedding) return [];
-    return await this.db.$queryRaw<Array<FileChunkSimilarity>>`
+    const similarityChunks = await this.db.$queryRaw<
+      Array<FileChunkSimilarity>
+    >`
       SELECT "file_id" as "fileId", "chunk", "content", "embedding" <=> ${embedding}::vector as "distance" 
       FROM "ai_context_embeddings"
       ORDER BY "distance" ASC
       LIMIT ${topK};
     `;
+    return similarityChunks.filter(c => Number(c.distance) <= threshold);
   }
 
   /**
-   *
+   * Match the input text with the workspace chunks
    * @param content input text to match
    * @param topK number of similar chunks to return, default 5
-   * @param threshold relevance threshold for the similarity score, higher threshold means more similar chunks, default 0.7, good enough based on prior experiments
    * @param signal abort signal
+   * @param threshold relevance threshold for the similarity score, higher threshold means more similar chunks, default 0.7, good enough based on prior experiments
    * @returns list of similar chunks
    */
   async matchWorkspaceChunks(
     content: string,
     topK: number = 5,
-    threshold: number = 0.7,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    threshold: number = 0.7
   ): Promise<ChunkSimilarity[]> {
     const embedding = await this.client
       .getEmbeddings([content], signal)
       .then(r => r?.[0]?.embedding);
     if (!embedding) return [];
-    return await this.db.$queryRaw<Array<DocChunkSimilarity>>`
+    const similarityChunks = await this.db.$queryRaw<Array<DocChunkSimilarity>>`
       SELECT "doc_id" as "docId", "chunk", "content", "embedding" <=> ${embedding}::vector as "distance"
       FROM "ai_workspace_embeddings"
-      WHERE "workspace_id" = ${this.workspaceId} AND "distance" <= ${threshold}
+      WHERE "workspace_id" = ${this.workspaceId}
       ORDER BY "distance" ASC
       LIMIT ${topK};
     `;
+    return similarityChunks.filter(c => Number(c.distance) <= threshold);
   }
 
   private processEmbeddings(fileId: string, embeddings: Embedding[]) {
