@@ -18,7 +18,7 @@
     "@capacitor/app": "^7.0.0",
     "@capacitor/core": "^7.0.0",
     "@capgo/inappbrowser": "^7.0.0",
-    "@sentry/react": "^8.44.0",
+    "@sentry/react": "^9.0.0",
     "@toeverything/infra": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
