@@ -7,8 +7,7 @@ import { doc, editor } from './editor.js';
 
 type DocMode = 'page' | 'edgeless';
 
-const container = document.querySelector('#right-column') as HTMLElement;
-const renderer = new CanvasRenderer(editor, container);
+const renderer = new CanvasRenderer(editor);
 
 async function handleToCanvasClick() {
   await renderer.render();
@@ -47,7 +46,7 @@ function initUI() {
       editor.mode = value as DocMode;
     });
 
-  document.querySelector('#left-column')?.append(editor);
+  document.querySelector('#container')!.append(editor);
 }
 
 function addParagraph(content: string) {

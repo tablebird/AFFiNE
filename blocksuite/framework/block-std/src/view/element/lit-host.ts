@@ -40,6 +40,7 @@ export class EditorHost extends SignalWatcher(
       outline: none;
       isolation: isolate;
       display: block;
+      position: relative;
       height: 100%;
     }
   `;

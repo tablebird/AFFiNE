@@ -7,27 +7,23 @@ import { type ParagraphLayout, type SectionLayout } from './types.js';
 export class CanvasRenderer {
   private readonly worker: Worker;
   private readonly editorContainer: AffineEditorContainer;
-  private readonly targetContainer: HTMLElement;
-  public readonly canvas: HTMLCanvasElement = document.createElement('canvas');
+  private readonly canvas: HTMLCanvasElement = document.createElement('canvas');
   private lastZoom: number | null = null;
   private lastSection: SectionLayout | null = null;
   private lastBitmap: ImageBitmap | null = null;
   private lastMode: 'page' | 'edgeless' = 'edgeless';
+  private initialized = false;
 
-  constructor(
-    editorContainer: AffineEditorContainer,
-    targetContainer: HTMLElement
-  ) {
+  constructor(editorContainer: AffineEditorContainer) {
     this.editorContainer = editorContainer;
-    this.targetContainer = targetContainer;
 
     this.worker = new Worker(new URL('./painter.worker.ts', import.meta.url), {
       type: 'module',
     });
+  }
 
-    if (!this.targetContainer.querySelector('canvas')) {
-      this.targetContainer.append(this.canvas);
-    }
+  private get targetContainer(): HTMLElement {
+    return this.editorContainer.host!;
   }
 
   get viewport() {
@@ -152,10 +148,14 @@ export class CanvasRenderer {
   private syncCanvasSize() {
     const hostRect = this.getHostRect();
     const dpr = window.devicePixelRatio;
-    this.canvas.style.width = `${hostRect.width}px`;
-    this.canvas.style.height = `${hostRect.height}px`;
+    this.canvas.style.position = 'absolute';
+    this.canvas.style.left = '0px';
+    this.canvas.style.top = '0px';
+    this.canvas.style.width = '100%';
+    this.canvas.style.height = '100%';
     this.canvas.width = hostRect.width * dpr;
     this.canvas.height = hostRect.height * dpr;
+    this.canvas.style.pointerEvents = 'none';
   }
 
   private updateCacheState(section: SectionLayout, bitmapCopy: ImageBitmap) {
@@ -210,7 +210,17 @@ export class CanvasRenderer {
     );
   }
 
+  private checkMount() {
+    if (this.initialized) return;
+    if (!this.targetContainer) return;
+    this.targetContainer.append(this.canvas);
+    this.initialized = true;
+  }
+
   public async render(): Promise<void> {
+    if (!this.targetContainer) return;
+    this.checkMount();
+
     const hostLayout = this.getHostLayout();
     if (!hostLayout) return;
 
