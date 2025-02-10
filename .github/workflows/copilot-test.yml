@@ -40,7 +40,7 @@ jobs:
       REDIS_SERVER_HOST: localhost
     services:
       postgres:
-        image: pgvector/pgvector:pg17
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_PASSWORD: affine
         options: >-
@@ -112,7 +112,7 @@ jobs:
       - build-server-native
     services:
       postgres:
-        image: pgvector/pgvector:pg17
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_PASSWORD: affine
         options: >-
