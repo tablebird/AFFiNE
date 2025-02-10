@@ -1,4 +1,5 @@
-use pdf_extract::{output_doc, PlainTextOutput};
+use pdf_extract::{output_doc, output_doc_encrypted, PlainTextOutput};
+use std::thread::spawn;
 
 /**
  * modified from https://github.com/Abraxas-365/langchain-rust/tree/v4.6.0/src/document_loaders
@@ -20,10 +21,29 @@ impl PdfExtractLoader {
 
 impl PdfExtractLoader {
   fn extract_text(&self) -> Result<String, LoaderError> {
-    let mut buffer: Vec<u8> = Vec::new();
-    let mut output = PlainTextOutput::new(&mut buffer as &mut dyn std::io::Write);
-    output_doc(&self.document, &mut output).map_err(|e| LoaderError::OtherError(e.to_string()))?;
-    Ok(String::from_utf8(buffer)?)
+    let mut doc = self.document.clone();
+    // prevent panic in the parser thread from crashing the main thread
+    match spawn(move || {
+      let mut buffer: Vec<u8> = Vec::new();
+      let mut output = PlainTextOutput::new(&mut buffer as &mut dyn std::io::Write);
+      if doc.is_encrypted() {
+        output_doc_encrypted(&mut doc, &mut output, "")?;
+      } else {
+        output_doc(&doc, &mut output)?;
+      }
+      Ok::<_, LoaderError>(buffer)
+    })
+    .join()
+    {
+      Ok(buffer) => return Ok(String::from_utf8(buffer?)?),
+      Err(e) => {
+        return Err(LoaderError::UnsupportedPDFFormat(
+          e.downcast::<String>()
+            .map(|s| s.to_string())
+            .unwrap_or("parser thread panic".to_string()),
+        ))
+      }
+    }
   }
 
   fn extract_text_to_doc(&self) -> Result<Document, LoaderError> {

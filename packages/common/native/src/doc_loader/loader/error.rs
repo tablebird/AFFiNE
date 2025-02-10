@@ -29,6 +29,9 @@ pub enum LoaderError {
   #[error(transparent)]
   PdfExtractOutputError(#[from] pdf_extract::OutputError),
 
+  #[error("Unsupported PDF format: {0}")]
+  UnsupportedPDFFormat(String),
+
   #[error(transparent)]
   ReadabilityError(#[from] readability::error::Error),
 
