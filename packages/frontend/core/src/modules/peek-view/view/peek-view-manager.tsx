@@ -93,10 +93,7 @@ const getRendererProps = (
         ? activePeekView.target.element
         : undefined,
     mode: getMode(activePeekView.info),
-    animation:
-      activePeekView.target.element && getMode(activePeekView.info) !== 'full'
-        ? 'zoom'
-        : 'fade',
+    animation: 'fadeBottom',
     dialogFrame: activePeekView.info.type !== 'image',
   };
 };

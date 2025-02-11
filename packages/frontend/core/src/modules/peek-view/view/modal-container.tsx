@@ -77,7 +77,7 @@ export const PeekViewModalContainer = forwardRef<
     children,
     onAnimationStart,
     onAnimateEnd,
-    animation = 'zoom',
+    animation = 'fadeBottom',
     mode = 'fit',
     dialogFrame = true,
   },
@@ -303,6 +303,41 @@ export const PeekViewModalContainer = forwardRef<
     });
   }, []);
 
+  const animateFadeBottom = useCallback((animateIn: boolean) => {
+    setAnimeState('animating');
+    return new Promise<void>(resolve => {
+      if (animateIn) setVtOpen(true);
+      setTimeout(() => {
+        const overlay = overlayRef.current;
+        const contentClip = contentClipRef.current;
+        if (!overlay || !contentClip) {
+          resolve();
+          return;
+        }
+
+        anime({
+          targets: [overlay],
+          opacity: animateIn ? [0, 1] : [1, 0],
+          easing: 'easeOutQuad',
+          duration: 230,
+        });
+        anime({
+          targets: [contentClip],
+          opacity: animateIn ? [0, 1] : [1, 0],
+          y: animateIn ? ['-2%', '0%'] : ['0%', '-2%'],
+          scale: animateIn ? [0.96, 1] : [1, 0.96],
+          easing: 'cubicBezier(0.42, 0, 0.58, 1)',
+          duration: 230,
+          complete: () => {
+            if (!animateIn) setVtOpen(false);
+            setAnimeState('idle');
+            resolve();
+          },
+        });
+      });
+    });
+  }, []);
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -318,12 +353,22 @@ export const PeekViewModalContainer = forwardRef<
   useLayoutEffect(() => {
     if (animation === 'zoom') {
       open ? animateZoomIn() : animateZoomOut();
+    } else if (animation === 'fadeBottom') {
+      animateFadeBottom(open).catch(console.error);
     } else if (animation === 'fade') {
       animateFade(open).catch(console.error);
     } else if (animation === 'none') {
       setVtOpen(open);
     }
-  }, [animateZoomOut, animation, open, target, animateZoomIn, animateFade]);
+  }, [
+    animateZoomOut,
+    animation,
+    open,
+    target,
+    animateZoomIn,
+    animateFade,
+    animateFadeBottom,
+  ]);
 
   return (
     <PeekViewContext.Provider value={emptyContext}>

@@ -217,7 +217,7 @@ function resolvePeekInfoFromPeekTarget(
   return;
 }
 
-export type PeekViewAnimation = 'fade' | 'zoom' | 'none';
+export type PeekViewAnimation = 'fade' | 'fadeBottom' | 'zoom' | 'none';
 export type PeekViewMode = 'full' | 'fit' | 'max';
 
 export class PeekViewEntity extends Entity {
