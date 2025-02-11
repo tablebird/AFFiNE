@@ -19,12 +19,16 @@ export interface SplitViewDragHandleProps
 export const SplitViewDragHandle = memo(
   forwardRef<HTMLDivElement, SplitViewDragHandleProps>(
     function SplitViewDragHandle(
-      { className, active, open, onOpenMenu, dragging, ...attrs },
+      { className, active, open, onOpenMenu, dragging, onClick, ...attrs },
       ref
     ) {
-      const onClick: MouseEventHandler = useCallback(() => {
-        !open && onOpenMenu?.();
-      }, [onOpenMenu, open]);
+      const handleOnClick: MouseEventHandler<HTMLDivElement> = useCallback(
+        e => {
+          !open && onOpenMenu?.();
+          onClick?.(e);
+        },
+        [onOpenMenu, open, onClick]
+      );
 
       return (
         <div
@@ -33,7 +37,7 @@ export const SplitViewDragHandle = memo(
           data-dragging={dragging}
           data-testid="split-view-indicator"
           className={clsx(className, styles.indicator)}
-          onClick={onClick}
+          onClick={handleOnClick}
           {...attrs}
         >
           <div className={styles.indicatorGradient} />
