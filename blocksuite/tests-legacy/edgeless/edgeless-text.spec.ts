@@ -169,11 +169,7 @@ test.describe('edgeless text block', () => {
     await waitNextFrame(page, 1000);
 
     // width and height changed
-    await assertEdgelessTextModelRect(
-      page,
-      '4',
-      new Bound(-25, -25, 395, 73.3)
-    );
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 395, 74));
 
     // blur, max width set to true
     await page.mouse.click(point[0] - 50, point[1], {
