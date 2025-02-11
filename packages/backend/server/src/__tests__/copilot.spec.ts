@@ -1275,9 +1275,18 @@ test('should be able to manage context', async t => {
       'should throw error if create context with invalid session id'
     );
 
+    const session = context.create(chatSession);
+    await t.notThrowsAsync(session, 'should create context with chat session');
+
     await t.notThrowsAsync(
-      context.create(chatSession),
-      'should create context with chat session'
+      context.get((await session).id),
+      'should get context after create'
+    );
+
+    await t.throwsAsync(
+      context.get(randomUUID()),
+      { instanceOf: Error },
+      'should throw error if get context with invalid id'
     );
   }
 
@@ -1285,8 +1294,11 @@ test('should be able to manage context', async t => {
     const session = await context.create(chatSession);
 
     const docId = randomUUID();
-    await session.addDocRecord(randomUUID());
-    const docs = session.listDocs();
+    await session.addDocRecord(docId);
+    const docs = session.listDocs().map(d => d.id);
     t.deepEqual(docs, [docId], 'should list doc id');
+
+    await session.removeDocRecord(docId);
+    t.deepEqual(session.listDocs(), [], 'should remove doc id');
   }
 });

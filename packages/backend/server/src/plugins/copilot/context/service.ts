@@ -1,23 +1,63 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
-import { CopilotInvalidContext, CopilotSessionNotFound } from '../../../base';
+import {
+  Cache,
+  CopilotInvalidContext,
+  CopilotSessionNotFound,
+} from '../../../base';
 import { ContextSession } from './session';
 import { ContextConfig, ContextConfigSchema } from './types';
 
+const CONTEXT_SESSION_KEY = 'context-session';
+
 @Injectable()
 export class CopilotContextService {
-  private readonly sessionCache = new Map<string, ContextSession>();
+  constructor(
+    private readonly cache: Cache,
+    private readonly db: PrismaClient
+  ) {}
 
-  constructor(private readonly db: PrismaClient) {}
+  private async saveConfig(
+    contextId: string,
+    config: ContextConfig,
+    refreshCache = false
+  ): Promise<void> {
+    if (!refreshCache) {
+      await this.db.aiContext.update({
+        where: { id: contextId },
+        data: { config },
+      });
+    }
+    await this.cache.set(`${CONTEXT_SESSION_KEY}:${contextId}`, config);
+  }
 
-  private cacheSession(
+  private async getCachedSession(
+    contextId: string
+  ): Promise<ContextSession | undefined> {
+    const cachedSession = await this.cache.get(
+      `${CONTEXT_SESSION_KEY}:${contextId}`
+    );
+    if (cachedSession) {
+      const config = ContextConfigSchema.safeParse(cachedSession);
+      if (config.success) {
+        return new ContextSession(
+          contextId,
+          config.data,
+          this.saveConfig.bind(this, contextId)
+        );
+      }
+    }
+    return undefined;
+  }
+
+  private async cacheSession(
     contextId: string,
     config: ContextConfig
-  ): ContextSession {
-    const context = new ContextSession(contextId, config, this.db);
-    this.sessionCache.set(contextId, context);
-    return context;
+  ): Promise<ContextSession> {
+    const dispatcher = this.saveConfig.bind(this, contextId);
+    await dispatcher(config, true);
+    return new ContextSession(contextId, config, dispatcher);
   }
 
   async create(sessionId: string): Promise<ContextSession> {
@@ -41,11 +81,11 @@ export class CopilotContextService {
     });
 
     const config = ContextConfigSchema.parse(context.config);
-    return this.cacheSession(context.id, config);
+    return await this.cacheSession(context.id, config);
   }
 
   async get(id: string): Promise<ContextSession> {
-    const context = this.sessionCache.get(id);
+    const context = await this.getCachedSession(id);
     if (context) return context;
     const ret = await this.db.aiContext.findUnique({
       where: { id },

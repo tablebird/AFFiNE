@@ -1,13 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-
-import { PrismaTransaction } from '../../../base';
 import { ContextConfig, ContextDoc, ContextList } from './types';
 
 export class ContextSession implements AsyncDisposable {
   constructor(
     private readonly contextId: string,
     private readonly config: ContextConfig,
-    private readonly db: PrismaClient
+    private readonly dispatcher?: (config: ContextConfig) => Promise<void>
   ) {}
 
   get id() {
@@ -51,12 +48,8 @@ export class ContextSession implements AsyncDisposable {
     return false;
   }
 
-  async save(tx?: PrismaTransaction) {
-    const executor = tx || this.db;
-    await executor.aiContext.update({
-      where: { id: this.contextId },
-      data: { config: this.config },
-    });
+  async save() {
+    await this.dispatcher?.(this.config);
   }
 
   async [Symbol.asyncDispose]() {
