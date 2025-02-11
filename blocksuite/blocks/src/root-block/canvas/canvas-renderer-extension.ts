@@ -1,12 +1,15 @@
-import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
-import type { AffineEditorContainer } from '@blocksuite/presets';
+import type { EditorHost } from '@blocksuite/block-std';
+import type {
+  GfxController,
+  Viewport,
+  Viewport,
+} from '@blocksuite/block-std/gfx';
 
-import { getSentenceRects, segmentSentences } from './text-utils.js';
-import { type ParagraphLayout, type SectionLayout } from './types.js';
+import { getSentenceRects, segmentSentences } from './text-utils';
+import { type ParagraphLayout, type SectionLayout } from './types';
 
-export class CanvasRenderer {
+class CanvasRenderer {
   private readonly worker: Worker;
-  private readonly editorContainer: AffineEditorContainer;
   private readonly canvas: HTMLCanvasElement = document.createElement('canvas');
   private lastZoom: number | null = null;
   private lastSection: SectionLayout | null = null;
@@ -14,32 +17,28 @@ export class CanvasRenderer {
   private lastMode: 'page' | 'edgeless' = 'edgeless';
   private initialized = false;
 
-  constructor(editorContainer: AffineEditorContainer) {
-    this.editorContainer = editorContainer;
-
+  constructor(
+    private readonly host: EditorHost,
+    private readonly viewport: GfxController['viewport']
+  ) {
     this.worker = new Worker(new URL('./painter.worker.ts', import.meta.url), {
       type: 'module',
     });
   }
 
   private get targetContainer(): HTMLElement {
-    return this.editorContainer.host!;
-  }
-
-  get viewport() {
-    return this.editorContainer.std.get(GfxControllerIdentifier).viewport;
+    return this.host;
   }
 
   getHostRect() {
-    return this.editorContainer.host!.getBoundingClientRect();
+    return this.host.getBoundingClientRect();
   }
 
   getHostLayout() {
-    const paragraphBlocks = this.editorContainer.host!.querySelectorAll(
+    const paragraphBlocks = this.host.querySelectorAll(
       '.affine-paragraph-rich-text-wrapper [data-v-text="true"]'
     );
 
-    const { viewport } = this;
     const zoom = this.viewport.zoom;
     const hostRect = this.getHostRect();
 
@@ -61,7 +60,7 @@ export class CanvasRenderer {
         return {
           text: sentence,
           rects: rects.map(rect => {
-            const [x, y] = viewport.toModelCoordFromClientCoord([
+            const [x, y] = this.viewport.toModelCoordFromClientCoord([
               rect.rect.x,
               rect.rect.y,
             ]);
@@ -70,8 +69,8 @@ export class CanvasRenderer {
               rect: {
                 x,
                 y,
-                w: rect.rect.w / zoom / viewport.viewScale,
-                h: rect.rect.h / zoom / viewport.viewScale,
+                w: rect.rect.w / zoom / this.viewport.viewScale,
+                h: rect.rect.h / zoom / this.viewport.viewScale,
               },
             };
           }),
@@ -86,12 +85,12 @@ export class CanvasRenderer {
 
     if (paragraphs.length === 0) return null;
 
-    const sectionModelCoord = viewport.toModelCoordFromClientCoord([
+    const sectionModelCoord = this.viewport.toModelCoordFromClientCoord([
       sectionMinX,
       sectionMinY,
     ]);
-    const w = (sectionMaxX - sectionMinX) / zoom / viewport.viewScale;
-    const h = (sectionMaxY - sectionMinY) / zoom / viewport.viewScale;
+    const w = (sectionMaxX - sectionMinX) / zoom / this.viewport.viewScale;
+    const h = (sectionMaxY - sectionMinY) / zoom / this.viewport.viewScale;
     const section: SectionLayout = {
       paragraphs,
       rect: {
@@ -161,7 +160,7 @@ export class CanvasRenderer {
   private updateCacheState(section: SectionLayout, bitmapCopy: ImageBitmap) {
     this.lastZoom = this.viewport.zoom;
     this.lastSection = section;
-    this.lastMode = this.editorContainer.mode;
+    this.lastMode = 'edgeless';
     if (this.lastBitmap) {
       this.lastBitmap.close();
     }
@@ -173,7 +172,7 @@ export class CanvasRenderer {
       this.lastZoom === currentZoom &&
       !!this.lastSection &&
       !!this.lastBitmap &&
-      this.lastMode === this.editorContainer.mode
+      this.lastMode === 'edgeless'
     );
   }
 
@@ -236,10 +235,33 @@ export class CanvasRenderer {
     }
   }
 
-  public destroy() {
+  dispose() {
     if (this.lastBitmap) {
       this.lastBitmap.close();
     }
     this.worker.terminate();
+    this.canvas.remove();
+  }
+}
+
+export class CanvasRendererExtension {
+  private renderer: CanvasRenderer | null = null;
+
+  constructor(
+    private readonly host: EditorHost,
+    private readonly viewport: Viewport
+  ) {}
+
+  mount() {
+    this.renderer = new CanvasRenderer(this.host, this.viewport);
+  }
+
+  unmount() {
+    this.renderer?.dispose();
+    this.renderer = null;
+  }
+
+  async render() {
+    await this.renderer?.render();
   }
 }

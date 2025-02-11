@@ -1,4 +1,4 @@
-import { type SectionLayout } from './types.js';
+import { type SectionLayout } from './types';
 
 type WorkerMessageInit = {
   type: 'initSection';

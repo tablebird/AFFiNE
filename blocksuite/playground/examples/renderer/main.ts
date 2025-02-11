@@ -1,20 +1,31 @@
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
+import { CanvasRendererExtension } from '@blocksuite/blocks';
 import { Text } from '@blocksuite/store';
 import { Pane } from 'tweakpane';
 
-import { CanvasRenderer } from './canvas-renderer.js';
 import { doc, editor } from './editor.js';
 
 type DocMode = 'page' | 'edgeless';
 
-const renderer = new CanvasRenderer(editor);
+// Initialize renderer after editor is mounted and rendered
+let renderer: CanvasRendererExtension;
+
+async function initRenderer() {
+  // Ensure editor is mounted and rendered
+  await editor.updateComplete;
+  const gfx = editor.std.get(GfxControllerIdentifier);
+  renderer = new CanvasRendererExtension(editor.std.host, gfx.viewport);
+  return gfx;
+}
 
 async function handleToCanvasClick() {
+  if (!renderer) {
+    const gfx = await initRenderer();
+    gfx.viewport.viewportUpdated.on(async () => {
+      await renderer.render();
+    });
+  }
   await renderer.render();
-  const viewport = editor.std.get(GfxControllerIdentifier).viewport;
-  viewport.viewportUpdated.on(async () => {
-    await renderer.render();
-  });
 }
 
 function initUI() {
@@ -57,8 +68,10 @@ function addParagraph(content: string) {
   doc.addBlock('affine:paragraph', props, note.id);
 }
 
-function main() {
+async function main() {
   initUI();
+  await editor.updateComplete;
+  await initRenderer();
 
   const firstParagraph = doc.getBlockByFlavour('affine:paragraph')[0];
   doc.updateBlock(firstParagraph, { text: new Text('Renderer') });
@@ -72,4 +85,4 @@ function main() {
   );
 }
 
-main();
+main().catch(console.error);

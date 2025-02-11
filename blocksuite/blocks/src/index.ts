@@ -16,6 +16,13 @@ export * from './_common/test-utils/test-utils.js';
 export * from './_common/transformers/index.js';
 export { type AbstractEditor } from './_common/types.js';
 export * from './_specs/index.js';
+export {
+  CanvasRendererExtension,
+  type ParagraphLayout,
+  type SectionLayout,
+  type SentenceLayout,
+  type SentenceRect,
+} from './root-block/canvas/index.js';
 export { EdgelessTemplatePanel } from './root-block/edgeless/components/toolbar/template/template-panel.js';
 export type {
   Template,
