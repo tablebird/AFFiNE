@@ -73,7 +73,7 @@ class CopilotContextFile implements ContextFile {
   name!: string;
 
   @Field(() => SafeIntResolver)
-  chunk_size!: number;
+  chunkSize!: number;
 
   @Field(() => ContextFileStatus)
   status!: ContextFileStatus;
@@ -97,7 +97,7 @@ class CopilotContextListItem {
   name!: string;
 
   @Field(() => SafeIntResolver, { nullable: true })
-  chunk_size!: number;
+  chunkSize!: number;
 
   @Field(() => ContextFileStatus, { nullable: true })
   status!: ContextFileStatus;

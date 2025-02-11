@@ -385,7 +385,7 @@ export async function listContextFiles(
         id: string;
         name: string;
         blobId: string;
-        chunk_size: number;
+        chunkSize: number;
         status: string;
         createdAt: number;
       }[];
@@ -405,7 +405,7 @@ export async function listContextFiles(
                   id
                   name
                   blobId
-                  chunk_size
+                  chunkSize
                   status
                   createdAt
                 }

@@ -180,7 +180,7 @@ mutation addContextDoc($options: AddContextDocInput!) {
     id
     createdAt
     name
-    chunk_size
+    chunkSize
     status
     blobId
   }

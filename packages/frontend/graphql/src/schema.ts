@@ -117,7 +117,7 @@ export interface CopilotContextDoc {
 export interface CopilotContextFile {
   __typename?: 'CopilotContextFile';
   blobId: Scalars['String']['output'];
-  chunk_size: Scalars['SafeInt']['output'];
+  chunkSize: Scalars['SafeInt']['output'];
   createdAt: Scalars['SafeInt']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -133,7 +133,7 @@ export interface CopilotContextFileNotSupportedDataType {
 export interface CopilotContextListItem {
   __typename?: 'CopilotContextListItem';
   blobId: Maybe<Scalars['String']['output']>;
-  chunk_size: Maybe<Scalars['SafeInt']['output']>;
+  chunkSize: Maybe<Scalars['SafeInt']['output']>;
   createdAt: Scalars['SafeInt']['output'];
   id: Scalars['ID']['output'];
   name: Maybe<Scalars['String']['output']>;
@@ -1963,7 +1963,7 @@ export type AddContextDocMutation = {
     id: string;
     createdAt: number;
     name: string | null;
-    chunk_size: number | null;
+    chunkSize: number | null;
     status: ContextFileStatus | null;
     blobId: string | null;
   }>;

@@ -615,7 +615,7 @@ class CopilotInvalidContextDataType {
 
 export class CopilotInvalidContext extends UserFriendlyError {
   constructor(args: CopilotInvalidContextDataType, message?: string | ((args: CopilotInvalidContextDataType) => string)) {
-    super('internal_server_error', 'copilot_invalid_context', message, args);
+    super('invalid_input', 'copilot_invalid_context', message, args);
   }
 }
 @ObjectType()
@@ -626,7 +626,7 @@ class CopilotContextFileNotSupportedDataType {
 
 export class CopilotContextFileNotSupported extends UserFriendlyError {
   constructor(args: CopilotContextFileNotSupportedDataType, message?: string | ((args: CopilotContextFileNotSupportedDataType) => string)) {
-    super('internal_server_error', 'copilot_context_file_not_supported', message, args);
+    super('bad_request', 'copilot_context_file_not_supported', message, args);
   }
 }
 @ObjectType()

@@ -20,7 +20,7 @@ export const ContextConfigSchema = z.object({
   files: z
     .object({
       id: z.string(),
-      chunk_size: z.number(),
+      chunkSize: z.number(),
       name: z.string(),
       status: z.enum([
         ContextFileStatus.processing,
