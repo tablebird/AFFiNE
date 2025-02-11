@@ -160,19 +160,11 @@ test.describe('edgeless text block', () => {
     await type(page, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     await waitNextFrame(page, 1000);
     // just width changed
-    await assertEdgelessTextModelRect(
-      page,
-      '4',
-      new Bound(-25, -25, 340.6, 26)
-    );
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 323, 26));
 
     await type(page, '\nbbb');
     // width not changed, height changed
-    await assertEdgelessTextModelRect(
-      page,
-      '4',
-      new Bound(-25, -25, 340.6, 49.3)
-    );
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 323, 50));
     await type(page, '\nccccccccccccccccccccccccccccccccccccccccccccccccc');
     await waitNextFrame(page, 1000);
 

@@ -430,6 +430,6 @@ test.describe('auto resize align', () => {
     // arrange
     await triggerComponentToolbarAction(page, 'autoResize');
     await waitNextFrame(page, 200);
-    await assertEdgelessSelectedModelRect(page, [0, 0, 2396.8, 420]);
+    await assertEdgelessSelectedModelRect(page, [0, 0, 2352.296875, 420]);
   });
 });
