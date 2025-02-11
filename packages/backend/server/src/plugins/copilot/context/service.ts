@@ -51,6 +51,10 @@ export class CopilotContextService {
     return undefined;
   }
 
+  // NOTE: we only cache config to avoid frequent database queries
+  // but we do not need to cache session instances because a distributed
+  // lock is already apply to mutation operation for the same context in
+  // the resolver, so there will be no simultaneous writing to the config
   private async cacheSession(
     contextId: string,
     config: ContextConfig
