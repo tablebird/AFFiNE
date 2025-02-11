@@ -472,6 +472,21 @@ query getCurrentUser {
 }`,
 };
 
+export const getDocDefaultRoleQuery = {
+  id: 'getDocDefaultRoleQuery' as const,
+  operationName: 'getDocDefaultRole',
+  definitionName: 'workspace',
+  containsFile: false,
+  query: `
+query getDocDefaultRole($workspaceId: String!, $docId: String!) {
+  workspace(id: $workspaceId) {
+    doc(docId: $docId) {
+      defaultRole
+    }
+  }
+}`,
+};
+
 export const getInviteInfoQuery = {
   id: 'getInviteInfoQuery' as const,
   operationName: 'getInviteInfo',
@@ -1277,6 +1292,17 @@ export const updateCopilotSessionMutation = {
   query: `
 mutation updateCopilotSession($options: UpdateChatSessionInput!) {
   updateCopilotSession(options: $options)
+}`,
+};
+
+export const updateDocDefaultRoleMutation = {
+  id: 'updateDocDefaultRoleMutation' as const,
+  operationName: 'updateDocDefaultRole',
+  definitionName: 'updateDocDefaultRole',
+  containsFile: false,
+  query: `
+mutation updateDocDefaultRole($input: UpdateDocDefaultRoleInput!) {
+  updateDocDefaultRole(input: $input)
 }`,
 };
 

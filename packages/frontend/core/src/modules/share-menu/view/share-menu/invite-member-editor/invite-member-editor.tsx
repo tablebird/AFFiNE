@@ -24,6 +24,7 @@ import { useI18n } from '@affine/i18n';
 import { ArrowLeftBigIcon } from '@blocksuite/icons/rc';
 import { useLiveData, useService } from '@toeverything/infra';
 import clsx from 'clsx';
+import { debounce } from 'lodash-es';
 import {
   type CompositionEventHandler,
   useCallback,
@@ -70,7 +71,6 @@ export const InviteMemberEditor = ({
   );
 
   const memberSearchService = useService(MemberSearchService);
-  const searchText = useLiveData(memberSearchService.searchText$);
 
   useEffect(() => {
     // reset the search text when the component is mounted
@@ -78,20 +78,25 @@ export const InviteMemberEditor = ({
     memberSearchService.loadMore();
   }, [memberSearchService]);
 
+  const debouncedSearch = useMemo(
+    () => debounce((value: string) => memberSearchService.search(value), 300),
+    [memberSearchService]
+  );
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const [composing, setComposing] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const handleValueChange = useCallback(
     (value: string) => {
+      setSearchText(value);
       if (!composing) {
-        memberSearchService.search(value);
+        debouncedSearch(value);
       }
     },
-    [composing, memberSearchService]
+    [composing, debouncedSearch]
   );
-
-  const [shouldSendEmail, setShouldSendEmail] = useState(false);
   const workspaceDialogService = useService(WorkspaceDialogService);
 
   const onInvite = useAsyncCallback(async () => {
@@ -122,14 +127,10 @@ export const InviteMemberEditor = ({
     useCallback(
       e => {
         setComposing(false);
-        memberSearchService.search(e.currentTarget.value);
+        debouncedSearch(e.currentTarget.value);
       },
-      [memberSearchService]
+      [debouncedSearch]
     );
-
-  const onCheckboxChange = useCallback(() => {
-    setShouldSendEmail(prev => !prev);
-  }, []);
 
   const focusInput = useCallback(() => {
     inputRef.current?.focus();
@@ -220,13 +221,14 @@ export const InviteMemberEditor = ({
             />
           )}
         </div>
-        <div className={styles.sentEmail} onClick={onCheckboxChange}>
+        <div className={styles.sentEmail}>
           <Checkbox
             className={styles.checkbox}
-            checked={shouldSendEmail}
-            disabled // not supported yet
+            checked={false}
+            disabled // TODO(@JimmFly): implement this
           />
           {t['com.affine.share-menu.invite-editor.sent-email']()}
+          {` (coming soon)`}
         </div>
         <Result onClickMember={handleClickMember} />
       </div>

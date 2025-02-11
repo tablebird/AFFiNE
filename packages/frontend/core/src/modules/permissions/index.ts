@@ -1,4 +1,5 @@
 export type { Member } from './entities/members';
+export { DocDefaultRoleService } from './services/doc-default-role';
 export {
   DocGrantedUsersService,
   type GrantedUser,
@@ -24,11 +25,13 @@ import {
 } from '../workspace';
 import { WorkspaceMembers } from './entities/members';
 import { WorkspacePermission } from './entities/permission';
+import { DocDefaultRoleService } from './services/doc-default-role';
 import { DocGrantedUsersService } from './services/doc-granted-users';
 import { GuardService } from './services/guard';
 import { MemberSearchService } from './services/member-search';
 import { WorkspaceMembersService } from './services/members';
 import { WorkspacePermissionService } from './services/permission';
+import { DocDefaultRoleStore } from './stores/doc-default-role';
 import { DocGrantedUsersStore } from './stores/doc-granted-users';
 import { GuardStore } from './stores/guard';
 import { MemberSearchStore } from './stores/member-search';
@@ -68,5 +71,11 @@ export function configurePermissionsModule(framework: Framework) {
       WorkspaceService,
       DocService,
     ])
-    .store(DocGrantedUsersStore, [WorkspaceServerService]);
+    .store(DocGrantedUsersStore, [WorkspaceServerService])
+    .service(DocDefaultRoleService, [
+      DocDefaultRoleStore,
+      WorkspaceService,
+      DocService,
+    ])
+    .store(DocDefaultRoleStore, [WorkspaceServerService]);
 }

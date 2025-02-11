@@ -124,7 +124,10 @@ export const sentEmail = style({
   gap: '8px',
   alignItems: 'center',
   fontSize: cssVar('fontSm'),
-  cursor: 'pointer',
+
+  // TODO(@JimmFly): remove this when we have a sent email feature
+  cursor: 'not-allowed',
+  color: cssVarV2('text/disable'),
 });
 
 export const checkbox = style({

@@ -1,6 +1,6 @@
 import type { PublicDocMode } from '@affine/graphql';
 import {
-  getWorkspacePublicPageByIdQuery,
+  getWorkspacePageByIdQuery,
   publishPageMutation,
   revokePublicPageMutation,
 } from '@affine/graphql';
@@ -22,7 +22,7 @@ export class ShareStore extends Store {
       throw new Error('No Server');
     }
     const data = await this.workspaceServerService.server.gql({
-      query: getWorkspacePublicPageByIdQuery,
+      query: getWorkspacePageByIdQuery,
       variables: {
         pageId: docId,
         workspaceId,
@@ -31,7 +31,7 @@ export class ShareStore extends Store {
         signal,
       },
     });
-    return data.workspace.publicDoc ?? undefined;
+    return data.workspace.doc ?? undefined;
   }
 
   async enableSharePage(

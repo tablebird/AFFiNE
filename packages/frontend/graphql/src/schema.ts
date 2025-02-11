@@ -2122,6 +2122,19 @@ export type GetCurrentUserQuery = {
   } | null;
 };
 
+export type GetDocDefaultRoleQueryVariables = Exact<{
+  workspaceId: Scalars['String']['input'];
+  docId: Scalars['String']['input'];
+}>;
+
+export type GetDocDefaultRoleQuery = {
+  __typename?: 'Query';
+  workspace: {
+    __typename?: 'WorkspaceType';
+    doc: { __typename?: 'DocType'; defaultRole: DocRole };
+  };
+};
+
 export type GetInviteInfoQueryVariables = Exact<{
   inviteId: Scalars['String']['input'];
 }>;
@@ -2860,6 +2873,15 @@ export type UpdateCopilotSessionMutation = {
   updateCopilotSession: string;
 };
 
+export type UpdateDocDefaultRoleMutationVariables = Exact<{
+  input: UpdateDocDefaultRoleInput;
+}>;
+
+export type UpdateDocDefaultRoleMutation = {
+  __typename?: 'Mutation';
+  updateDocDefaultRole: boolean;
+};
+
 export type UpdateDocUserRoleMutationVariables = Exact<{
   input: UpdateDocUserRoleInput;
 }>;
@@ -3220,6 +3242,11 @@ export type Queries =
       name: 'getCurrentUserQuery';
       variables: GetCurrentUserQueryVariables;
       response: GetCurrentUserQuery;
+    }
+  | {
+      name: 'getDocDefaultRoleQuery';
+      variables: GetDocDefaultRoleQueryVariables;
+      response: GetDocDefaultRoleQuery;
     }
   | {
       name: 'getInviteInfoQuery';
@@ -3597,6 +3624,11 @@ export type Mutations =
       name: 'updateCopilotSessionMutation';
       variables: UpdateCopilotSessionMutationVariables;
       response: UpdateCopilotSessionMutation;
+    }
+  | {
+      name: 'updateDocDefaultRoleMutation';
+      variables: UpdateDocDefaultRoleMutationVariables;
+      response: UpdateDocDefaultRoleMutation;
     }
   | {
       name: 'updateDocUserRoleMutation';

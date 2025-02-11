@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from '@affine/component';
 import { useAsyncCallback } from '@affine/core/components/hooks/affine-async-hooks';
+import { AuthService } from '@affine/core/modules/cloud';
 import { DocService } from '@affine/core/modules/doc';
 import {
   DocGrantedUsersService,
@@ -17,6 +18,7 @@ import {
 import { DocRole, UserFriendlyError } from '@affine/graphql';
 import { useI18n } from '@affine/i18n';
 import { useLiveData, useService } from '@toeverything/infra';
+import clsx from 'clsx';
 import { useMemo } from 'react';
 
 import { PlanTag } from '../plan-tag';
@@ -32,6 +34,10 @@ export const MemberItem = ({
   openPaywallModal: () => void;
 }) => {
   const user = grantedUser.user;
+  const session = useService(AuthService).session;
+  const account = useLiveData(session.account$);
+  const disableManage =
+    account?.id === user.id || grantedUser.role === DocRole.Owner;
 
   const role = useMemo(() => {
     switch (grantedUser.role) {
@@ -78,30 +84,33 @@ export const MemberItem = ({
           </Tooltip>
         </div>
       </div>
-
-      <Menu
-        items={
-          <Options
-            userId={user.id}
-            memberRole={grantedUser.role}
-            hittingPaywall={hittingPaywall}
-            openPaywallModal={openPaywallModal}
-          />
-        }
-        contentOptions={{
-          align: 'start',
-        }}
-      >
-        <MenuTrigger
-          variant="plain"
-          className={styles.menuTriggerStyle}
-          contentStyle={{
-            width: '100%',
+      {disableManage ? (
+        <div className={clsx(styles.memberRoleStyle, 'disable')}>{role}</div>
+      ) : (
+        <Menu
+          items={
+            <Options
+              userId={user.id}
+              memberRole={grantedUser.role}
+              hittingPaywall={hittingPaywall}
+              openPaywallModal={openPaywallModal}
+            />
+          }
+          contentOptions={{
+            align: 'start',
           }}
         >
-          {role}
-        </MenuTrigger>
-      </Menu>
+          <MenuTrigger
+            variant="plain"
+            className={styles.menuTriggerStyle}
+            contentStyle={{
+              width: '100%',
+            }}
+          >
+            {role}
+          </MenuTrigger>
+        </Menu>
+      )}
     </div>
   );
 };
@@ -184,6 +193,7 @@ const Options = ({
   const removeMember = useAsyncCallback(async () => {
     try {
       await docGrantedUsersService.revokeUsersRole(userId);
+      docGrantedUsersService.loadMore();
     } catch (error) {
       const err = UserFriendlyError.fromAnyError(error);
       notify.error({

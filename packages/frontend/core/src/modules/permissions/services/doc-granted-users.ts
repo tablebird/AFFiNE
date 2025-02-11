@@ -117,6 +117,9 @@ export class DocGrantedUsersService extends Service {
     this.grantedUsers$.next(
       this.grantedUsers$.value.filter(user => user.user.id !== userId)
     );
+    if (this.grantedUserCount$.value > 0) {
+      this.grantedUserCount$.next(this.grantedUserCount$.value - 1);
+    }
   }
 
   async updateUserRole(userId: string, role: DocRole) {
