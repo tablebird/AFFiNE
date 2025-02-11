@@ -144,11 +144,3 @@ export class FrameBlockModel
     });
   }
 }
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:frame': FrameBlockModel;
-    }
-  }
-}

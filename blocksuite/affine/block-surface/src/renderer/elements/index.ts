@@ -1,6 +1,7 @@
+import type { GfxPrimitiveElementModel } from '@blocksuite/block-std/gfx';
 import type { IBound } from '@blocksuite/global/utils';
 
-import type { RoughCanvas, SurfaceElementModel } from '../../index.js';
+import type { RoughCanvas } from '../../index.js';
 import type { CanvasRenderer } from '../canvas-renderer.js';
 import { brush } from './brush/index.js';
 import { connector } from './connector/index.js';
@@ -11,7 +12,7 @@ import { text } from './text/index.js';
 export { normalizeShapeBound } from './shape/utils.js';
 
 export type ElementRenderer<
-  T extends BlockSuite.SurfaceElementModel = SurfaceElementModel,
+  T extends GfxPrimitiveElementModel = GfxPrimitiveElementModel,
 > = (
   model: T,
   ctx: CanvasRenderingContext2D,

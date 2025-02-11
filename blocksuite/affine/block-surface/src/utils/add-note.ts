@@ -10,7 +10,10 @@ import { TelemetryProvider } from '@blocksuite/affine-shared/services';
 import type { NoteChildrenFlavour } from '@blocksuite/affine-shared/types';
 import { handleNativeRangeAtPoint } from '@blocksuite/affine-shared/utils';
 import type { BlockStdScope } from '@blocksuite/block-std';
-import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
+import {
+  type GfxBlockElementModel,
+  GfxControllerIdentifier,
+} from '@blocksuite/block-std/gfx';
 import {
   type IPoint,
   type Point,
@@ -117,7 +120,7 @@ export function addNote(
     const blocks =
       (doc.root?.children.filter(
         child => child.flavour === 'affine:note'
-      ) as BlockSuite.EdgelessBlockModelType[]) ?? [];
+      ) as GfxBlockElementModel[]) ?? [];
     const element = blocks.find(b => b.id === noteId);
     if (element) {
       gfx.selection.set({

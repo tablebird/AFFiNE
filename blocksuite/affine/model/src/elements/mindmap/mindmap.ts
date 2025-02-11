@@ -1,6 +1,7 @@
 import type {
   BaseElementProps,
   GfxModel,
+  GfxPrimitiveElementModel,
   PointTestOptions,
   SerializedElement,
 } from '@blocksuite/block-std/gfx';
@@ -44,7 +45,7 @@ export type MindmapNode = {
   id: string;
   detail: NodeDetail;
 
-  element: BlockSuite.SurfaceElementModel;
+  element: GfxPrimitiveElementModel;
   children: MindmapNode[];
 
   parent: MindmapNode | null;
@@ -836,7 +837,7 @@ export class MindmapElementModel extends GfxGroupLikeElementModel<MindmapElement
       return;
     }
 
-    const stashed = new Set<BlockSuite.SurfaceElementModel>();
+    const stashed = new Set<GfxPrimitiveElementModel>();
     const traverse = (node: MindmapNode) => {
       node.element.stash('xywh');
       stashed.add(node.element);
@@ -974,12 +975,4 @@ export class MindmapElementModel extends GfxGroupLikeElementModel<MindmapElement
   @watch(watchStyle)
   @field()
   accessor style: MindmapStyle = MindmapStyle.ONE;
-}
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceGroupLikeModelMap {
-      mindmap: MindmapElementModel;
-    }
-  }
 }

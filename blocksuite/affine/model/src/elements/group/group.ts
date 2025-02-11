@@ -119,15 +119,3 @@ export class GroupElementModel extends GfxGroupLikeElementModel<GroupElementProp
   @field()
   accessor title: Y.Text = new Y.Text();
 }
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceGroupLikeModelMap {
-      group: GroupElementModel;
-    }
-
-    interface SurfaceElementModelMap {
-      group: GroupElementModel;
-    }
-  }
-}

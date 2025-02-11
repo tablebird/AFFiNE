@@ -24,11 +24,3 @@ export type EmbedYoutubeBlockProps = {
 export class EmbedYoutubeModel extends defineEmbedModel<EmbedYoutubeBlockProps>(
   BlockModel
 ) {}
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:embed-youtube': EmbedYoutubeModel;
-    }
-  }
-}

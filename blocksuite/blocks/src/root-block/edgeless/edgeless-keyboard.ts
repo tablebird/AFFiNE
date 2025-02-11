@@ -23,6 +23,7 @@ import { matchModels } from '@blocksuite/affine-shared/utils';
 import { SurfaceSelection, TextSelection } from '@blocksuite/block-std';
 import {
   GfxBlockElementModel,
+  type GfxPrimitiveElementModel,
   type GfxToolsMap,
   type GfxToolsOption,
   isGfxGroupCompatibleModel,
@@ -573,7 +574,7 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
       const node = mindmapNodes[0];
       const mindmap = node.group as MindmapElementModel;
       const nodeDirection = mindmap.getLayoutDir(node.id);
-      let targetNode: BlockSuite.SurfaceElementModel | null = null;
+      let targetNode: GfxPrimitiveElementModel | null = null;
 
       switch (key) {
         case 'ArrowUp':

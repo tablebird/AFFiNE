@@ -224,11 +224,3 @@ export class BrushElementModel extends GfxPrimitiveElementModel<BrushProps> {
 }
 
 type Instance = GfxPrimitiveElementModel<BrushProps> & BrushProps;
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceElementModelMap {
-      brush: BrushElementModel;
-    }
-  }
-}

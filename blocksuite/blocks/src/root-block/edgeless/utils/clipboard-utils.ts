@@ -6,6 +6,7 @@ import type {
   FrameBlockProps,
   ImageBlockModel,
   NoteBlockModel,
+  ShapeElementModel,
 } from '@blocksuite/affine-model';
 import { getElementsWithoutGroup } from '@blocksuite/affine-shared/utils';
 import {
@@ -72,7 +73,7 @@ export const splitElements = (elements: GfxModel[]) => {
       return 'shapes';
     }) as {
       notes: NoteBlockModel[];
-      shapes: BlockSuite.SurfaceModel[];
+      shapes: ShapeElementModel[];
       frames: FrameBlockModel[];
       images: ImageBlockModel[];
       edgelessTexts: EdgelessTextBlockModel[];

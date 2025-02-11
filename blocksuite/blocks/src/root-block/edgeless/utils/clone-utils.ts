@@ -15,6 +15,7 @@ import {
   getTopElements,
   GfxBlockElementModel,
   type GfxModel,
+  type GfxPrimitiveElementModel,
   isGfxGroupCompatibleModel,
   type SerializedElement,
 } from '@blocksuite/block-std/gfx';
@@ -225,7 +226,7 @@ export function mapMindmapIds(
 }
 
 export function getElementProps(
-  element: BlockSuite.SurfaceModel,
+  element: GfxPrimitiveElementModel,
   ids: Map<string, string>
 ) {
   if (element instanceof ConnectorElementModel) {

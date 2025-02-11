@@ -1,5 +1,6 @@
 import type { getCopilotHistoriesQuery, RequestOptions } from '@affine/graphql';
 import type { EditorHost } from '@blocksuite/affine/block-std';
+import type { GfxModel } from '@blocksuite/affine/block-std/gfx';
 import type { BlockModel } from '@blocksuite/affine/store';
 
 import type { DocContext } from '../chat-panel/chat-context';
@@ -72,7 +73,7 @@ declare global {
 
       // internal context
       host: EditorHost;
-      models?: (BlockModel | BlockSuite.SurfaceElementModel)[];
+      models?: (BlockModel | GfxModel)[];
       control: TrackerControl;
       where: TrackerWhere;
     }

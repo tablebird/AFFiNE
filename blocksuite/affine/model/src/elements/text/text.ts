@@ -90,15 +90,3 @@ export class TextElementModel extends GfxPrimitiveElementModel<TextElementProps>
   @field()
   accessor xywh: SerializedXYWH = '[0,0,16,16]';
 }
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceElementModelMap {
-      text: TextElementModel;
-    }
-
-    interface EdgelessTextModelMap {
-      text: TextElementModel;
-    }
-  }
-}

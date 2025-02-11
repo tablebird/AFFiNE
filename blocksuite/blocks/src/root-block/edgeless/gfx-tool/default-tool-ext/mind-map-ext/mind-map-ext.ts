@@ -14,6 +14,7 @@ import {
 import type { PointerEventState } from '@blocksuite/block-std';
 import {
   type GfxModel,
+  type GfxPrimitiveElementModel,
   isGfxGroupCompatibleModel,
 } from '@blocksuite/block-std/gfx';
 import type { Bound, IVec } from '@blocksuite/global/utils';
@@ -352,7 +353,7 @@ export class MindMapExt extends DefaultToolExt {
   ) {
     const OPACITY = 0.3;
     const updatedNodes = new Set<
-      BlockSuite.SurfaceElementModel | LocalConnectorElementModel
+      GfxPrimitiveElementModel | LocalConnectorElementModel
     >();
     const traverse = (node: MindmapNode, parent: MindmapNode | null) => {
       node.element.opacity = OPACITY;

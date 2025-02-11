@@ -508,14 +508,3 @@ export class ConnectorElementModel extends GfxPrimitiveElementModel<ConnectorEle
   @local()
   accessor xywh: SerializedXYWH = '[0,0,0,0]';
 }
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceElementModelMap {
-      connector: ConnectorElementModel;
-    }
-    interface EdgelessTextModelMap {
-      connector: ConnectorElementModel;
-    }
-  }
-}

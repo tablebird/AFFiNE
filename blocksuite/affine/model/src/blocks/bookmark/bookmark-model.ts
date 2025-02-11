@@ -57,11 +57,3 @@ export const BookmarkBlockSchema = defineBlockSchema({
 export class BookmarkBlockModel
   extends GfxCompatible<BookmarkBlockProps>(BlockModel)
   implements GfxElementGeometry {}
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:bookmark': BookmarkBlockModel;
-    }
-  }
-}

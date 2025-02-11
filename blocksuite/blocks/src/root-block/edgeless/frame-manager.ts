@@ -491,11 +491,7 @@ export function getBlocksInFrameBound(
   if (!surface) return [];
 
   return (
-    getNotesInFrameBound(
-      doc,
-      model,
-      fullyContained
-    ) as BlockSuite.EdgelessBlockModelType[]
+    getNotesInFrameBound(doc, model, fullyContained) as GfxBlockElementModel[]
   ).concat(
     surface.children.filter(ele => {
       if (ele.id === model.id) return false;
@@ -507,6 +503,6 @@ export function getBlocksInFrameBound(
       }
 
       return false;
-    }) as BlockSuite.EdgelessBlockModelType[]
+    }) as GfxBlockElementModel[]
   );
 }

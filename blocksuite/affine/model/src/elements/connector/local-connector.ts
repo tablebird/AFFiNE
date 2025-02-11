@@ -56,11 +56,3 @@ export class LocalConnectorElementModel extends GfxLocalElementModel {
     return 'connector';
   }
 }
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceLocalModelMap {
-      connector: LocalConnectorElementModel;
-    }
-  }
-}

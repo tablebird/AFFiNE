@@ -178,7 +178,7 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
         return 'edgelessText';
       }
 
-      return (model as BlockSuite.SurfaceElementModel).type;
+      return model.type;
     });
     return result as CategorizedElements;
   }

@@ -42,11 +42,3 @@ export const ImageBlockSchema = defineBlockSchema({
 export class ImageBlockModel
   extends GfxCompatible<ImageBlockProps>(BlockModel)
   implements GfxElementGeometry {}
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:image': ImageBlockModel;
-    }
-  }
-}

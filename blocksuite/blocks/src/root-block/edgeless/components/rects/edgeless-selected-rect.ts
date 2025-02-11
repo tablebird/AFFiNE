@@ -43,6 +43,7 @@ import {
   GfxControllerIdentifier,
   GfxExtensionIdentifier,
   type GfxModel,
+  type GfxPrimitiveElementModel,
 } from '@blocksuite/block-std/gfx';
 import type {
   Disposable,
@@ -891,7 +892,7 @@ export class EdgelessSelectedRectWidget extends WidgetComponent<
         areAllConnectors = false;
         areAllShapes = false;
       } else {
-        assertType<BlockSuite.SurfaceElementModel>(element);
+        assertType<GfxPrimitiveElementModel>(element);
         if (element.type === CanvasElementType.CONNECTOR) {
           const connector = element as ConnectorElementModel;
           areAllIndependentConnectors &&= !(

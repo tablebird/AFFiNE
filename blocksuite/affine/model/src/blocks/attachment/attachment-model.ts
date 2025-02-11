@@ -88,11 +88,3 @@ export const AttachmentBlockSchema = defineBlockSchema({
 export class AttachmentBlockModel
   extends GfxCompatible<AttachmentBlockProps>(BlockModel)
   implements GfxElementGeometry {}
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:attachment': AttachmentBlockModel;
-    }
-  }
-}

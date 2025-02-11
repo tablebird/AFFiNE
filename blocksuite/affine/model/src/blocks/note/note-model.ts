@@ -155,11 +155,3 @@ export class NoteBlockModel
     return false;
   }
 }
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:note': NoteBlockModel;
-    }
-  }
-}

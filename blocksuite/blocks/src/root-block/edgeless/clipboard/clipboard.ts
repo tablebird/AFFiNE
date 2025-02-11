@@ -6,7 +6,7 @@ import {
   SurfaceGroupLikeModel,
   TextUtils,
 } from '@blocksuite/affine-block-surface';
-import type { Connection } from '@blocksuite/affine-model';
+import type { Connection, ShapeElementModel } from '@blocksuite/affine-model';
 import {
   BookmarkStyles,
   DEFAULT_NOTE_HEIGHT,
@@ -40,8 +40,10 @@ import type {
 } from '@blocksuite/block-std';
 import {
   compareLayer,
+  type GfxBlockElementModel,
   type GfxCompatibleProps,
   type GfxModel,
+  type GfxPrimitiveElementModel,
   type SerializedElement,
   SortOrder,
 } from '@blocksuite/block-std/gfx';
@@ -313,7 +315,7 @@ export class EdgelessClipboardController extends PageClipboard {
           .get(EmbedOptionProvider)
           .getEmbedBlockOptions(url);
         if (embedOptions) {
-          flavour = embedOptions.flavour as BlockSuite.EdgelessModelKeys;
+          flavour = embedOptions.flavour;
           style = embedOptions.styles[0];
         }
       }
@@ -605,7 +607,7 @@ export class EdgelessClipboardController extends PageClipboard {
       segment: 'toolbar',
       type: clipboardData.type as string,
     });
-    const element = this.crud.getElementById(id) as BlockSuite.SurfaceModel;
+    const element = this.crud.getElementById(id) as GfxPrimitiveElementModel;
     assertExists(element);
     return element;
   }
@@ -882,8 +884,8 @@ export class EdgelessClipboardController extends PageClipboard {
   private async _edgelessToCanvas(
     edgeless: EdgelessRootBlockComponent,
     bound: IBound,
-    nodes?: BlockSuite.EdgelessBlockModelType[],
-    canvasElements: BlockSuite.SurfaceModel[] = [],
+    nodes?: GfxBlockElementModel[],
+    canvasElements: GfxPrimitiveElementModel[] = [],
     {
       background,
       padding = IMAGE_PADDING,
@@ -961,7 +963,7 @@ export class EdgelessClipboardController extends PageClipboard {
     };
 
     const _drawTopLevelBlock = async (
-      block: BlockSuite.EdgelessBlockModelType,
+      block: GfxBlockElementModel,
       isInFrame = false
     ) => {
       const blockComponent = this.std.view.getBlock(block.id);
@@ -992,19 +994,19 @@ export class EdgelessClipboardController extends PageClipboard {
       nodes ??
       (edgeless.service.gfx.getElementsByBound(bound, {
         type: 'block',
-      }) as BlockSuite.EdgelessBlockModelType[]);
+      }) as GfxBlockElementModel[]);
     for (const nodeElement of nodeElements) {
       await _drawTopLevelBlock(nodeElement);
 
       if (matchModels(nodeElement, [FrameBlockModel])) {
-        const blocksInsideFrame: BlockSuite.EdgelessBlockModelType[] = [];
+        const blocksInsideFrame: GfxBlockElementModel[] = [];
         this.edgeless.service.frame
           .getElementsInFrameBound(nodeElement, false)
           .forEach(ele => {
             if (isTopLevelBlock(ele)) {
-              blocksInsideFrame.push(ele as BlockSuite.EdgelessBlockModelType);
+              blocksInsideFrame.push(ele as GfxBlockElementModel);
             } else {
-              canvasElements.push(ele as BlockSuite.SurfaceModel);
+              canvasElements.push(ele as GfxPrimitiveElementModel);
             }
           });
 
@@ -1245,8 +1247,8 @@ export class EdgelessClipboardController extends PageClipboard {
       ),
     };
 
-    const blockModels: BlockSuite.EdgelessBlockModelType[] = [];
-    const canvasElements: BlockSuite.SurfaceModel[] = [];
+    const blockModels: GfxBlockElementModel[] = [];
+    const canvasElements: GfxPrimitiveElementModel[] = [];
     const allElements: GfxModel[] = [];
 
     for (const data of elementsRawData) {
@@ -1283,7 +1285,7 @@ export class EdgelessClipboardController extends PageClipboard {
         const block = this.doc.getBlock(newId);
         if (!block) continue;
 
-        assertType<BlockSuite.EdgelessBlockModelType>(block.model);
+        assertType<GfxBlockElementModel>(block.model);
         blockModels.push(block.model);
         allElements.push(block.model);
         context.oldToNewIdMap.set(oldId, newId);
@@ -1343,8 +1345,8 @@ export class EdgelessClipboardController extends PageClipboard {
   }
 
   async toCanvas(
-    blocks: BlockSuite.EdgelessBlockModelType[],
-    shapes: BlockSuite.SurfaceModel[],
+    blocks: GfxBlockElementModel[],
+    shapes: ShapeElementModel[],
     options?: CanvasExportOptions
   ) {
     blocks.sort(compareLayer);

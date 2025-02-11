@@ -1,4 +1,7 @@
-import type { ConnectorElementModel } from '@blocksuite/affine-model';
+import type {
+  ConnectorElementModel,
+  SurfaceElementModelMap,
+} from '@blocksuite/affine-model';
 import type { SurfaceBlockProps } from '@blocksuite/block-std/gfx';
 import { SurfaceBlockModel as BaseSurfaceModel } from '@blocksuite/block-std/gfx';
 import { DisposableGroup } from '@blocksuite/global/utils';
@@ -55,11 +58,9 @@ export class SurfaceBlockModel extends BaseSurfaceModel {
     );
   }
 
-  override getElementsByType<K extends keyof BlockSuite.SurfaceElementModelMap>(
+  override getElementsByType<K extends keyof SurfaceElementModelMap>(
     type: K
-  ): BlockSuite.SurfaceElementModelMap[K][] {
-    return super.getElementsByType(
-      type
-    ) as BlockSuite.SurfaceElementModelMap[K][];
+  ): SurfaceElementModelMap[K][] {
+    return super.getElementsByType(type) as SurfaceElementModelMap[K][];
   }
 }

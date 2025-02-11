@@ -11,7 +11,7 @@ export class EditPropsMiddlewareBuilder extends SurfaceMiddlewareBuilder {
   middleware: SurfaceMiddleware = ctx => {
     if (ctx.type === 'beforeAdd') {
       const { type, props } = ctx.payload;
-      const key = getLastPropsKey(type as BlockSuite.EdgelessModelKeys, props);
+      const key = getLastPropsKey(type, props);
       const nProps = key
         ? this.std.get(EditPropsStore).applyLastProps(key, ctx.payload.props)
         : null;

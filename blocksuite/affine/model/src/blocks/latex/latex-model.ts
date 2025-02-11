@@ -37,11 +37,3 @@ export const LatexBlockSchema = defineBlockSchema({
 export class LatexBlockModel
   extends GfxCompatible<LatexProps>(BlockModel)
   implements GfxElementGeometry {}
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:latex': LatexBlockModel;
-    }
-  }
-}

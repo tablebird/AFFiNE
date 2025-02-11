@@ -8,7 +8,7 @@ import { NodePropsSchema } from '@blocksuite/affine-shared/utils';
 const LastPropsSchema = NodePropsSchema;
 
 export function getLastPropsKey(
-  modelType: BlockSuite.EdgelessModelKeys,
+  modelType: string,
   modelProps: Partial<LastProps[LastPropsKey]>
 ): LastPropsKey | null {
   if (modelType === 'shape') {

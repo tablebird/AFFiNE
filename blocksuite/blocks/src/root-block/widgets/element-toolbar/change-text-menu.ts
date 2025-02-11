@@ -29,6 +29,8 @@ import {
   FontWeight,
   resolveColor,
   ShapeElementModel,
+  type SurfaceTextModel,
+  type SurfaceTextModelMap,
   TextAlign,
   TextElementModel,
   type TextStyleProps,
@@ -76,14 +78,14 @@ const TEXT_ALIGN_CHOOSE: [TextAlign, () => TemplateResult<1>][] = [
 ] as const;
 
 function countByField<K extends keyof Omit<TextStyleProps, 'color'>>(
-  elements: BlockSuite.EdgelessTextModelType[],
+  elements: SurfaceTextModel[],
   field: K
 ) {
   return countBy(elements, element => extractField(element, field));
 }
 
 function extractField<K extends keyof Omit<TextStyleProps, 'color'>>(
-  element: BlockSuite.EdgelessTextModelType,
+  element: SurfaceTextModel,
   field: K
 ) {
   //TODO: It's not a very good handling method.
@@ -101,23 +103,23 @@ function extractField<K extends keyof Omit<TextStyleProps, 'color'>>(
 }
 
 function getMostCommonValue<K extends keyof Omit<TextStyleProps, 'color'>>(
-  elements: BlockSuite.EdgelessTextModelType[],
+  elements: SurfaceTextModel[],
   field: K
 ) {
   const values = countByField(elements, field);
   return maxBy(Object.entries(values), ([_k, count]) => count);
 }
 
-function getMostCommonAlign(elements: BlockSuite.EdgelessTextModelType[]) {
+function getMostCommonAlign(elements: SurfaceTextModel[]) {
   const max = getMostCommonValue(elements, 'textAlign');
   return max ? (max[0] as TextAlign) : TextAlign.Left;
 }
 
 function getMostCommonColor(
-  elements: BlockSuite.EdgelessTextModelType[],
+  elements: SurfaceTextModel[],
   colorScheme: ColorScheme
 ): string {
-  const colors = countBy(elements, (ele: BlockSuite.EdgelessTextModelType) => {
+  const colors = countBy(elements, (ele: SurfaceTextModel) => {
     const color =
       ele instanceof ConnectorElementModel ? ele.labelStyle.color : ele.color;
     return resolveColor(color, colorScheme);
@@ -128,28 +130,28 @@ function getMostCommonColor(
     : resolveColor(DefaultTheme.textColor, colorScheme);
 }
 
-function getMostCommonFontFamily(elements: BlockSuite.EdgelessTextModelType[]) {
+function getMostCommonFontFamily(elements: SurfaceTextModel[]) {
   const max = getMostCommonValue(elements, 'fontFamily');
   return max ? (max[0] as FontFamily) : FontFamily.Inter;
 }
 
-function getMostCommonFontSize(elements: BlockSuite.EdgelessTextModelType[]) {
+function getMostCommonFontSize(elements: SurfaceTextModel[]) {
   const max = getMostCommonValue(elements, 'fontSize');
   return max ? Number(max[0]) : FONT_SIZE_LIST[0].value;
 }
 
-function getMostCommonFontStyle(elements: BlockSuite.EdgelessTextModelType[]) {
+function getMostCommonFontStyle(elements: SurfaceTextModel[]) {
   const max = getMostCommonValue(elements, 'fontStyle');
   return max ? (max[0] as FontStyle) : FontStyle.Normal;
 }
 
-function getMostCommonFontWeight(elements: BlockSuite.EdgelessTextModelType[]) {
+function getMostCommonFontWeight(elements: SurfaceTextModel[]) {
   const max = getMostCommonValue(elements, 'fontWeight');
   return max ? (max[0] as FontWeight) : FontWeight.Regular;
 }
 
 function buildProps(
-  element: BlockSuite.EdgelessTextModelType,
+  element: SurfaceTextModel,
   props: { [K in keyof TextStyleProps]?: TextStyleProps[K] }
 ) {
   if (element instanceof ConnectorElementModel) {
@@ -236,9 +238,7 @@ export class EdgelessChangeTextMenu extends WithDisposable(LitElement) {
     });
   };
 
-  private readonly _updateElementBound = (
-    element: BlockSuite.EdgelessTextModelType
-  ) => {
+  private readonly _updateElementBound = (element: SurfaceTextModel) => {
     const elementType = this.elementType;
     if (elementType === 'text' && element instanceof TextElementModel) {
       // the change of font family will change the bound of the text
@@ -506,10 +506,10 @@ export class EdgelessChangeTextMenu extends WithDisposable(LitElement) {
   accessor edgeless!: EdgelessRootBlockComponent;
 
   @property({ attribute: false })
-  accessor elements!: BlockSuite.EdgelessTextModelType[];
+  accessor elements!: SurfaceTextModel[];
 
   @property({ attribute: false })
-  accessor elementType!: BlockSuite.EdgelessTextModelKeyType;
+  accessor elementType!: keyof SurfaceTextModelMap;
 
   @query('edgeless-color-picker-button.text-color')
   accessor textColorButton!: EdgelessColorPickerButton;

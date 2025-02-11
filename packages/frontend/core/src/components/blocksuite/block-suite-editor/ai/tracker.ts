@@ -1,10 +1,11 @@
 import { AIProvider } from '@affine/core/blocksuite/presets/ai';
 import { mixpanel, track } from '@affine/track';
 import type { EditorHost } from '@blocksuite/affine/block-std';
+import type { GfxPrimitiveElementModel } from '@blocksuite/affine/block-std/gfx';
 import type { BlockModel } from '@blocksuite/affine/store';
 import { lowerCase, omit } from 'lodash-es';
 
-type ElementModel = BlockSuite.SurfaceElementModel;
+type ElementModel = GfxPrimitiveElementModel;
 
 type AIActionEventName =
   | 'AI action invoked'

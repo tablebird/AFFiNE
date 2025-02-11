@@ -22,7 +22,10 @@ import {
   type EditorHost,
   StdIdentifier,
 } from '@blocksuite/block-std';
-import type { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
+import type {
+  GfxBlockElementModel,
+  GfxPrimitiveElementModel,
+} from '@blocksuite/block-std/gfx';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import type { IBound } from '@blocksuite/global/utils';
 import { Bound } from '@blocksuite/global/utils';
@@ -410,7 +413,7 @@ export class ExportManager {
     bound: IBound,
     edgeless?: EdgelessRootBlockComponent,
     nodes?: GfxBlockElementModel[],
-    surfaces?: BlockSuite.SurfaceElementModel[],
+    surfaces?: GfxPrimitiveElementModel[],
     edgelessBackground?: {
       zoom: number;
     }

@@ -261,15 +261,3 @@ export class LocalShapeElementModel extends GfxLocalElementModel {
   @prop()
   accessor textVerticalAlign: TextVerticalAlign = TextVerticalAlign.Center;
 }
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceElementModelMap {
-      shape: ShapeElementModel;
-    }
-
-    interface EdgelessTextModelMap {
-      shape: ShapeElementModel;
-    }
-  }
-}

@@ -4,6 +4,7 @@ import type {
   EdgelessRootBlockComponent,
   GroupElementModel,
   NoteBlockModel,
+  SurfaceElementModel,
 } from '@blocksuite/blocks';
 import type { BlockModel, Store } from '@blocksuite/store';
 import { beforeEach, describe, expect, test } from 'vitest';
@@ -852,7 +853,7 @@ test('the actual rendering z-index should satisfy the logic order of their index
 });
 
 describe('index generator', () => {
-  let preinsertedShape: BlockSuite.SurfaceElementModel;
+  let preinsertedShape: SurfaceElementModel;
   let preinsertedNote: NoteBlockModel;
 
   beforeEach(() => {
@@ -863,7 +864,7 @@ describe('index generator', () => {
 
     preinsertedShape = service.crud.getElementById(
       shapeId
-    )! as BlockSuite.SurfaceElementModel;
+    )! as SurfaceElementModel;
     preinsertedNote = service.crud.getElementById(noteId)! as NoteBlockModel;
   });
 
