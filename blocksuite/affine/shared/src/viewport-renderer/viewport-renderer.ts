@@ -15,8 +15,6 @@ export const ViewportTurboRendererIdentifier = LifeCycleWatcherIdentifier(
 ) as ServiceIdentifier<ViewportTurboRendererExtension>;
 
 export class ViewportTurboRendererExtension extends LifeCycleWatcher {
-  static override key = 'ViewportTurboRenderer';
-
   static override setup(di: Container) {
     di.addImpl(ViewportTurboRendererIdentifier, this, [StdIdentifier]);
   }
