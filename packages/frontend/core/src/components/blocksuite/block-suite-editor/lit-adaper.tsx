@@ -156,7 +156,7 @@ const usePatchSpecs = (mode: DocMode) => {
     builder.extend(
       [
         patchReferenceRenderer(reactToLit, referenceRenderer),
-        patchForEdgelessNoteConfig(reactToLit),
+        patchForEdgelessNoteConfig(framework, reactToLit),
         patchNotificationService(confirmModal),
         patchPeekViewService(peekViewService),
         patchOpenDocExtension(),

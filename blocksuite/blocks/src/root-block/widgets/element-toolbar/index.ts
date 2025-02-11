@@ -1,4 +1,3 @@
-import type { BuiltInEmbedModel } from '@blocksuite/affine-block-bookmark';
 import { isNoteBlock } from '@blocksuite/affine-block-surface';
 import { ConnectorCWithArrowIcon } from '@blocksuite/affine-components/icons';
 import {
@@ -12,6 +11,7 @@ import {
 import type {
   AttachmentBlockModel,
   BrushElementModel,
+  BuiltInEmbedModel,
   ConnectorElementModel,
   EdgelessTextBlockModel,
   FrameBlockModel,

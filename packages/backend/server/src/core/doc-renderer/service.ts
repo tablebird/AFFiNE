@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { applyUpdate, Doc } from 'yjs';
 
-import { Cache, OnEvent } from '../../base';
+import { Cache } from '../../base';
 import { DocReader } from '../doc';
 import {
   type PageDocContent,
@@ -78,11 +78,7 @@ export class DocContentService {
     return content;
   }
 
-  @OnEvent('doc.snapshot.updated')
-  async markDocContentCacheStale({
-    workspaceId,
-    docId,
-  }: Events['doc.snapshot.updated']) {
+  async markDocContentCacheStale(workspaceId: string, docId: string) {
     const key =
       workspaceId === docId
         ? `workspace:${workspaceId}:content`

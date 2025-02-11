@@ -241,9 +241,13 @@ export class UserModel extends BaseModel {
   // #region ConnectedAccount
 
   async createConnectedAccount(data: CreateConnectedAccountInput) {
-    return await this.db.connectedAccount.create({
+    const account = await this.db.connectedAccount.create({
       data,
     });
+    this.logger.log(
+      `Connected account ${account.provider}:${account.id} created`
+    );
+    return account;
   }
 
   async getConnectedAccount(provider: string, providerAccountId: string) {

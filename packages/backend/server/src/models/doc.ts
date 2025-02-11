@@ -265,6 +265,21 @@ export class DocModel extends BaseModel {
     };
   }
 
+  /**
+   * Delete expired histories.
+   */
+  async deleteExpiredHistories() {
+    const { count } = await this.db.snapshotHistory.deleteMany({
+      where: {
+        expiredAt: {
+          lte: new Date(),
+        },
+      },
+    });
+    this.logger.log(`Deleted ${count} expired histories`);
+    return count;
+  }
+
   // #endregion
 
   // #region Doc

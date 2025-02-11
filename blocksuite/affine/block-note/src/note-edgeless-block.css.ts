@@ -1,6 +1,6 @@
 import { EDGELESS_BLOCK_CHILD_PADDING } from '@blocksuite/affine-shared/consts';
 import { cssVar } from '@toeverything/theme';
-import { globalStyle, style } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 
 export const ACTIVE_NOTE_EXTRA_PADDING = 20;
 
@@ -56,14 +56,6 @@ export const noteBackground = style({
       boxShadow: cssVar('activeShadow'),
     },
   },
-});
-
-globalStyle(`${edgelessNoteContainer} > doc-title`, {
-  position: 'relative',
-});
-
-globalStyle(`${edgelessNoteContainer} > doc-title .doc-title-container`, {
-  padding: '26px 0px',
 });
 
 export const pageContent = style({

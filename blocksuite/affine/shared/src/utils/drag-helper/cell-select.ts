@@ -1,4 +1,5 @@
-type OffsetList = number[];
+import type { OffsetList } from './types';
+
 type CellOffsets = {
   rows: OffsetList;
   columns: OffsetList;

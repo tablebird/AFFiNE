@@ -61,12 +61,6 @@ export const useGeneralSettingList = (): GeneralSettingList => {
       icon: <KeyboardIcon />,
       testId: 'shortcuts-panel-trigger',
     },
-    {
-      key: 'about',
-      title: t['com.affine.aboutAFFiNE.title'](),
-      icon: <InformationIcon />,
-      testId: 'about-panel-trigger',
-    },
   ];
   if (enableEditorSettings) {
     // add editor settings to second position
@@ -104,12 +98,20 @@ export const useGeneralSettingList = (): GeneralSettingList => {
     });
   }
 
-  settings.push({
-    key: 'experimental-features',
-    title: t['com.affine.settings.workspace.experimental-features'](),
-    icon: <ExperimentIcon />,
-    testId: 'experimental-features-trigger',
-  });
+  settings.push(
+    {
+      key: 'experimental-features',
+      title: t['com.affine.settings.workspace.experimental-features'](),
+      icon: <ExperimentIcon />,
+      testId: 'experimental-features-trigger',
+    },
+    {
+      key: 'about',
+      title: t['com.affine.aboutAFFiNE.title'](),
+      icon: <InformationIcon />,
+      testId: 'about-panel-trigger',
+    }
+  );
 
   return settings;
 };

@@ -179,7 +179,13 @@ function DocPeekPreviewEditor({
   );
 }
 
-export function DocPeekPreview({ docRef }: { docRef: DocReferenceInfo }) {
+export function DocPeekPreview({
+  docRef,
+  animating,
+}: {
+  docRef: DocReferenceInfo;
+  animating?: boolean;
+}) {
   const {
     docId,
     blockIds,
@@ -204,7 +210,8 @@ export function DocPeekPreview({ docRef }: { docRef: DocReferenceInfo }) {
           databaseRowId,
           type: 'database',
         }
-      : undefined
+      : undefined,
+    !animating
   );
 
   // if sync engine has been synced and the page is null, show 404 page.

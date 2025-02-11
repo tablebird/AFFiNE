@@ -57,7 +57,7 @@ export const FunctionalityModules = [
       generateId: true,
       idGenerator(req: Request) {
         // make every request has a unique id to tracing
-        return req.get('x-rpc-trace-id') ?? genRequestId('req');
+        return req.get('x-cloud-trace-context') ?? genRequestId('req');
       },
       setup(cls, _req, res: Response) {
         res.setHeader('X-Request-Id', cls.getId());

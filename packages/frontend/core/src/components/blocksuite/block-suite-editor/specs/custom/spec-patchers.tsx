@@ -13,6 +13,7 @@ import { DesktopApiService } from '@affine/core/modules/desktop-api';
 import { type DocService, DocsService } from '@affine/core/modules/doc';
 import type { EditorService } from '@affine/core/modules/editor';
 import { EditorSettingService } from '@affine/core/modules/editor-setting';
+import { JournalService } from '@affine/core/modules/journal';
 import { resolveLinkToDoc } from '@affine/core/modules/navigation';
 import type { PeekViewService } from '@affine/core/modules/peek-view';
 import {
@@ -79,7 +80,7 @@ import {
   SplitViewIcon,
 } from '@blocksuite/icons/lit';
 import { type FrameworkProvider } from '@toeverything/infra';
-import { type TemplateResult } from 'lit';
+import { html, type TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { literal } from 'lit/static-html.js';
 import { pick } from 'lodash-es';
@@ -87,6 +88,7 @@ import { pick } from 'lodash-es';
 import type { DocProps } from '../../../../../blocksuite/initialization';
 import { AttachmentEmbedPreview } from '../../../../attachment-viewer/pdf-viewer-embedded';
 import { generateUrl } from '../../../../hooks/affine/use-share-url';
+import { BlocksuiteEditorJournalDocTitle } from '../../journal-doc-title';
 import { EdgelessNoteHeader } from './widgets/edgeless-note-header';
 import { createKeyboardToolbarConfig } from './widgets/keyboard-toolbar';
 
@@ -656,11 +658,21 @@ export function patchForClipboardInElectron(framework: FrameworkProvider) {
 }
 
 export function patchForEdgelessNoteConfig(
+  framework: FrameworkProvider,
   reactToLit: (element: ElementOrFactory) => TemplateResult
 ) {
   return NoteConfigExtension({
     edgelessNoteHeader: ({ note }) =>
       reactToLit(<EdgelessNoteHeader note={note} />),
+    pageBlockTitle: ({ note }) => {
+      const journalService = framework.get(JournalService);
+      const isJournal = !!journalService.journalDate$(note.doc.id).value;
+      if (isJournal) {
+        return reactToLit(<BlocksuiteEditorJournalDocTitle page={note.doc} />);
+      } else {
+        return html`<doc-title .doc=${note.doc}></doc-title>`;
+      }
+    },
   });
 }
 

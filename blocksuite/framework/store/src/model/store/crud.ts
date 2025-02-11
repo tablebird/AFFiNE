@@ -1,7 +1,7 @@
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import * as Y from 'yjs';
 
-import { native2Y } from '../../reactive/index.js';
+import { isPureObject, native2Y } from '../../reactive/index.js';
 import type { Schema } from '../../schema/index.js';
 import type { BlockModel } from '../block/block-model.js';
 import type { YBlock } from '../block/types.js';
@@ -95,11 +95,26 @@ export class DocCRUD {
     delete props.flavour;
     delete props.children;
 
-    Object.entries(props).forEach(([key, value]) => {
-      if (value === undefined) return;
+    const isFlatData = schema.model.isFlatData;
+    if (isFlatData) {
+      const run = (obj: unknown, basePath: string) => {
+        if (isPureObject(obj)) {
+          Object.entries(obj).forEach(([key, value]) => {
+            const fullPath = basePath ? `${basePath}.${key}` : key;
+            run(value, fullPath);
+          });
+        } else {
+          yBlock.set(`prop:${basePath}`, native2Y(obj));
+        }
+      };
+      run(props, '');
+    } else {
+      Object.entries(props).forEach(([key, value]) => {
+        if (value === undefined) return;
 
-      yBlock.set(`prop:${key}`, native2Y(value));
-    });
+        yBlock.set(`prop:${key}`, native2Y(value));
+      });
+    }
 
     const parentId =
       parent ?? (schema.model.role === 'root' ? null : this.root);

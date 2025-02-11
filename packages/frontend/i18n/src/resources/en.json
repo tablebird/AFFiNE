@@ -1428,7 +1428,7 @@
   "com.affine.settings.workspace.affine-ai.title": "AFFiNE AI",
   "com.affine.settings.workspace.affine-ai.label": "Allow AFFiNE AI Assistant",
   "com.affine.settings.workspace.affine-ai.description": "Allow workspace members to use AFFiNE AI features. This setting doesn't affect billing. Workspace members use AFFiNE AI through their personal accounts.",
-  "com.affine.settings.workspace.backup": "Backup",
+  "com.affine.settings.workspace.backup": "Achieved workspaces",
   "com.affine.settings.workspace.backup.subtitle": "Management in local workspace backup files",
   "com.affine.settings.workspace.backup.empty": "No backup files found",
   "com.affine.settings.workspace.backup.delete": "Delete backup workspace",

@@ -1,12 +1,7 @@
-import type {
-  BuiltInEmbedBlockComponent,
-  BuiltInEmbedModel,
-} from '@blocksuite/affine-block-bookmark';
+import {} from '@blocksuite/affine-block-bookmark';
 import {
-  isInternalEmbedModel,
-  toggleEmbedCardEditModal,
-} from '@blocksuite/affine-block-bookmark';
-import {
+  EmbedLinkedDocBlockComponent,
+  EmbedSyncedDocBlockComponent,
   getDocContentWithMaxLength,
   getEmbedCardIcons,
 } from '@blocksuite/affine-block-embed';
@@ -14,6 +9,7 @@ import {
   EdgelessCRUDIdentifier,
   reassociateConnectorsCommand,
 } from '@blocksuite/affine-block-surface';
+import { toggleEmbedCardEditModal } from '@blocksuite/affine-components/embed-card-modal';
 import {
   CaptionIcon,
   CopyIcon,
@@ -23,7 +19,11 @@ import {
   PaletteIcon,
   SmallArrowDownIcon,
 } from '@blocksuite/affine-components/icons';
-import { notifyLinkedDocSwitchedToEmbed } from '@blocksuite/affine-components/notification';
+import {
+  notifyLinkedDocClearedAliases,
+  notifyLinkedDocSwitchedToCard,
+  notifyLinkedDocSwitchedToEmbed,
+} from '@blocksuite/affine-components/notification';
 import { isPeekable, peek } from '@blocksuite/affine-components/peek';
 import { toast } from '@blocksuite/affine-components/toast';
 import {
@@ -33,7 +33,9 @@ import {
 import {
   type AliasInfo,
   BookmarkStyles,
+  type BuiltInEmbedModel,
   type EmbedCardStyle,
+  isInternalEmbedModel,
 } from '@blocksuite/affine-model';
 import {
   EMBED_CARD_HEIGHT,
@@ -69,6 +71,7 @@ import {
   isEmbedLinkedDocBlock,
   isEmbedSyncedDocBlock,
 } from '../../edgeless/utils/query.js';
+import type { BuiltInEmbedBlockComponent } from '../../utils/types';
 
 export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
   static override styles = css`
@@ -287,7 +290,30 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
       this.std.host,
       this.model,
       this._viewType,
-      originalDocInfo
+      originalDocInfo,
+      (std, component) => {
+        if (
+          isEmbedLinkedDocBlock(this.model) &&
+          component instanceof EmbedLinkedDocBlockComponent
+        ) {
+          component.refreshData();
+
+          notifyLinkedDocClearedAliases(std);
+        }
+      },
+      (std, component, props) => {
+        if (
+          isEmbedSyncedDocBlock(this.model) &&
+          component instanceof EmbedSyncedDocBlockComponent
+        ) {
+          component.convertToCard(props);
+
+          notifyLinkedDocSwitchedToCard(std);
+        } else {
+          this.model.doc.updateBlock(this.model, props);
+          component.requestUpdate();
+        }
+      }
     );
 
     track(this.std, this.model, this._viewType, 'OpenedAliasPopup', {

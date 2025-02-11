@@ -1,21 +1,15 @@
-import { EdgelessCRUDIdentifier } from '@blocksuite/affine-block-surface';
-import { toast } from '@blocksuite/affine-components/toast';
-import type { EmbedCardStyle } from '@blocksuite/affine-model';
-import {
-  EMBED_CARD_HEIGHT,
-  EMBED_CARD_WIDTH,
-} from '@blocksuite/affine-shared/consts';
 import { EmbedOptionProvider } from '@blocksuite/affine-shared/services';
 import { isValidUrl, stopPropagation } from '@blocksuite/affine-shared/utils';
 import type { EditorHost } from '@blocksuite/block-std';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
-import { Bound, Vec, WithDisposable } from '@blocksuite/global/utils';
+import { WithDisposable } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 import { html } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
+import { toast } from '../toast';
 import { embedCardModalStyles } from './styles.js';
 
 export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
@@ -55,37 +49,13 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
         index
       );
     } else if (mode === 'edgeless') {
-      let flavour = 'affine:bookmark',
-        targetStyle: EmbedCardStyle = 'vertical';
-
-      if (embedOptions) {
-        flavour = embedOptions.flavour;
-        targetStyle = embedOptions.styles[0];
-      }
-
       const gfx = this.host.std.get(GfxControllerIdentifier);
-      const crud = this.host.std.get(EdgelessCRUDIdentifier);
-
-      const viewport = gfx.viewport;
       const surfaceModel = gfx.surface;
       if (!surfaceModel) {
         return;
       }
 
-      const center = Vec.toVec(viewport.center);
-      crud.addBlock(
-        flavour,
-        {
-          url,
-          xywh: Bound.fromCenter(
-            center,
-            EMBED_CARD_WIDTH[targetStyle],
-            EMBED_CARD_HEIGHT[targetStyle]
-          ).serialize(),
-          style: targetStyle,
-        },
-        surfaceModel
-      );
+      this.createOptions.onSave(url);
 
       gfx.tool.setTool(
         // @ts-expect-error FIXME: resolve after gfx tool refactor
@@ -180,6 +150,7 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
       }
     | {
         mode: 'edgeless';
+        onSave: (url: string) => void;
       };
 
   @property({ attribute: false })
@@ -210,6 +181,7 @@ export async function toggleEmbedCardCreateModal(
       }
     | {
         mode: 'edgeless';
+        onSave: (url: string) => void;
       }
 ): Promise<void> {
   host.selection.clear();

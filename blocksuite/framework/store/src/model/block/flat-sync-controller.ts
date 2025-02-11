@@ -50,7 +50,7 @@ export class FlatSyncController {
     model.schema = schema;
 
     model.id = this.id;
-    model.keys = Array.from(props).map(key => key.replace('prop:', ''));
+    model.keys = Array.from(props);
     model.yBlock = this.yBlock;
     const reactive = new ReactiveFlatYMap(
       this.yBlock,
@@ -69,8 +69,7 @@ export class FlatSyncController {
     const defaultProps = schema.model.props?.(internalPrimitives);
     if (defaultProps) {
       Object.entries(defaultProps).forEach(([key, value]) => {
-        const keyWithProp = `prop:${key}`;
-        if (keyWithProp in proxy) {
+        if (key in proxy) {
           return;
         }
         proxy[key] = value;
@@ -149,9 +148,8 @@ export class FlatSyncController {
     // Set default props if not exists
     if (defaultProps) {
       Object.keys(defaultProps).forEach(key => {
-        const keyWithProp = `prop:${key}`;
-        if (props.has(keyWithProp)) return;
-        props.add(keyWithProp);
+        if (props.has(key)) return;
+        props.add(key);
       });
     }
 

@@ -23,6 +23,7 @@ import {
 } from './table-block.css';
 import { TableDataManager } from './table-data-manager';
 
+export const TableBlockComponentName = 'affine-table';
 export class TableBlockComponent extends CaptionedBlockComponent<TableBlockModel> {
   private _dataManager: TableDataManager | null = null;
 
@@ -38,6 +39,7 @@ export class TableBlockComponent extends CaptionedBlockComponent<TableBlockModel
   override connectedCallback() {
     super.connectedCallback();
     this.setAttribute(RANGE_SYNC_EXCLUDE_ATTR, 'true');
+    this.style.position = 'relative';
   }
 
   override get topContenteditableElement() {
@@ -191,6 +193,6 @@ export class TableBlockComponent extends CaptionedBlockComponent<TableBlockModel
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-table': TableBlockComponent;
+    [TableBlockComponentName]: TableBlockComponent;
   }
 }

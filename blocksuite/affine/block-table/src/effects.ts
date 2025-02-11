@@ -1,11 +1,11 @@
-import { AddButton } from './add-button';
-import { SelectionLayer } from './selection-layer';
-import { TableBlockComponent } from './table-block';
-import { TableCell } from './table-cell';
+import { AddButton, AddButtonComponentName } from './add-button';
+import { SelectionLayer, SelectionLayerComponentName } from './selection-layer';
+import { TableBlockComponent, TableBlockComponentName } from './table-block';
+import { TableCell, TableCellComponentName } from './table-cell';
 
 export function effects() {
-  customElements.define('affine-table', TableBlockComponent);
-  customElements.define('affine-table-cell', TableCell);
-  customElements.define('affine-table-add-button', AddButton);
-  customElements.define('affine-table-selection-layer', SelectionLayer);
+  customElements.define(TableBlockComponentName, TableBlockComponent);
+  customElements.define(TableCellComponentName, TableCell);
+  customElements.define(AddButtonComponentName, AddButton);
+  customElements.define(SelectionLayerComponentName, SelectionLayer);
 }

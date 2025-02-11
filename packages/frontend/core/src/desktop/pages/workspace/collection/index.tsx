@@ -21,6 +21,7 @@ import {
   ViewIcon,
   ViewTitle,
 } from '../../../../modules/workbench';
+import { AllDocSidebarTabs } from '../layouts/all-doc-sidebar-tabs';
 import { CollectionDetailHeader } from './header';
 
 export const CollectionDetail = ({
@@ -123,6 +124,7 @@ export const Component = function CollectionPage() {
     <>
       <ViewIcon icon="collection" />
       <ViewTitle title={collection.name} />
+      <AllDocSidebarTabs />
       {inner}
     </>
   );

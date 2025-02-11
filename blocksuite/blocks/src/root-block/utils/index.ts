@@ -1,1 +1,2 @@
-export * from './callback.js';
+export * from './callback';
+export * from './types';

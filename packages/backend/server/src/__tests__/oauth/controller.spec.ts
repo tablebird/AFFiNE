@@ -308,7 +308,7 @@ test('should not throw if account registered', async t => {
 });
 
 test('should be able to fullfil user with oauth sign in', async t => {
-  const { app, db } = t.context;
+  const { app, models } = t.context;
 
   const u3 = await app.createUser('u3@affine.pro');
 
@@ -321,11 +321,11 @@ test('should be able to fullfil user with oauth sign in', async t => {
   t.truthy(sessionUser);
   t.is(sessionUser!.email, u3.email);
 
-  const account = await db.connectedAccount.findFirst({
-    where: {
-      userId: u3.id,
-    },
-  });
+  const account = await models.user.getConnectedAccount(
+    OAuthProviderName.Google,
+    '1'
+  );
 
   t.truthy(account);
+  t.is(account!.user.id, u3.id);
 });

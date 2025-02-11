@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import ava, { TestFn } from 'ava';
 import Sinon from 'sinon';
 
@@ -276,16 +275,13 @@ test('should trigger user.deleted event', async t => {
 });
 
 test('should paginate users', async t => {
-  const db = t.context.module.get(PrismaClient);
   const now = Date.now();
   await Promise.all(
     Array.from({ length: 100 }).map((_, i) =>
-      db.user.create({
-        data: {
-          name: `test${i}`,
-          email: `test${i}@affine.pro`,
-          createdAt: new Date(now + i),
-        },
+      t.context.user.create({
+        name: `test-paginate-${i}`,
+        email: `test-paginate-${i}@affine.pro`,
+        createdAt: new Date(now + i),
       })
     )
   );
@@ -294,7 +290,7 @@ test('should paginate users', async t => {
   t.is(users.length, 10);
   t.deepEqual(
     users.map(user => user.email),
-    Array.from({ length: 10 }).map((_, i) => `test${i}@affine.pro`)
+    Array.from({ length: 10 }).map((_, i) => `test-paginate-${i}@affine.pro`)
   );
 });
 

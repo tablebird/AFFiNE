@@ -473,6 +473,21 @@ test('@ popover with click "select a specific date" should show a date picker', 
   ).toBeVisible();
 });
 
+test('@ popover can auto focus on the "New Doc" item when query returns no items', async ({
+  page,
+}) => {
+  await page.keyboard.press('Enter');
+  await waitForEmptyEditor(page);
+  await page.keyboard.press('@');
+  await page.keyboard.type('nawowenni');
+  await expect(page.locator('.linked-doc-popover')).toBeVisible();
+  const newDocMenuItem = page
+    .locator('.linked-doc-popover')
+    .locator('[data-id="create-page"]');
+  await expect(newDocMenuItem).toBeVisible();
+  await expect(newDocMenuItem).toHaveAttribute('hover', 'true');
+});
+
 test('linked doc should show markdown preview in the backlink section', async ({
   page,
 }) => {

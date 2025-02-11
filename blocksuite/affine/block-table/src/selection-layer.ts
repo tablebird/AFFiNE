@@ -14,6 +14,7 @@ type Rect = {
   height: number;
 };
 
+export const SelectionLayerComponentName = 'affine-table-selection-layer';
 export class SelectionLayer extends SignalWatcher(
   WithDisposable(ShadowlessElement)
 ) {
@@ -105,6 +106,6 @@ export class SelectionLayer extends SignalWatcher(
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-table-selection-layer': SelectionLayer;
+    [SelectionLayerComponentName]: SelectionLayer;
   }
 }

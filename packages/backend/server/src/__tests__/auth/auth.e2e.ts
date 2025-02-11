@@ -187,7 +187,7 @@ test('should revoke token after change user identify', async t => {
 
     // change password
     {
-      const u3Email = 'u3@affine.pro';
+      const u3Email = 'u3333@affine.pro';
 
       await app.logout();
       const u3 = await app.signup(u3Email);

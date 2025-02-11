@@ -1,26 +1,52 @@
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
 import { Text } from '@blocksuite/store';
+import { Pane } from 'tweakpane';
 
 import { CanvasRenderer } from './canvas-renderer.js';
 import { doc, editor } from './editor.js';
 
+type DocMode = 'page' | 'edgeless';
+
 const container = document.querySelector('#right-column') as HTMLElement;
 const renderer = new CanvasRenderer(editor, container);
 
-function initUI() {
-  const toCanvasButton = document.querySelector('#to-canvas-button')!;
-  toCanvasButton.addEventListener('click', async () => {
+async function handleToCanvasClick() {
+  await renderer.render();
+  const viewport = editor.std.get(GfxControllerIdentifier).viewport;
+  viewport.viewportUpdated.on(async () => {
     await renderer.render();
+  });
+}
 
-    const viewport = editor.std.get(GfxControllerIdentifier).viewport;
-    viewport.viewportUpdated.on(async () => {
-      await renderer.render();
+function initUI() {
+  const pane = new Pane({
+    container: document.querySelector('#tweakpane-container') as HTMLElement,
+  });
+
+  const params = {
+    mode: 'edgeless' as DocMode,
+  };
+
+  pane
+    .addButton({
+      title: 'To Canvas',
+    })
+    .on('click', () => {
+      handleToCanvasClick().catch(console.error);
     });
-  });
-  const switchModeButton = document.querySelector('#switch-mode-button')!;
-  switchModeButton.addEventListener('click', async () => {
-    editor.mode = editor.mode === 'page' ? 'edgeless' : 'page';
-  });
+
+  pane
+    .addBinding(params, 'mode', {
+      label: 'Editor Mode',
+      options: {
+        Doc: 'page',
+        Edgeless: 'edgeless',
+      },
+    })
+    .on('change', ({ value }) => {
+      editor.mode = value as DocMode;
+    });
+
   document.querySelector('#left-column')?.append(editor);
 }
 

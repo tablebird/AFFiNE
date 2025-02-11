@@ -51,8 +51,9 @@ export function setupAIProvider(
   globalDialogService: GlobalDialogService,
   networkSearchService: AINetworkSearchService
 ) {
-  function getChatPrompt(attachments?: (string | File | Blob)[]) {
-    if (attachments?.length) {
+  function getChatPrompt(options: BlockSuitePresets.ChatOptions) {
+    const { attachments, docs } = options;
+    if (attachments?.length || docs?.length) {
       return 'Chat With AFFiNE AI';
     }
     const { enabled, visible } = networkSearchService;
@@ -60,19 +61,16 @@ export function setupAIProvider(
       ? 'Search With AFFiNE AI'
       : 'Chat With AFFiNE AI';
   }
-  async function getChatSessionId(
-    workspaceId: string,
-    docId: string,
-    attachments?: (string | File | Blob)[]
-  ) {
+  async function getChatSessionId(options: BlockSuitePresets.ChatOptions) {
     const userId = (await AIProvider.userInfo)?.id;
 
     if (!userId) {
       throw new UnauthorizedError();
     }
 
+    const { workspaceId, docId } = options;
     const storeKey = `${userId}:${workspaceId}:${docId}`;
-    const promptName = getChatPrompt(attachments);
+    const promptName = getChatPrompt(options);
     if (!chatSessions.has(storeKey)) {
       chatSessions.set(storeKey, {
         getSessionId: createChatSession({
@@ -114,9 +112,7 @@ export function setupAIProvider(
 
   //#region actions
   AIProvider.provide('chat', options => {
-    const sessionId =
-      options.sessionId ??
-      getChatSessionId(options.workspaceId, options.docId, options.attachments);
+    const sessionId = options.sessionId ?? getChatSessionId(options);
     const { input, docs, ...rest } = options;
     const params = docs?.length
       ? {

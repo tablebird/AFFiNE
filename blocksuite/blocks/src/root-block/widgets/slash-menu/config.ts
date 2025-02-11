@@ -1,5 +1,4 @@
 import { addSiblingAttachmentBlocks } from '@blocksuite/affine-block-attachment';
-import { toggleEmbedCardCreateModal } from '@blocksuite/affine-block-bookmark';
 import type { DataViewBlockComponent } from '@blocksuite/affine-block-data-view';
 import { insertDatabaseBlockCommand } from '@blocksuite/affine-block-database';
 import {
@@ -13,6 +12,7 @@ import { insertLatexBlockCommand } from '@blocksuite/affine-block-latex';
 import { getSurfaceBlock } from '@blocksuite/affine-block-surface';
 import { insertSurfaceRefBlockCommand } from '@blocksuite/affine-block-surface-ref';
 import { insertTableBlockCommand } from '@blocksuite/affine-block-table';
+import { toggleEmbedCardCreateModal } from '@blocksuite/affine-components/embed-card-modal';
 import {
   ArrowDownBigIcon,
   ArrowUpBigIcon,

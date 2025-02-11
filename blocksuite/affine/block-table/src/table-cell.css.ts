@@ -107,15 +107,52 @@ export const threePointerIconDotStyle = style({
   backgroundColor: threePointerIconColorVar,
   borderRadius: '50%',
 });
-
-export const widthDragHandleStyle = style({
+export const indicatorStyle = style({
   position: 'absolute',
-  top: '-1px',
-  height: 'calc(100% + 2px)',
-  right: '-3px',
-  width: '5px',
   backgroundColor: cssVarV2.table.indicator.activated,
-  cursor: 'ew-resize',
   zIndex: 2,
   transition: 'opacity 0.2s ease-in-out',
+  pointerEvents: 'none',
 });
+export const columnIndicatorStyle = style([
+  indicatorStyle,
+  {
+    top: '-1px',
+    height: 'calc(100% + 2px)',
+    width: '5px',
+  },
+]);
+export const columnRightIndicatorStyle = style([
+  columnIndicatorStyle,
+  {
+    cursor: 'ew-resize',
+    right: '-3px',
+    pointerEvents: 'auto',
+  },
+]);
+export const columnLeftIndicatorStyle = style([
+  columnIndicatorStyle,
+  {
+    left: '-2px',
+  },
+]);
+export const rowIndicatorStyle = style([
+  indicatorStyle,
+  {
+    left: '-1px',
+    width: 'calc(100% + 2px)',
+    height: '5px',
+  },
+]);
+export const rowBottomIndicatorStyle = style([
+  rowIndicatorStyle,
+  {
+    bottom: '-3px',
+  },
+]);
+export const rowTopIndicatorStyle = style([
+  rowIndicatorStyle,
+  {
+    top: '-2px',
+  },
+]);

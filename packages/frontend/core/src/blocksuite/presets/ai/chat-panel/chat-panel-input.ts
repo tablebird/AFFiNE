@@ -363,7 +363,10 @@ export class ChatPanelInput extends SignalWatcher(WithDisposable(LitElement)) {
     const { images, status } = this.chatContextValue;
     const hasImages = images.length > 0;
     const maxHeight = hasImages ? 272 + 2 : 200 + 2;
-    const networkDisabled = !!this.chatContextValue.images.length;
+    const networkDisabled =
+      !!this.chatContextValue.images.length ||
+      !!this.chatContextValue.chips.filter(chip => chip.state !== 'candidate')
+        .length;
     const networkActive = !!this.networkSearchConfig.enabled.value;
     const uploadDisabled = networkActive && !networkDisabled;
     return html`<style>

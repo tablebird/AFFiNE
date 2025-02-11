@@ -1,3 +1,4 @@
+import { BookmarkBlockComponent } from '@blocksuite/affine-block-bookmark';
 import {
   EmbedFigmaBlockComponent,
   EmbedGithubBlockComponent,
@@ -7,21 +8,7 @@ import {
   EmbedSyncedDocBlockComponent,
   EmbedYoutubeBlockComponent,
 } from '@blocksuite/affine-block-embed';
-import type {
-  BookmarkBlockModel,
-  EmbedFigmaModel,
-  EmbedGithubModel,
-  EmbedHtmlModel,
-  EmbedLoomModel,
-  EmbedYoutubeModel,
-} from '@blocksuite/affine-model';
-import {
-  EmbedLinkedDocModel,
-  EmbedSyncedDocModel,
-} from '@blocksuite/affine-model';
 import type { BlockComponent } from '@blocksuite/block-std';
-
-import { BookmarkBlockComponent } from '../../bookmark-block';
 
 export type ExternalEmbedBlockComponent =
   | BookmarkBlockComponent
@@ -42,19 +29,6 @@ export type BuiltInEmbedBlockComponent =
   | LinkableEmbedBlockComponent
   | EmbedHtmlBlockComponent;
 
-export type ExternalEmbedModel =
-  | BookmarkBlockModel
-  | EmbedFigmaModel
-  | EmbedGithubModel
-  | EmbedLoomModel
-  | EmbedYoutubeModel;
-
-export type InternalEmbedModel = EmbedLinkedDocModel | EmbedSyncedDocModel;
-
-export type LinkableEmbedModel = ExternalEmbedModel | InternalEmbedModel;
-
-export type BuiltInEmbedModel = LinkableEmbedModel | EmbedHtmlModel;
-
 export function isEmbedCardBlockComponent(
   block: BlockComponent
 ): block is BuiltInEmbedBlockComponent {
@@ -67,13 +41,5 @@ export function isEmbedCardBlockComponent(
     block instanceof EmbedYoutubeBlockComponent ||
     block instanceof EmbedLinkedDocBlockComponent ||
     block instanceof EmbedSyncedDocBlockComponent
-  );
-}
-
-export function isInternalEmbedModel(
-  model: BuiltInEmbedModel
-): model is InternalEmbedModel {
-  return (
-    model instanceof EmbedLinkedDocModel || model instanceof EmbedSyncedDocModel
   );
 }

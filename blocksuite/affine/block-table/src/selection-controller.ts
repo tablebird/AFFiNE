@@ -1,6 +1,7 @@
 import {
   domToOffsets,
   getAreaByOffsets,
+  getTargetIndexByDraggingOffset,
 } from '@blocksuite/affine-shared/utils';
 import type { UIEventStateContext } from '@blocksuite/block-std';
 import { IS_MOBILE } from '@blocksuite/global/env';
@@ -14,6 +15,13 @@ import {
   TableSelectionData,
 } from './selection-schema';
 import type { TableBlockComponent } from './table-block';
+import {
+  createColumnDragPreview,
+  createRowDragPreview,
+  type TableCell,
+  TableCellComponentName,
+} from './table-cell';
+import { cleanSelection } from './utils';
 type Cells = string[][];
 const TEXT = 'text/plain';
 export class SelectionController implements ReactiveController {
@@ -44,7 +52,7 @@ export class SelectionController implements ReactiveController {
       return;
     }
     const onMove = (event: MouseEvent) => {
-      this.dataManager.draggingColumnId$.value = columnId;
+      this.dataManager.widthAdjustColumnId$.value = columnId;
       this.dataManager.virtualWidth$.value = {
         columnId,
         width: Math.max(
@@ -55,7 +63,7 @@ export class SelectionController implements ReactiveController {
     };
     const onUp = () => {
       const width = this.dataManager.virtualWidth$.value?.width;
-      this.dataManager.draggingColumnId$.value = undefined;
+      this.dataManager.widthAdjustColumnId$.value = undefined;
       this.dataManager.virtualWidth$.value = undefined;
       if (width) {
         this.dataManager.setColumnWidth(columnId, width);
@@ -76,13 +84,198 @@ export class SelectionController implements ReactiveController {
       if (!(target instanceof HTMLElement)) {
         return;
       }
-      const dragHandle = target.closest('[data-width-adjust-column-id]');
-      if (dragHandle instanceof HTMLElement) {
-        this.widthAdjust(dragHandle, event);
+      const widthAdjustColumn = target.closest('[data-width-adjust-column-id]');
+      if (widthAdjustColumn instanceof HTMLElement) {
+        this.widthAdjust(widthAdjustColumn, event);
+        return;
+      }
+      const columnDragHandle = target.closest('[data-drag-column-id]');
+      if (columnDragHandle instanceof HTMLElement) {
+        this.columnDrag(columnDragHandle, event);
+        return;
+      }
+      const rowDragHandle = target.closest('[data-drag-row-id]');
+      if (rowDragHandle instanceof HTMLElement) {
+        this.rowDrag(rowDragHandle, event);
         return;
       }
       this.onDragStart(event);
     });
+  }
+  startColumnDrag(x: number, columnDragHandle: HTMLElement) {
+    const columnId = columnDragHandle.dataset['dragColumnId'];
+    if (!columnId) {
+      return;
+    }
+    const cellRect = columnDragHandle.closest('td')?.getBoundingClientRect();
+    const containerRect = this.host.getBoundingClientRect();
+    if (!cellRect) {
+      return;
+    }
+    const initialDiffX = x - cellRect.left;
+    const cells = Array.from(
+      this.host.querySelectorAll(`td[data-column-id="${columnId}"]`)
+    ).map(td => td.closest(TableCellComponentName) as TableCell);
+    const firstCell = cells[0];
+    if (!firstCell) {
+      return;
+    }
+    const draggingIndex = firstCell.columnIndex;
+    const columns = Array.from(
+      this.host.querySelectorAll(`td[data-row-id="${firstCell?.row?.rowId}"]`)
+    ).map(td => td.getBoundingClientRect());
+    const columnOffsets = columns.flatMap((column, index) =>
+      index === columns.length - 1 ? [column.left, column.right] : [column.left]
+    );
+    const columnDragPreview = createColumnDragPreview(cells);
+    columnDragPreview.style.top = `${cellRect.top - containerRect.top - 0.5}px`;
+    columnDragPreview.style.left = `${cellRect.left - containerRect.left}px`;
+    columnDragPreview.style.width = `${cellRect.width}px`;
+    this.host.append(columnDragPreview);
+    document.body.style.pointerEvents = 'none';
+    const onMove = (x: number) => {
+      const { targetIndex, isForward } = getTargetIndexByDraggingOffset(
+        columnOffsets,
+        draggingIndex,
+        x - initialDiffX
+      );
+      if (targetIndex != null) {
+        this.dataManager.ui.columnIndicatorIndex$.value = isForward
+          ? targetIndex + 1
+          : targetIndex;
+      } else {
+        this.dataManager.ui.columnIndicatorIndex$.value = undefined;
+      }
+      columnDragPreview.style.left = `${x - initialDiffX - containerRect.left}px`;
+    };
+    const onEnd = () => {
+      const targetIndex = this.dataManager.ui.columnIndicatorIndex$.value;
+      this.dataManager.ui.columnIndicatorIndex$.value = undefined;
+      document.body.style.pointerEvents = 'auto';
+      columnDragPreview.remove();
+      if (targetIndex != null) {
+        this.dataManager.moveColumn(
+          draggingIndex,
+          targetIndex === 0 ? undefined : targetIndex - 1
+        );
+      }
+    };
+    return {
+      onMove,
+      onEnd,
+    };
+  }
+  columnDrag(columnDragHandle: HTMLElement, event: MouseEvent) {
+    let drag: { onMove: (x: number) => void; onEnd: () => void } | undefined =
+      undefined;
+    const initialX = event.clientX;
+    const onMove = (event: MouseEvent) => {
+      const diffX = event.clientX - initialX;
+      if (!drag && Math.abs(diffX) > 10) {
+        event.preventDefault();
+        event.stopPropagation();
+        cleanSelection();
+        this.setSelected(undefined);
+        drag = this.startColumnDrag(initialX, columnDragHandle);
+      }
+      drag?.onMove(event.clientX);
+    };
+    const onUp = () => {
+      drag?.onEnd();
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }
+  startRowDrag(y: number, rowDragHandle: HTMLElement) {
+    const rowId = rowDragHandle.dataset['dragRowId'];
+    if (!rowId) {
+      return;
+    }
+    const cellRect = rowDragHandle.closest('td')?.getBoundingClientRect();
+    const containerRect = this.host.getBoundingClientRect();
+    if (!cellRect) {
+      return;
+    }
+    const initialDiffY = y - cellRect.top;
+    const cells = Array.from(
+      this.host.querySelectorAll(`td[data-row-id="${rowId}"]`)
+    ).map(td => td.closest(TableCellComponentName) as TableCell);
+    const firstCell = cells[0];
+    if (!firstCell) {
+      return;
+    }
+    const draggingIndex = firstCell.rowIndex;
+    const rows = Array.from(
+      this.host.querySelectorAll(
+        `td[data-column-id="${firstCell?.column?.columnId}"]`
+      )
+    ).map(td => td.getBoundingClientRect());
+    const rowOffsets = rows.flatMap((row, index) =>
+      index === rows.length - 1 ? [row.top, row.bottom] : [row.top]
+    );
+    const rowDragPreview = createRowDragPreview(cells);
+    rowDragPreview.style.left = `${cellRect.left - containerRect.left}px`;
+    rowDragPreview.style.top = `${cellRect.top - containerRect.top - 0.5}px`;
+    rowDragPreview.style.height = `${cellRect.height}px`;
+    this.host.append(rowDragPreview);
+    document.body.style.pointerEvents = 'none';
+    const onMove = (y: number) => {
+      const { targetIndex, isForward } = getTargetIndexByDraggingOffset(
+        rowOffsets,
+        draggingIndex,
+        y - initialDiffY
+      );
+      if (targetIndex != null) {
+        this.dataManager.ui.rowIndicatorIndex$.value = isForward
+          ? targetIndex + 1
+          : targetIndex;
+      } else {
+        this.dataManager.ui.rowIndicatorIndex$.value = undefined;
+      }
+      rowDragPreview.style.top = `${y - initialDiffY - containerRect.top}px`;
+    };
+    const onEnd = () => {
+      const targetIndex = this.dataManager.ui.rowIndicatorIndex$.value;
+      this.dataManager.ui.rowIndicatorIndex$.value = undefined;
+      document.body.style.pointerEvents = 'auto';
+      rowDragPreview.remove();
+      if (targetIndex != null) {
+        this.dataManager.moveRow(
+          draggingIndex,
+          targetIndex === 0 ? undefined : targetIndex - 1
+        );
+      }
+    };
+    return {
+      onMove,
+      onEnd,
+    };
+  }
+  rowDrag(rowDragHandle: HTMLElement, event: MouseEvent) {
+    let drag: { onMove: (x: number) => void; onEnd: () => void } | undefined =
+      undefined;
+    const initialY = event.clientY;
+    const onMove = (event: MouseEvent) => {
+      const diffY = event.clientY - initialY;
+      if (!drag && Math.abs(diffY) > 10) {
+        event.preventDefault();
+        event.stopPropagation();
+        cleanSelection();
+        this.setSelected(undefined);
+        drag = this.startRowDrag(initialY, rowDragHandle);
+      }
+      drag?.onMove(event.clientY);
+    };
+    // eslint-disable-next-line sonarjs/no-identical-functions
+    const onUp = () => {
+      drag?.onEnd();
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
   }
   readonly doCopyOrCut = (selection: TableAreaSelection, isCut: boolean) => {
     const columns = this.dataManager.uiColumns$.value;

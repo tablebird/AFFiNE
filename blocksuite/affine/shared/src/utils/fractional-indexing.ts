@@ -1,5 +1,9 @@
 import { generateKeyBetween } from 'fractional-indexing';
 
+function hasSamePrefix(a: string, b: string) {
+  return a.startsWith(b) || b.startsWith(a);
+}
+
 /**
  * generate a key between a and b, the result key is always satisfied with a < result < b.
  * the key always has a random suffix, so there is no need to worry about collision.
@@ -59,7 +63,7 @@ export function generateFractionalIndexingKeyBetween(
     return generateKeyBetween(aSubkey, null) + '0' + postfix();
   } else if (aSubkey !== null && bSubkey !== null) {
     // generate a key between a and b
-    if (aSubkey === bSubkey && a !== null && b !== null) {
+    if (hasSamePrefix(aSubkey, bSubkey) && a !== null && b !== null) {
       // conflict, if the subkeys are the same, generate a key between fullkeys
       return generateKeyBetween(a, b) + '0' + postfix();
     } else {

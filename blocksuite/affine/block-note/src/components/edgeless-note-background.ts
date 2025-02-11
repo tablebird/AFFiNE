@@ -1,13 +1,9 @@
 import {
   DefaultTheme,
   NoteBlockModel,
-  NoteDisplayMode,
   StrokeStyle,
 } from '@blocksuite/affine-model';
-import {
-  FeatureFlagService,
-  ThemeProvider,
-} from '@blocksuite/affine-shared/services';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
 import {
   getClosestBlockComponentByPoint,
   handleNativeRangeAtPoint,
@@ -37,6 +33,7 @@ import { html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
+import { isPageBlock } from '../utils';
 import * as styles from './edgeless-note-background.css';
 
 @requiredProperties({
@@ -72,18 +69,6 @@ export class EdgelessNoteBackground extends SignalWatcher(
 
   get doc() {
     return this.std.host.doc;
-  }
-
-  private get _isPageBlock() {
-    return (
-      this.std.get(FeatureFlagService).getFlag('enable_page_block') &&
-      // is the first page visible note
-      this.note.parent?.children.find(
-        child =>
-          matchFlavours(child, ['affine:note']) &&
-          child.displayMode !== NoteDisplayMode.EdgelessOnly
-      ) === this.note
-    );
   }
 
   private _tryAddParagraph(x: number, y: number) {
@@ -174,7 +159,7 @@ export class EdgelessNoteBackground extends SignalWatcher(
       @pointerdown=${stopPropagation}
       @click=${this._handleClickAtBackground}
     >
-      ${this._isPageBlock ? this._renderHeader() : nothing}
+      ${isPageBlock(this.std, this.note) ? this._renderHeader() : nothing}
     </div>`;
   }
 

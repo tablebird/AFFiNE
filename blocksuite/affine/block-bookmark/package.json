@@ -14,7 +14,6 @@
   "license": "MIT",
   "dependencies": {
     "@blocksuite/affine-block-embed": "workspace:*",
-    "@blocksuite/affine-block-surface": "workspace:*",
     "@blocksuite/affine-components": "workspace:*",
     "@blocksuite/affine-model": "workspace:*",
     "@blocksuite/affine-shared": "workspace:*",

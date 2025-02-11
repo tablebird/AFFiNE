@@ -19,6 +19,7 @@ import {
   ViewIcon,
   ViewTitle,
 } from '../../../../modules/workbench';
+import { AllDocSidebarTabs } from '../layouts/all-doc-sidebar-tabs';
 import { EmptyPageList } from '../page-list-empty';
 import * as styles from './all-page.css';
 import { FilterContainer } from './all-page-filter';
@@ -78,6 +79,7 @@ export const AllPage = () => {
           )}
         </div>
       </ViewBody>
+      <AllDocSidebarTabs />
     </>
   );
 };

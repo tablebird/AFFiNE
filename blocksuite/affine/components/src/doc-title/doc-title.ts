@@ -219,5 +219,5 @@ export class DocTitle extends WithDisposable(ShadowlessElement) {
   accessor doc!: Store;
 
   @property({ attribute: false })
-  accessor wrapText = false;
+  accessor wrapText = true;
 }

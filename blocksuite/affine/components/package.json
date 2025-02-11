@@ -62,7 +62,8 @@
     "./notification": "./src/notification/index.ts",
     "./block-zero-width": "./src/block-zero-width/index.ts",
     "./block-selection": "./src/block-selection/index.ts",
-    "./doc-title": "./src/doc-title/index.ts"
+    "./doc-title": "./src/doc-title/index.ts",
+    "./embed-card-modal": "./src/embed-card-modal/index.ts"
   },
   "files": [
     "src",

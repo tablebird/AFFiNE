@@ -3,11 +3,7 @@ import type { DocTitle } from '@blocksuite/affine-components/doc-title';
 import { MoreIndicatorIcon } from '@blocksuite/affine-components/icons';
 import { NoteDisplayMode } from '@blocksuite/affine-model';
 import { EDGELESS_BLOCK_CHILD_PADDING } from '@blocksuite/affine-shared/consts';
-import { FeatureFlagService } from '@blocksuite/affine-shared/services';
-import {
-  matchFlavours,
-  stopPropagation,
-} from '@blocksuite/affine-shared/utils';
+import { stopPropagation } from '@blocksuite/affine-shared/utils';
 import { toGfxBlockComponent } from '@blocksuite/block-std';
 import { Bound } from '@blocksuite/global/utils';
 import { html, nothing } from 'lit';
@@ -19,19 +15,13 @@ import { styleMap } from 'lit/directives/style-map.js';
 import { NoteBlockComponent } from './note-block';
 import { ACTIVE_NOTE_EXTRA_PADDING } from './note-edgeless-block.css';
 import * as styles from './note-edgeless-block.css';
+import { isPageBlock } from './utils';
 
 export const AFFINE_EDGELESS_NOTE = 'affine-edgeless-note';
 
 export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
   NoteBlockComponent
 ) {
-  private get _isPageBlock() {
-    return (
-      this.std.get(FeatureFlagService).getFlag('enable_page_block') &&
-      this._isFirstVisibleNote()
-    );
-  }
-
   private get _isShowCollapsedContent() {
     return (
       this.model.edgeless.collapse &&
@@ -88,7 +78,7 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
   }
 
   private _handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'ArrowUp' && this._isPageBlock) {
+    if (e.key === 'ArrowUp') {
       this._docTitle?.inlineEditor?.focusEnd();
     }
   }
@@ -101,16 +91,6 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     ) {
       this._isHover = true;
     }
-  }
-
-  private _isFirstVisibleNote() {
-    return (
-      this.model.parent?.children.find(
-        child =>
-          matchFlavours(child, ['affine:note']) &&
-          child.displayMode !== NoteDisplayMode.EdgelessOnly
-      ) === this.model
-    );
   }
 
   private _leaved() {
@@ -259,12 +239,9 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
           .note=${this.model}
         ></edgeless-note-background>
 
-        ${this._isPageBlock && !collapse
-          ? html`<doc-title
-              .doc=${this.doc}
-              .wrapText=${!collapse}
-            ></doc-title>`
-          : nothing}
+        <edgeless-page-block-title
+          .note=${this.model}
+        ></edgeless-page-block-title>
 
         <div
           class="edgeless-note-page-content"
@@ -284,7 +261,7 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
           .editing=${this._editing}
         ></edgeless-note-mask>
 
-        ${isCollapsable && !this._isPageBlock
+        ${isCollapsable && !isPageBlock(this.std, this.model)
           ? html`<div
               class="${classMap({
                 [styles.collapseButton]: true,

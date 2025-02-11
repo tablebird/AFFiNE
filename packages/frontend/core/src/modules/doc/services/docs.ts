@@ -64,6 +64,14 @@ export class DocsService extends Service {
     super();
   }
 
+  loaded(docId: string) {
+    const exists = this.pool.get(docId);
+    if (exists) {
+      return { doc: exists.obj, release: exists.release };
+    }
+    return null;
+  }
+
   open(docId: string) {
     const docRecord = this.list.doc$(docId).value;
     if (!docRecord) {

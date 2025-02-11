@@ -19,6 +19,7 @@ import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { PageNotFound } from '../../404';
+import { AllDocSidebarTabs } from '../layouts/all-doc-sidebar-tabs';
 import { EmptyPageList } from '../page-list-empty';
 import { TagDetailHeader } from './header';
 import * as styles from './index.css';
@@ -99,5 +100,10 @@ export const TagDetail = ({ tagId }: { tagId?: string }) => {
 export const Component = () => {
   const params = useParams();
 
-  return <TagDetail tagId={params.tagId} />;
+  return (
+    <>
+      <AllDocSidebarTabs />
+      <TagDetail tagId={params.tagId} />;
+    </>
+  );
 };

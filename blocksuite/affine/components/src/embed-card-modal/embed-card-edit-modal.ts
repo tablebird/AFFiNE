@@ -1,16 +1,8 @@
-import {
-  EmbedLinkedDocBlockComponent,
-  EmbedSyncedDocBlockComponent,
-} from '@blocksuite/affine-block-embed';
-import {
-  notifyLinkedDocClearedAliases,
-  notifyLinkedDocSwitchedToCard,
-} from '@blocksuite/affine-components/notification';
-import { toast } from '@blocksuite/affine-components/toast';
-import type { AliasInfo } from '@blocksuite/affine-model';
+import type { AliasInfo, LinkableEmbedModel } from '@blocksuite/affine-model';
 import {
   EmbedLinkedDocModel,
   EmbedSyncedDocModel,
+  isInternalEmbedModel,
 } from '@blocksuite/affine-model';
 import {
   type LinkEventType,
@@ -37,8 +29,7 @@ import { choose } from 'lit/directives/choose.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
-import type { LinkableEmbedModel } from './type.js';
-import { isInternalEmbedModel } from './type.js';
+import { toast } from '../toast';
 
 export class EmbedCardEditModal extends SignalWatcher(
   WithDisposable(LitElement)
@@ -171,14 +162,8 @@ export class EmbedCardEditModal extends SignalWatcher(
 
     this.model.doc.updateBlock(this.model, { title: null, description: null });
 
-    if (
-      this.isEmbedLinkedDocModel &&
-      blockComponent instanceof EmbedLinkedDocBlockComponent
-    ) {
-      blockComponent.refreshData();
+    this.onReset?.(std, blockComponent);
 
-      notifyLinkedDocClearedAliases(std);
-    }
     blockComponent.requestUpdate();
 
     track(std, this.model, this.viewType, 'ResetedAlias', { control: 'reset' });
@@ -207,17 +192,7 @@ export class EmbedCardEditModal extends SignalWatcher(
     const props: AliasInfo = { title };
     if (description) props.description = description;
 
-    if (
-      this.isEmbedSyncedDocModel &&
-      blockComponent instanceof EmbedSyncedDocBlockComponent
-    ) {
-      blockComponent.convertToCard(props);
-
-      notifyLinkedDocSwitchedToCard(std);
-    } else {
-      this.model.doc.updateBlock(this.model, props);
-      blockComponent.requestUpdate();
-    }
+    this.onSave?.(std, blockComponent, props);
 
     track(std, this.model, this.viewType, 'SavedAlias', { control: 'save' });
 
@@ -393,6 +368,20 @@ export class EmbedCardEditModal extends SignalWatcher(
   @property({ attribute: false })
   accessor originalDocInfo: AliasInfo | undefined = undefined;
 
+  @property({ attribute: false })
+  accessor onReset:
+    | ((std: BlockStdScope, component: BlockComponent) => void)
+    | undefined = undefined;
+
+  @property({ attribute: false })
+  accessor onSave:
+    | ((
+        std: BlockStdScope,
+        component: BlockComponent,
+        props: AliasInfo
+      ) => void)
+    | undefined = undefined;
+
   accessor resetButtonDisabled$ = computed<boolean>(
     () =>
       !(
@@ -418,7 +407,13 @@ export function toggleEmbedCardEditModal(
   host: EditorHost,
   embedCardModel: LinkableEmbedModel,
   viewType: string,
-  originalDocInfo?: AliasInfo
+  originalDocInfo?: AliasInfo,
+  onReset?: (std: BlockStdScope, component: BlockComponent) => void,
+  onSave?: (
+    std: BlockStdScope,
+    component: BlockComponent,
+    props: AliasInfo
+  ) => void
 ) {
   document.body.querySelector('embed-card-edit-modal')?.remove();
 
@@ -427,6 +422,8 @@ export function toggleEmbedCardEditModal(
   embedCardEditModal.host = host;
   embedCardEditModal.viewType = viewType;
   embedCardEditModal.originalDocInfo = originalDocInfo;
+  embedCardEditModal.onReset = onReset;
+  embedCardEditModal.onSave = onSave;
   document.body.append(embedCardEditModal);
 }
 

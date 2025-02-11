@@ -46,7 +46,7 @@ export class RpcDocReader extends DatabaseDocReader {
       const res = await fetch(url, {
         headers: {
           'x-access-token': this.crypto.sign(docId),
-          'x-rpc-trace-id': this.cls.getId(),
+          'x-cloud-trace-context': this.cls.getId(),
         },
       });
       if (!res.ok) {

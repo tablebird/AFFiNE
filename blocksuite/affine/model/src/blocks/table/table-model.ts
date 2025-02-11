@@ -48,6 +48,7 @@ export const TableBlockSchema = defineBlockSchema({
     cells: {},
   }),
   metadata: {
+    isFlatData: true,
     role: 'content',
     version: 1,
     parent: ['affine:note'],

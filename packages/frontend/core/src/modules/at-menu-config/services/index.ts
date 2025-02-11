@@ -16,7 +16,7 @@ import {
   NewXxxEdgelessIcon,
   NewXxxPageIcon,
 } from '@blocksuite/icons/lit';
-import { computed } from '@preact/signals-core';
+import { computed, Signal } from '@preact/signals-core';
 import { Service } from '@toeverything/infra';
 import { cssVarV2 } from '@toeverything/theme/v2';
 import { html } from 'lit';
@@ -27,6 +27,10 @@ import type { DocDisplayMetaService } from '../../doc-display-meta';
 import type { DocSearchMenuService } from '../../doc-search-menu/services';
 import type { EditorSettingService } from '../../editor-setting';
 import { type JournalService, suggestJournalDate } from '../../journal';
+
+function resolveSignal<T>(data: T | Signal<T>): T {
+  return data instanceof Signal ? data.value : data;
+}
 
 export class AtMenuConfigService extends Service {
   constructor(
@@ -46,6 +50,7 @@ export class AtMenuConfigService extends Service {
     return {
       getMenus: this.getMenusFn(),
       mobile: this.getMobileConfig(),
+      autoFocusedItem: this.autoFocusedItem,
     };
   }
 
@@ -55,6 +60,22 @@ export class AtMenuConfigService extends Service {
       docId: id,
     });
   }
+
+  private readonly autoFocusedItem = (
+    menus: LinkedMenuGroup[],
+    query: string
+  ): LinkedMenuItem | null => {
+    if (query.trim().length === 0) {
+      return null;
+    }
+    // if the second group (linkToDocGroup) is EMPTY,
+    // if the query is NOT empty && the second group (linkToDocGroup) is EMPTY,
+    // we will focus on the first item of the third group (create), which is the "New Doc" item.
+    if (resolveSignal(menus[1].items).length === 0) {
+      return resolveSignal(menus[2].items)[0];
+    }
+    return null;
+  };
 
   private newDocMenuGroup(
     query: string,

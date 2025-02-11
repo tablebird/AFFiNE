@@ -1,5 +1,4 @@
 import { addSiblingAttachmentBlocks } from '@blocksuite/affine-block-attachment';
-import { toggleEmbedCardCreateModal } from '@blocksuite/affine-block-bookmark';
 import { insertDatabaseBlockCommand } from '@blocksuite/affine-block-database';
 import { insertImagesCommand } from '@blocksuite/affine-block-image';
 import { insertLatexBlockCommand } from '@blocksuite/affine-block-latex';
@@ -18,6 +17,7 @@ import {
 } from '@blocksuite/affine-block-paragraph';
 import { getSurfaceBlock } from '@blocksuite/affine-block-surface';
 import { insertSurfaceRefBlockCommand } from '@blocksuite/affine-block-surface-ref';
+import { toggleEmbedCardCreateModal } from '@blocksuite/affine-components/embed-card-modal';
 import {
   formatBlockCommand,
   formatNativeCommand,

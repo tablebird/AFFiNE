@@ -1,33 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaClient } from '@prisma/client';
 
 import { metrics, OnEvent } from '../../base';
+import { Models } from '../../models';
 import { PgWorkspaceDocStorageAdapter } from './adapters/workspace';
 
 @Injectable()
 export class DocStorageCronJob {
   constructor(
-    private readonly db: PrismaClient,
+    private readonly models: Models,
     private readonly workspace: PgWorkspaceDocStorageAdapter
   ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT /* everyday at 12am */)
   async cleanupExpiredHistory() {
-    await this.db.snapshotHistory.deleteMany({
-      where: {
-        expiredAt: {
-          lte: new Date(),
-        },
-      },
-    });
+    await this.models.doc.deleteExpiredHistories();
   }
 
   @Cron(CronExpression.EVERY_MINUTE)
   async reportUpdatesQueueCount() {
     metrics.doc
       .gauge('updates_queue_count')
-      .record(await this.db.update.count());
+      .record(await this.models.doc.getGlobalUpdateCount());
   }
 
   @OnEvent('user.deleted')

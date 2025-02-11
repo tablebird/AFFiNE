@@ -12,11 +12,13 @@ export const useEditor = (
   pageId: string,
   preferMode?: DocMode,
   preferSelector?: EditorSelector,
-  defaultOpenProperty?: DefaultOpenProperty
+  defaultOpenProperty?: DefaultOpenProperty,
+  canLoad?: boolean
 ) => {
   const currentWorkspace = useService(WorkspaceService).workspace;
   const docsService = useService(DocsService);
   const docRecordList = docsService.list;
+  const [loading, setLoading] = useState(false);
   const docListReady = useLiveData(docRecordList.isReady$);
   const docRecord = docRecordList.doc$(pageId).value;
   const preferModeRef = useRef(preferMode);
@@ -25,16 +27,40 @@ export const useEditor = (
   const [doc, setDoc] = useState<Doc | null>(null);
   const [editor, setEditor] = useState<Editor | null>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!docRecord) {
       return;
     }
-    const { doc: opened, release } = docsService.open(pageId);
-    setDoc(opened);
+    let canceled = false;
+    let release: () => void;
+    setLoading(true);
+    const loaded = docsService.loaded(pageId);
+    if (loaded) {
+      setDoc(loaded.doc);
+      release = loaded.release;
+      setLoading(false);
+    } else if (canLoad) {
+      requestIdleCallback(
+        () => {
+          if (canceled) {
+            return;
+          }
+          const { doc: opened, release: _release } = docsService.open(pageId);
+          setDoc(opened);
+          release = _release;
+          setLoading(false);
+        },
+        {
+          timeout: 1000,
+        }
+      );
+    }
     return () => {
-      release();
+      canceled = true;
+      release?.();
+      setLoading(false);
     };
-  }, [docRecord, docsService, pageId]);
+  }, [canLoad, docRecord, docsService, pageId]);
 
   useLayoutEffect(() => {
     if (!doc) {
@@ -55,5 +81,10 @@ export const useEditor = (
     return currentWorkspace.engine.doc.addPriority(pageId, 10);
   }, [currentWorkspace, pageId]);
 
-  return { doc, editor, workspace: currentWorkspace, loading: !docListReady };
+  return {
+    doc,
+    editor,
+    workspace: currentWorkspace,
+    loading: !docListReady || loading,
+  };
 };

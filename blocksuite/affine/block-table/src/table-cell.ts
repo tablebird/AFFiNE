@@ -7,7 +7,7 @@ import {
 import { TextBackgroundDuotoneIcon } from '@blocksuite/affine-components/icons';
 import {
   DefaultInlineManagerExtension,
-  type RichText,
+  RichText,
 } from '@blocksuite/affine-components/rich-text';
 import type { TableColumn, TableRow } from '@blocksuite/affine-model';
 import { cssVarV2 } from '@blocksuite/affine-shared/theme';
@@ -49,16 +49,19 @@ import {
 import type { TableBlockComponent } from './table-block';
 import {
   cellContainerStyle,
+  columnLeftIndicatorStyle,
   columnOptionsCellStyle,
   columnOptionsStyle,
+  columnRightIndicatorStyle,
+  rowBottomIndicatorStyle,
   rowOptionsCellStyle,
   rowOptionsStyle,
+  rowTopIndicatorStyle,
   threePointerIconDotStyle,
   threePointerIconStyle,
-  widthDragHandleStyle,
 } from './table-cell.css';
 import type { TableDataManager } from './table-data-manager';
-
+export const TableCellComponentName = 'affine-table-cell';
 export class TableCell extends SignalWatcher(
   WithDisposable(ShadowlessElement)
 ) {
@@ -88,6 +91,9 @@ export class TableCell extends SignalWatcher(
 
   @property({ attribute: false })
   accessor selectionController!: SelectionController;
+
+  @property({ attribute: false })
+  accessor height: number | undefined;
 
   get hoverColumnIndex$() {
     return this.dataManager.hoverColumnIndex$;
@@ -447,6 +453,7 @@ export class TableCell extends SignalWatcher(
     };
     return html`<div class=${columnOptionsCellStyle}>
       <div
+        data-drag-column-id=${column.columnId}
         class=${classMap({
           [columnOptionsStyle]: true,
         })}
@@ -470,6 +477,7 @@ export class TableCell extends SignalWatcher(
     };
     return html`<div class=${rowOptionsCellStyle}>
       <div
+        data-drag-row-id=${row.rowId}
         class=${classMap({
           [rowOptionsStyle]: true,
         })}
@@ -483,7 +491,7 @@ export class TableCell extends SignalWatcher(
     </div>`;
   }
   renderOptionsButton() {
-    if (!this.row || !this.column) {
+    if (this.readonly || !this.row || !this.column) {
       return nothing;
     }
     return html`
@@ -525,33 +533,115 @@ export class TableCell extends SignalWatcher(
     });
   }
 
-  renderWidthDragHandle() {
+  showColumnIndicator$ = computed(() => {
+    const indicatorIndex =
+      this.dataManager.ui.columnIndicatorIndex$.value ?? -1;
+    if (indicatorIndex === 0 && this.columnIndex === 0) {
+      return 'left';
+    }
+    if (indicatorIndex - 1 === this.columnIndex) {
+      return 'right';
+    }
+    return;
+  });
+  showRowIndicator$ = computed(() => {
+    const indicatorIndex = this.dataManager.ui.rowIndicatorIndex$.value ?? -1;
+    if (indicatorIndex === 0 && this.rowIndex === 0) {
+      return 'top';
+    }
+    if (indicatorIndex - 1 === this.rowIndex) {
+      return 'bottom';
+    }
+    return;
+  });
+  renderRowIndicator() {
+    if (this.readonly) {
+      return nothing;
+    }
+    const columnIndex = this.columnIndex;
+    const isFirstColumn = columnIndex === 0;
+    const isLastColumn =
+      columnIndex === this.dataManager.uiColumns$.value.length - 1;
+    const showIndicator = this.showRowIndicator$.value;
+    const style = (show: boolean) =>
+      styleMap({
+        opacity: show ? 1 : 0,
+        borderRadius: isFirstColumn
+          ? '3px 0 0 3px'
+          : isLastColumn
+            ? '0 3px 3px 0'
+            : '0',
+      });
+    const indicator0 =
+      this.rowIndex === 0
+        ? html`
+            <div
+              style=${style(showIndicator === 'top')}
+              class=${rowTopIndicatorStyle}
+            ></div>
+          `
+        : nothing;
+    return html`
+      ${indicator0}
+      <div
+        style=${style(showIndicator === 'bottom')}
+        class=${rowBottomIndicatorStyle}
+      ></div>
+    `;
+  }
+  renderColumnIndicator() {
+    if (this.readonly) {
+      return nothing;
+    }
     const hoverColumnId$ = this.dataManager.hoverDragHandleColumnId$;
-    const draggingColumnId$ = this.dataManager.draggingColumnId$;
+    const draggingColumnId$ = this.dataManager.widthAdjustColumnId$;
     const rowIndex = this.rowIndex;
     const isFirstRow = rowIndex === 0;
     const isLastRow = rowIndex === this.dataManager.uiRows$.value.length - 1;
-    const show =
+    const showWidthAdjustIndicator =
       draggingColumnId$.value === this.column?.columnId ||
       hoverColumnId$.value === this.column?.columnId;
-    return html`<div
-      @mouseenter=${() => {
-        hoverColumnId$.value = this.column?.columnId;
-      }}
-      @mouseleave=${() => {
-        hoverColumnId$.value = undefined;
-      }}
-      style=${styleMap({
+    const showIndicator = this.showColumnIndicator$.value;
+    const style = (show: boolean) =>
+      styleMap({
         opacity: show ? 1 : 0,
         borderRadius: isFirstRow
           ? '3px 3px 0 0'
           : isLastRow
             ? '0 0 3px 3px'
             : '0',
-      })}
-      data-width-adjust-column-id=${this.column?.columnId}
-      class=${widthDragHandleStyle}
-    ></div>`;
+      });
+    const indicator0 =
+      this.columnIndex === 0
+        ? html`
+            <div
+              style=${style(showIndicator === 'left')}
+              class=${columnLeftIndicatorStyle}
+            ></div>
+          `
+        : nothing;
+    const mouseEnter = () => {
+      hoverColumnId$.value = this.column?.columnId;
+    };
+    const mouseLeave = () => {
+      hoverColumnId$.value = undefined;
+    };
+    return html` ${indicator0}
+      <div
+        @mouseenter=${mouseEnter}
+        @mouseleave=${mouseLeave}
+        style=${style(showWidthAdjustIndicator || showIndicator === 'right')}
+        data
+        -
+        width
+        -
+        adjust
+        -
+        column
+        -
+        id=${this.column?.columnId}
+        class=${columnRightIndicatorStyle}
+      ></div>`;
   }
 
   richText$ = signal<RichText>();
@@ -666,11 +756,78 @@ export class TableCell extends SignalWatcher(
               : null}"
           data-parent-flavour="affine:table"
         ></rich-text>
-        ${this.renderOptionsButton()} ${this.renderWidthDragHandle()}
+        ${this.renderOptionsButton()} ${this.renderColumnIndicator()}
+        ${this.renderRowIndicator()}
       </td>
     `;
   }
 }
+
+export const createColumnDragPreview = (cells: TableCell[]) => {
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.opacity = '0.8';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.zIndex = '1000';
+  container.style.boxShadow = '0 0 10px 0 rgba(0, 0, 0, 0.1)';
+  container.style.backgroundColor = cssVarV2.layer.background.primary;
+  cells.forEach((cell, index) => {
+    const div = document.createElement('div');
+    const td = cell.querySelector('td');
+    if (index !== 0) {
+      div.style.borderTop = `1px solid ${cssVarV2.layer.insideBorder.border}`;
+    }
+    if (td) {
+      div.style.height = `${td.getBoundingClientRect().height}px`;
+    }
+    if (cell.text) {
+      const text = new RichText();
+      text.style.padding = '8px 12px';
+      text.yText = cell.text;
+      text.readonly = true;
+      text.attributesSchema = cell.inlineManager?.getSchema();
+      text.attributeRenderer = cell.inlineManager?.getRenderer();
+      text.embedChecker = cell.inlineManager?.embedChecker ?? (() => false);
+      div.append(text);
+    }
+    container.append(div);
+  });
+  return container;
+};
+
+export const createRowDragPreview = (cells: TableCell[]) => {
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.opacity = '0.8';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'row';
+  container.style.zIndex = '1000';
+  container.style.boxShadow = '0 0 10px 0 rgba(0, 0, 0, 0.1)';
+  container.style.backgroundColor = cssVarV2.layer.background.primary;
+  cells.forEach((cell, index) => {
+    const div = document.createElement('div');
+    const td = cell.querySelector('td');
+    if (index !== 0) {
+      div.style.borderLeft = `1px solid ${cssVarV2.layer.insideBorder.border}`;
+    }
+    if (td) {
+      div.style.width = `${td.getBoundingClientRect().width}px`;
+    }
+    if (cell.text) {
+      const text = new RichText();
+      text.style.padding = '8px 12px';
+      text.yText = cell.text;
+      text.readonly = true;
+      text.attributesSchema = cell.inlineManager?.getSchema();
+      text.attributeRenderer = cell.inlineManager?.getRenderer();
+      text.embedChecker = cell.inlineManager?.embedChecker ?? (() => false);
+      div.append(text);
+    }
+    container.append(div);
+  });
+  return container;
+};
 
 const threePointerIcon = (vertical: boolean = false) => {
   return html`
@@ -688,6 +845,6 @@ const threePointerIcon = (vertical: boolean = false) => {
 };
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-table-cell': TableCell;
+    [TableCellComponentName]: TableCell;
   }
 }

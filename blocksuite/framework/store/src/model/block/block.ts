@@ -44,6 +44,9 @@ export class Block {
     const onChange = !options.onChange
       ? undefined
       : (key: string, value: unknown) => {
+          if (!this._syncController || !this.model) {
+            return;
+          }
           options.onChange?.(this, key, value);
         };
     const flavour = yBlock.get('sys:flavour') as string;

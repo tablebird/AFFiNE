@@ -55,7 +55,7 @@ export type PeekViewModalContainerProps = PropsWithChildren<{
   target?: HTMLElement;
   controls?: React.ReactNode;
   onAnimationStart?: () => void;
-  onAnimateEnd?: () => void;
+  onAnimationEnd?: () => void;
   mode?: PeekViewMode;
   animation?: PeekViewAnimation;
   testId?: string;
@@ -76,7 +76,7 @@ export const PeekViewModalContainer = forwardRef<
     controls,
     children,
     onAnimationStart,
-    onAnimateEnd,
+    onAnimationEnd,
     animation = 'zoom',
     mode = 'fit',
     dialogFrame = true,
@@ -84,9 +84,7 @@ export const PeekViewModalContainer = forwardRef<
   ref
 ) {
   const [vtOpen, setVtOpen] = useState(open);
-  const [animeState, setAnimeState] = useState<'idle' | 'ready' | 'animating'>(
-    'idle'
-  );
+  const [animeState, setAnimeState] = useState<'idle' | 'animating'>('idle');
   const contentClipRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -143,6 +141,7 @@ export const PeekViewModalContainer = forwardRef<
         if (!contentClip || !content || !target || !overlay) {
           resolve();
           setAnimeState('idle');
+          onAnimationEnd?.();
           return;
         }
         const targets = contentClip;
@@ -196,6 +195,7 @@ export const PeekViewModalContainer = forwardRef<
           complete: (ins: AnimeInstance) => {
             paramsMap?.contentWrapper?.complete?.(ins);
             setAnimeState('idle');
+            onAnimationEnd?.();
             overlay.style.pointerEvents = '';
             if (zoomIn) {
               Object.assign(targets.style, {
@@ -238,6 +238,7 @@ export const PeekViewModalContainer = forwardRef<
    */
   const animateZoomIn = useCallback(() => {
     setAnimeState('animating');
+    onAnimationStart?.();
     setVtOpen(true);
     setTimeout(() => {
       zoomAnimate(true, {
@@ -257,9 +258,10 @@ export const PeekViewModalContainer = forwardRef<
       // controls delay: to make sure the time interval for animations of dialog and controls is 150ms.
       400 - 230 + 150
     );
-  }, [animateControls, zoomAnimate]);
+  }, [animateControls, onAnimationStart, zoomAnimate]);
   const animateZoomOut = useCallback(() => {
     setAnimeState('animating');
+    onAnimationStart?.();
     animateControls(false);
     zoomAnimate(false, {
       contentWrapper: {
@@ -275,33 +277,38 @@ export const PeekViewModalContainer = forwardRef<
     })
       .then(() => setVtOpen(false))
       .catch(console.error);
-  }, [animateControls, zoomAnimate]);
+  }, [animateControls, onAnimationStart, zoomAnimate]);
 
-  const animateFade = useCallback((animateIn: boolean) => {
-    setAnimeState('animating');
-    return new Promise<void>(resolve => {
-      if (animateIn) setVtOpen(true);
-      setTimeout(() => {
-        const overlay = overlayRef.current;
-        const contentClip = contentClipRef.current;
-        if (!overlay || !contentClip) {
-          resolve();
-          return;
-        }
-        anime({
-          targets: [overlay, contentClip],
-          opacity: animateIn ? [0, 1] : [1, 0],
-          easing: 'easeOutQuad',
-          duration: 230,
-          complete: () => {
-            if (!animateIn) setVtOpen(false);
-            setAnimeState('idle');
+  const animateFade = useCallback(
+    (animateIn: boolean) => {
+      setAnimeState('animating');
+      onAnimationStart?.();
+      return new Promise<void>(resolve => {
+        if (animateIn) setVtOpen(true);
+        setTimeout(() => {
+          const overlay = overlayRef.current;
+          const contentClip = contentClipRef.current;
+          if (!overlay || !contentClip) {
             resolve();
-          },
+            return;
+          }
+          anime({
+            targets: [overlay, contentClip],
+            opacity: animateIn ? [0, 1] : [1, 0],
+            easing: 'easeOutQuad',
+            duration: 230,
+            complete: () => {
+              if (!animateIn) setVtOpen(false);
+              setAnimeState('idle');
+              onAnimationEnd?.();
+              resolve();
+            },
+          });
         });
       });
-    });
-  }, []);
+    },
+    [onAnimationEnd, onAnimationStart]
+  );
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -332,8 +339,6 @@ export const PeekViewModalContainer = forwardRef<
           <PeekViewModalOverlay
             ref={overlayRef}
             className={styles.modalOverlay}
-            onAnimationStart={onAnimationStart}
-            onAnimationEnd={onAnimateEnd}
             data-anime-state={animeState}
           />
           <div
