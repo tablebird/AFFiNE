@@ -1,13 +1,16 @@
-import type { TestFn } from 'ava';
+import type { ExecutionContext, TestFn } from 'ava';
 import ava from 'ava';
 import Sinon from 'sinon';
+import type { Response } from 'supertest';
 
 import { WorkerModule } from '../plugins/worker';
 import { createTestingApp, TestingApp } from './utils';
 
-const test = ava as TestFn<{
+type TestContext = {
   app: TestingApp;
-}>;
+};
+
+const test = ava as TestFn<TestContext>;
 
 test.before(async t => {
   const app = await createTestingApp({
@@ -21,35 +24,50 @@ test.after.always(async t => {
   await t.context.app.close();
 });
 
-test('should proxy image', async t => {
+const assertAndSnapshotRaw = async (
+  t: ExecutionContext<TestContext>,
+  route: string,
+  message: string,
+  options?: {
+    status?: number;
+    origin?: string;
+    method?: 'GET' | 'OPTIONS' | 'POST';
+    body?: any;
+    checker?: (res: Response) => any;
+  }
+) => {
+  const {
+    status = 200,
+    origin = 'http://localhost',
+    method = 'GET',
+    checker = () => {},
+  } = options || {};
   const { app } = t.context;
+  const res = app[method](route)
+    .set('Origin', origin)
+    .send(options?.body)
+    .expect(status)
+    .expect(checker);
+  t.notThrowsAsync(res, message);
+  t.snapshot((await res).body);
+};
 
-  const assertAndSnapshot = async (
-    route: string,
-    origin: string,
-    status: number,
-    message: string
-  ) => {
-    const res = app.GET(route).set('Origin', origin).expect(status);
-    t.notThrowsAsync(res, message);
-    t.snapshot((await res).body);
-  };
+test('should proxy image', async t => {
+  const assertAndSnapshot = assertAndSnapshotRaw.bind(null, t);
 
   {
     await assertAndSnapshot(
       '/api/worker/image-proxy',
-      'http://localhost',
-      400,
-      'should return 400 if "url" query parameter is missing'
+      'should return 400 if "url" query parameter is missing',
+      { status: 400 }
     );
   }
 
   {
     await assertAndSnapshot(
       '/api/worker/image-proxy?url=http://example.com/image.png',
-      'http://invalid.com',
-      400,
-      'should return 400 for invalid origin header'
+      'should return 400 for invalid origin header',
+      { status: 400, origin: 'http://invalid.com' }
     );
   }
 
@@ -71,9 +89,70 @@ test('should proxy image', async t => {
 
     await assertAndSnapshot(
       '/api/worker/image-proxy?url=http://example.com/image.png',
-      'http://localhost',
-      200,
       'should return image buffer'
+    );
+
+    fetchSpy.restore();
+  }
+});
+
+test('shound preview link', async t => {
+  const assertAndSnapshot = assertAndSnapshotRaw.bind(null, t);
+
+  await assertAndSnapshot(
+    '/api/worker/link-preview',
+    'should return proper CORS headers on OPTIONS request',
+    {
+      status: 204,
+      method: 'OPTIONS',
+      checker: (res: Response) => {
+        if (!res.headers['access-control-allow-methods']) {
+          throw new Error('Missing CORS headers');
+        }
+      },
+    }
+  );
+
+  await assertAndSnapshot(
+    '/api/worker/link-preview',
+    'should return 400 if request body is invalid',
+    { status: 400, method: 'POST' }
+  );
+
+  await assertAndSnapshot(
+    '/api/worker/link-preview',
+    'should return 400 if provided URL is from the same origin',
+    { status: 400, method: 'POST', body: { url: 'http://localhost/somepage' } }
+  );
+
+  {
+    const fakeHTML = new Response(`
+        <html>
+          <head>
+            <meta property="og:title" content="Test Title" />
+            <meta property="og:description" content="Test Description" />
+            <meta property="og:image" content="http://example.com/image.png" />
+          </head>
+          <body>
+            <title>Fallback Title</title>
+          </body>
+        </html>
+      `);
+
+    Object.defineProperty(fakeHTML, 'url', {
+      value: 'http://example.com/page',
+    });
+
+    const fetchSpy = Sinon.stub(global, 'fetch').resolves(fakeHTML);
+
+    await assertAndSnapshot(
+      '/api/worker/link-preview',
+      'should process a valid external URL and return link preview data',
+      {
+        status: 200,
+        method: 'POST',
+        body: { url: 'http://external.com/page' },
+      }
     );
 
     fetchSpy.restore();

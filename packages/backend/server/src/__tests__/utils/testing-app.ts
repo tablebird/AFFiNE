@@ -95,7 +95,7 @@ export class TestingApp extends ApplyType<INestApplication>() {
   }
 
   request(
-    method: 'get' | 'post' | 'put' | 'delete' | 'patch',
+    method: 'options' | 'get' | 'post' | 'put' | 'delete' | 'patch',
     path: string
   ): supertest.Test {
     return supertest(this.getHttpServer())
@@ -104,6 +104,10 @@ export class TestingApp extends ApplyType<INestApplication>() {
         `${AuthService.sessionCookieName}=${this.sessionCookie ?? ''}`,
         `${AuthService.userCookieName}=${this.currentUserCookie ?? ''}`,
       ]);
+  }
+
+  OPTIONS(path: string): supertest.Test {
+    return this.request('options', path);
   }
 
   GET(path: string): supertest.Test {
