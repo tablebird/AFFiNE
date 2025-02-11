@@ -144,6 +144,10 @@ export function useAFFiNEI18N(): {
       */
     Delete(): string;
     /**
+      * `Deleted`
+      */
+    Deleted(): string;
+    /**
       * `Disable`
       */
     Disable(): string;
@@ -2241,6 +2245,10 @@ export function useAFFiNEI18N(): {
       * `Snapshot`
       */
     ["com.affine.import.snapshot"](): string;
+    /**
+      * `Import your AFFiNE workspace and page snapshot file.`
+      */
+    ["com.affine.import.snapshot.tooltip"](): string;
     /**
       * `Import failed, please try again.`
       */
@@ -4858,6 +4866,14 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.editorSettings.edgeless.shape.triangle"](): string;
     /**
+      * `Frame`
+      */
+    ["com.affine.settings.editorSettings.edgeless.frame"](): string;
+    /**
+      * `Background`
+      */
+    ["com.affine.settings.editorSettings.edgeless.frame.background"](): string;
+    /**
       * `Style`
       */
     ["com.affine.settings.editorSettings.edgeless.style"](): string;
@@ -5700,7 +5716,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.workspace.affine-ai.description"](): string;
     /**
-      * `Backup`
+      * `Achieved workspaces`
       */
     ["com.affine.settings.workspace.backup"](): string;
     /**
@@ -5847,7 +5863,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.share-menu.option.link.label"](): string;
     /**
-      * `No Access`
+      * `No access`
       */
     ["com.affine.share-menu.option.link.no-access"](): string;
     /**
@@ -5855,7 +5871,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.share-menu.option.link.no-access.description"](): string;
     /**
-      * `Read Only`
+      * `Read only`
       */
     ["com.affine.share-menu.option.link.readonly"](): string;
     /**
@@ -5959,6 +5975,30 @@ export function useAFFiNEI18N(): {
       * `Notify via Email`
       */
     ["com.affine.share-menu.invite-editor.sent-email"](): string;
+    /**
+      * `Permission not available in Free plan`
+      */
+    ["com.affine.share-menu.paywall.owner.title"](): string;
+    /**
+      * `Upgrade to Pro or higher to unlock permission settings for this doc.`
+      */
+    ["com.affine.share-menu.paywall.owner.description"](): string;
+    /**
+      * `Upgrade`
+      */
+    ["com.affine.share-menu.paywall.owner.confirm"](): string;
+    /**
+      * `Permission requires a workspace upgrade`
+      */
+    ["com.affine.share-menu.paywall.member.title"](): string;
+    /**
+      * `Ask your workspace owner to upgrade to Pro or higher to enable permissions.`
+      */
+    ["com.affine.share-menu.paywall.member.description"](): string;
+    /**
+      * `Got it`
+      */
+    ["com.affine.share-menu.paywall.member.confirm"](): string;
     /**
       * `Built with`
       */
@@ -6926,6 +6966,10 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.workspace.template.remove"](): string;
     /**
+      * `You don't have permission to do this`
+      */
+    ["com.affine.no-permission"](): string;
+    /**
       * `Unused blobs`
       */
     ["com.affine.settings.workspace.storage.unused-blobs"](): string;
@@ -7161,13 +7205,13 @@ export function useAFFiNEI18N(): {
         spaceId: string;
     }>): string;
     /**
-      * `Expected to publish a page, not a Space.`
+      * `Expected to publish a doc, not a Space.`
       */
-    ["error.EXPECT_TO_PUBLISH_PAGE"](): string;
+    ["error.EXPECT_TO_PUBLISH_DOC"](): string;
     /**
-      * `Expected to revoke a public page, not a Space.`
+      * `Expected to revoke a public doc, not a Space.`
       */
-    ["error.EXPECT_TO_REVOKE_PUBLIC_PAGE"](): string;
+    ["error.EXPECT_TO_REVOKE_PUBLIC_DOC"](): string;
     /**
       * `Expect grant roles on doc {{docId}} under Space {{spaceId}}, not a Space.`
       */
@@ -7190,9 +7234,9 @@ export function useAFFiNEI18N(): {
         spaceId: string;
     }>): string;
     /**
-      * `Page is not public.`
+      * `Doc is not public.`
       */
-    ["error.PAGE_IS_NOT_PUBLIC"](): string;
+    ["error.DOC_IS_NOT_PUBLIC"](): string;
     /**
       * `Failed to store doc updates.`
       */
@@ -7206,9 +7250,13 @@ export function useAFFiNEI18N(): {
       */
     ["error.ACTION_FORBIDDEN_ON_NON_TEAM_WORKSPACE"](): string;
     /**
-      * `Page default role can not be owner.`
+      * `Doc default role can not be owner.`
       */
-    ["error.PAGE_DEFAULT_ROLE_CAN_NOT_BE_OWNER"](): string;
+    ["error.DOC_DEFAULT_ROLE_CAN_NOT_BE_OWNER"](): string;
+    /**
+      * `Can not batch grant doc owner permissions.`
+      */
+    ["error.CAN_NOT_BATCH_GRANT_DOC_OWNER_PERMISSIONS"](): string;
     /**
       * `Unsupported subscription plan: {{plan}}.`
       */
