@@ -1,6 +1,6 @@
-import type {
+import {
   SurfaceBlockModel,
-  SurfaceBlockTransformer,
+  type SurfaceBlockTransformer,
 } from '@blocksuite/affine-block-surface';
 import { matchFlavours } from '@blocksuite/affine-shared/utils';
 import type { BlockStdScope } from '@blocksuite/block-std';
@@ -50,7 +50,7 @@ export const gfxBlocksFilter = (
       const parent = store.getParent(payload.model.id);
 
       if (
-        matchFlavours(parent, ['affine:surface']) &&
+        matchFlavours(parent, [SurfaceBlockModel]) &&
         !selectedIds.has(payload.model.id)
       ) {
         payload.action = 'skip';
