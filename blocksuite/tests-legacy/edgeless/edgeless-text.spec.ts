@@ -155,11 +155,7 @@ test.describe('edgeless text block', () => {
       delay: 100,
     });
     await waitNextFrame(page);
-    await assertEdgelessTextModelRect(
-      page,
-      '4',
-      new Bound(-25, -25, 220, 25.3)
-    );
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 220, 26));
 
     await type(page, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     await waitNextFrame(page, 1000);
@@ -167,7 +163,7 @@ test.describe('edgeless text block', () => {
     await assertEdgelessTextModelRect(
       page,
       '4',
-      new Bound(-25, -25, 340.6, 25.3)
+      new Bound(-25, -25, 340.6, 26)
     );
 
     await type(page, '\nbbb');

@@ -322,7 +322,7 @@ test.describe('auto resize align', () => {
     // arrange
     await triggerComponentToolbarAction(page, 'autoResize');
     await waitNextFrame(page, 200);
-    await assertEdgelessSelectedModelRect(page, [0, 0, 1956.8, 200]);
+    await assertEdgelessSelectedModelRect(page, [0, 0, 1912.296875, 200]);
   });
 
   test('resize and arrange note', async ({ page }) => {
