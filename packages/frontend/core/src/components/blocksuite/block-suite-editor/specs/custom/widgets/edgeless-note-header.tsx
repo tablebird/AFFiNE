@@ -1,11 +1,12 @@
 import { IconButton } from '@affine/component';
 import { useSharingUrl } from '@affine/core/components/hooks/affine/use-share-url';
 import { WorkspaceDialogService } from '@affine/core/modules/dialogs';
-import { DocDisplayMetaService } from '@affine/core/modules/doc-display-meta';
+import { DocService } from '@affine/core/modules/doc';
 import { EditorService } from '@affine/core/modules/editor';
 import { FeatureFlagService } from '@affine/core/modules/feature-flag';
 import { useInsidePeekView } from '@affine/core/modules/peek-view/view/modal-container';
 import { WorkspaceService } from '@affine/core/modules/workspace';
+import { extractEmojiIcon } from '@affine/core/utils';
 import { useI18n } from '@affine/i18n';
 import { track } from '@affine/track';
 import { GfxControllerIdentifier } from '@blocksuite/affine/block-std/gfx';
@@ -16,14 +17,14 @@ import {
 } from '@blocksuite/affine/blocks';
 import { Bound } from '@blocksuite/affine/global/utils';
 import {
-  ExpandFullIcon,
   InformationIcon,
+  LinkedPageIcon,
   LinkIcon,
   ToggleDownIcon,
   ToggleRightIcon,
 } from '@blocksuite/icons/rc';
 import { useLiveData, useService, useServices } from '@toeverything/infra';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import * as styles from './edgeless-note-header.css';
 
@@ -33,10 +34,14 @@ const EdgelessNoteToggleButton = ({ note }: { note: NoteBlockModel }) => {
   const editor = useService(EditorService).editor;
   const editorContainer = useLiveData(editor.editorContainer$);
   const gfx = editorContainer?.std.get(GfxControllerIdentifier);
-  const docDisplayMetaService = useService(DocDisplayMetaService);
+  const { doc } = useService(DocService);
 
-  const Icon = useLiveData(docDisplayMetaService.icon$(note.doc.id));
-  const title = useLiveData(docDisplayMetaService.title$(note.doc.id));
+  const title = useLiveData(doc.title$);
+  // only render emoji if it exists (mode or journal icon will not be rendered)
+  const { emoji, rest: titleWithoutEmoji } = useMemo(
+    () => extractEmojiIcon(title),
+    [title]
+  );
 
   useEffect(() => {
     setCollapsed(note.edgeless.collapse);
@@ -87,7 +92,8 @@ const EdgelessNoteToggleButton = ({ note }: { note: NoteBlockModel }) => {
       <div className={styles.title} data-testid="edgeless-note-title">
         {collapsed && (
           <>
-            <Icon /> {title}
+            {emoji && <span>{emoji}</span>}
+            <span>{titleWithoutEmoji}</span>
           </>
         )}
       </div>
@@ -95,11 +101,11 @@ const EdgelessNoteToggleButton = ({ note }: { note: NoteBlockModel }) => {
   );
 };
 
-const ExpandFullButton = () => {
+const ViewInPageButton = () => {
   const t = useI18n();
   const editor = useService(EditorService).editor;
 
-  const expand = useCallback(() => {
+  const viewInPage = useCallback(() => {
     editor.setMode('page');
   }, [editor]);
 
@@ -108,10 +114,10 @@ const ExpandFullButton = () => {
       className={styles.button}
       size={styles.iconSize}
       tooltip={t['com.affine.editor.edgeless-note-header.view-in-page']()}
-      data-testid="edgeless-note-expand-button"
-      onClick={expand}
+      data-testid="edgeless-note-view-in-page-button"
+      onClick={viewInPage}
     >
-      <ExpandFullIcon />
+      <LinkedPageIcon />
     </IconButton>
   );
 };
@@ -185,7 +191,7 @@ export const EdgelessNoteHeader = ({ note }: { note: NoteBlockModel }) => {
   return (
     <div className={styles.header} data-testid="edgeless-page-block-header">
       <EdgelessNoteToggleButton note={note} />
-      <ExpandFullButton />
+      <ViewInPageButton />
       {!insidePeekView && <InfoButton note={note} />}
       <LinkButton note={note} />
     </div>

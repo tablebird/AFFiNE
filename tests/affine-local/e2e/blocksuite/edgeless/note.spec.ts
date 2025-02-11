@@ -100,8 +100,10 @@ test.describe('edgeless page block', () => {
     page,
   }) => {
     const toolbar = locateHeaderToolbar(page);
-    const expandButton = toolbar.getByTestId('edgeless-note-expand-button');
-    await expandButton.click();
+    const viewInPageButton = toolbar.getByTestId(
+      'edgeless-note-view-in-page-button'
+    );
+    await viewInPageButton.click();
 
     expect(await getPageMode(page)).toBe('page');
   });
