@@ -53,6 +53,6 @@ export class ContextSession implements AsyncDisposable {
   }
 
   async [Symbol.asyncDispose]() {
-    await this.save?.();
+    await this.save();
   }
 }

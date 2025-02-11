@@ -607,12 +607,12 @@ export const USER_FRIENDLY_ERRORS = {
       `Provider ${provider} failed with ${kind} error: ${message || 'unknown'}`,
   },
   copilot_invalid_context: {
-    type: 'internal_server_error',
+    type: 'invalid_input',
     args: { contextId: 'string' },
     message: ({ contextId }) => `Invalid copilot context ${contextId}.`,
   },
   copilot_context_file_not_supported: {
-    type: 'internal_server_error',
+    type: 'bad_request',
     args: { fileName: 'string', message: 'string' },
     message: ({ fileName, message }) =>
       `File ${fileName} is not supported to use as context: ${message}`,

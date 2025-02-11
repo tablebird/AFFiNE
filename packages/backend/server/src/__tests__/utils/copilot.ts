@@ -221,7 +221,7 @@ export async function createCopilotContext(
         }
       `);
 
-  return res.body.data.createCopilotContext;
+  return res.createCopilotContext;
 }
 
 export async function matchContext(
@@ -252,7 +252,7 @@ export async function matchContext(
     { contextId, content, limit }
   );
 
-  return res.body.data.matchContext;
+  return res.matchContext;
 }
 
 export async function listContext(
@@ -278,7 +278,7 @@ export async function listContext(
         }
       `);
 
-  return res.body.data.currentUser?.copilot?.contexts;
+  return res.currentUser?.copilot?.contexts;
 }
 
 export async function addContextFile(
@@ -331,7 +331,7 @@ export async function removeContextFile(
     { options: { contextId, fileId } }
   );
 
-  return res.body.data.removeContextFile;
+  return res.removeContextFile;
 }
 
 export async function addContextDoc(
@@ -350,7 +350,7 @@ export async function addContextDoc(
     { options: { contextId, docId } }
   );
 
-  return res.body.data.addContextDoc;
+  return res.addContextDoc;
 }
 
 export async function removeContextDoc(
@@ -367,7 +367,7 @@ export async function removeContextDoc(
     { options: { contextId, docId } }
   );
 
-  return res.body.data.removeContextDoc;
+  return res.removeContextDoc;
 }
 
 export async function listContextFiles(
@@ -415,8 +415,7 @@ export async function listContextFiles(
         }
       `);
 
-  const { docs, files } =
-    res.body.data.currentUser?.copilot?.contexts?.[0] || {};
+  const { docs, files } = res.currentUser?.copilot?.contexts?.[0] || {};
 
   return { docs, files };
 }
