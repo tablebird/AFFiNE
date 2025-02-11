@@ -15,11 +15,17 @@ type FootNotePopupRenderer = (
   abortController: AbortController
 ) => TemplateResult<1>;
 
+export type FootNotePopupClickHandler = (
+  footnote: FootNote,
+  abortController: AbortController
+) => void;
+
 export interface FootNoteNodeConfig {
   customNodeRenderer?: FootNoteNodeRenderer;
   customPopupRenderer?: FootNotePopupRenderer;
   interactive?: boolean;
   hidePopup?: boolean;
+  onPopupClick?: FootNotePopupClickHandler;
 }
 
 export class FootNoteNodeConfigProvider {
@@ -27,13 +33,17 @@ export class FootNoteNodeConfigProvider {
   private _customPopupRenderer?: FootNotePopupRenderer;
   private _hidePopup: boolean;
   private _interactive: boolean;
-
+  private _onPopupClick?: FootNotePopupClickHandler;
   get customNodeRenderer() {
     return this._customNodeRenderer;
   }
 
   get customPopupRenderer() {
     return this._customPopupRenderer;
+  }
+
+  get onPopupClick() {
+    return this._onPopupClick;
   }
 
   get doc() {
@@ -56,6 +66,7 @@ export class FootNoteNodeConfigProvider {
     this._customPopupRenderer = config.customPopupRenderer;
     this._hidePopup = config.hidePopup ?? false;
     this._interactive = config.interactive ?? true;
+    this._onPopupClick = config.onPopupClick;
   }
 
   setCustomNodeRenderer(renderer: FootNoteNodeRenderer) {
@@ -72,6 +83,10 @@ export class FootNoteNodeConfigProvider {
 
   setInteractive(interactive: boolean) {
     this._interactive = interactive;
+  }
+
+  setPopupClick(onPopupClick: FootNotePopupClickHandler) {
+    this._onPopupClick = onPopupClick;
   }
 }
 

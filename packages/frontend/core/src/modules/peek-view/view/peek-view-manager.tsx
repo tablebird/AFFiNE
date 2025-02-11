@@ -1,11 +1,11 @@
 import { toReactNode } from '@affine/component';
-import { AIChatBlockPeekViewTemplate } from '@affine/core/blocksuite/presets/ai';
 import { BlockComponent } from '@blocksuite/affine/block-std';
 import { useLiveData, useService } from '@toeverything/infra';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { ActivePeekView } from '../entities/peek-view';
 import { PeekViewService } from '../services/peek-view';
+import { AIChatBlockPeekView } from './ai-chat-block-peek-view';
 import { AttachmentPreviewPeekView } from './attachment-preview';
 import { DocPeekPreview } from './doc-preview';
 import { ImagePreviewPeekView } from './image-preview';
@@ -46,8 +46,7 @@ function renderPeekView({ info }: ActivePeekView, animating?: boolean) {
   }
 
   if (info.type === 'ai-chat-block') {
-    const template = AIChatBlockPeekViewTemplate(info.model, info.host);
-    return toReactNode(template);
+    return <AIChatBlockPeekView model={info.model} host={info.host} />;
   }
 
   return null; // unreachable

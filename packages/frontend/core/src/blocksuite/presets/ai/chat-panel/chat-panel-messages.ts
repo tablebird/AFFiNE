@@ -6,6 +6,7 @@ import {
   FeatureFlagService,
   isInsidePageEditor,
   PaymentRequiredError,
+  type SpecBuilder,
   UnauthorizedError,
 } from '@blocksuite/affine/blocks';
 import { WithDisposable } from '@blocksuite/affine/global/utils';
@@ -128,6 +129,9 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
 
   @property({ attribute: false })
   accessor updateContext!: (context: Partial<ChatContextValue>) => void;
+
+  @property({ attribute: false })
+  accessor previewSpecBuilder!: SpecBuilder;
 
   @query('.chat-panel-messages')
   accessor messagesContainer: HTMLDivElement | null = null;
@@ -316,6 +320,7 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
           .attachments=${item.attachments}
           .text=${item.content}
           .state=${state}
+          .previewSpecBuilder=${this.previewSpecBuilder}
         ></chat-text>
         ${shouldRenderError ? AIChatErrorRenderer(host, error) : nothing}
         ${this.renderEditorActions(item, isLast)}`;

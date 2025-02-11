@@ -24,6 +24,9 @@ import { ref } from 'lit-html/directives/ref.js';
 import { HoverController } from '../../../../../hover/controller';
 import type { FootNoteNodeConfigProvider } from './footnote-config';
 
+// Virtual padding for the footnote popup overflow detection offsets.
+const POPUP_SHIFT_PADDING = 8;
+
 export class AffineFootnoteNode extends WithDisposable(ShadowlessElement) {
   static override styles = css`
     .footnote-node {
@@ -64,6 +67,10 @@ export class AffineFootnoteNode extends WithDisposable(ShadowlessElement) {
     return this.config?.hidePopup;
   }
 
+  get onPopupClick() {
+    return this.config?.onPopupClick;
+  }
+
   get inlineEditor() {
     const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
       `[${INLINE_ROOT_ATTR}]`
@@ -92,6 +99,7 @@ export class AffineFootnoteNode extends WithDisposable(ShadowlessElement) {
           .footnote=${footnote}
           .std=${this.std}
           .abortController=${abortController}
+          .onPopupClick=${this.onPopupClick}
         ></footnote-popup>`;
   };
 
@@ -130,7 +138,7 @@ export class AffineFootnoteNode extends WithDisposable(ShadowlessElement) {
           referenceElement: this,
           placement: 'top',
           autoUpdate: true,
-          middleware: [shift()],
+          middleware: [shift({ padding: POPUP_SHIFT_PADDING })],
         },
       };
     },

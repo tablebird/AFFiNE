@@ -18,7 +18,8 @@ import {
   LightLoadingIcon,
   WebIcon16,
 } from '../../../../../icons';
-import { RefNodeSlotsProvider } from '../../../../extension/ref-node-slots';
+import { PeekViewProvider } from '../../../../../peek/service';
+import type { FootNotePopupClickHandler } from './footnote-config';
 
 export class FootNotePopup extends SignalWatcher(WithDisposable(LitElement)) {
   static override styles = css`
@@ -130,27 +131,47 @@ export class FootNotePopup extends SignalWatcher(WithDisposable(LitElement)) {
   /**
    * When clicking the chip, we will navigate to the reference doc or open the url
    */
-  private readonly _onChipClick = () => {
-    const referenceType = this.footnote.reference.type;
-    const { docId, url } = this.footnote.reference;
-    switch (referenceType) {
-      case 'doc': {
-        if (!docId) {
-          break;
+  private readonly _handleDocReference = (docId: string) => {
+    this.std
+      .getOptional(PeekViewProvider)
+      ?.peek({
+        docId,
+      })
+      .catch(console.error);
+  };
+
+  private readonly _handleUrlReference = (url: string) => {
+    window.open(url, '_blank');
+  };
+
+  private readonly _handleReference = () => {
+    const { type, docId, url } = this.footnote.reference;
+
+    switch (type) {
+      case 'doc':
+        if (docId) {
+          this._handleDocReference(docId);
         }
-        this.std
-          .getOptional(RefNodeSlotsProvider)
-          ?.docLinkClicked.emit({ pageId: docId, host: this.std.host });
         break;
-      }
       case 'url':
-        if (!url) {
-          break;
+        if (url) {
+          this._handleUrlReference(url);
         }
-        window.open(url, '_blank');
         break;
     }
+
     this.abortController.abort();
+  };
+
+  private readonly _onChipClick = () => {
+    // If the onPopupClick is defined, use it
+    if (this.onPopupClick) {
+      this.onPopupClick(this.footnote, this.abortController);
+      return;
+    }
+
+    // Otherwise, handle the reference by default
+    this._handleReference();
   };
 
   override connectedCallback() {
@@ -195,4 +216,7 @@ export class FootNotePopup extends SignalWatcher(WithDisposable(LitElement)) {
 
   @property({ attribute: false })
   accessor abortController!: AbortController;
+
+  @property({ attribute: false })
+  accessor onPopupClick: FootNotePopupClickHandler | undefined = undefined;
 }

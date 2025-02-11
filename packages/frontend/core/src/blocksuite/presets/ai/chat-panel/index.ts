@@ -3,7 +3,10 @@ import './chat-panel-messages';
 
 import type { EditorHost } from '@blocksuite/affine/block-std';
 import { ShadowlessElement } from '@blocksuite/affine/block-std';
-import { NotificationProvider } from '@blocksuite/affine/blocks';
+import {
+  NotificationProvider,
+  type SpecBuilder,
+} from '@blocksuite/affine/blocks';
 import { debounce, WithDisposable } from '@blocksuite/affine/global/utils';
 import type { Store } from '@blocksuite/affine/store';
 import { css, html, type PropertyValues } from 'lit';
@@ -172,6 +175,9 @@ export class ChatPanel extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   accessor docDisplayConfig!: DocDisplayConfig;
 
+  @property({ attribute: false })
+  accessor previewSpecBuilder!: SpecBuilder;
+
   @state()
   accessor isLoading = false;
 
@@ -315,6 +321,7 @@ export class ChatPanel extends WithDisposable(ShadowlessElement) {
         .updateContext=${this.updateContext}
         .host=${this.host}
         .isLoading=${this.isLoading}
+        .previewSpecBuilder=${this.previewSpecBuilder}
       ></chat-panel-messages>
       <chat-panel-chips
         .host=${this.host}

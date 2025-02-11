@@ -1,4 +1,5 @@
 import { ChatPanel } from '@affine/core/blocksuite/presets/ai';
+import { createPageModePreviewSpecs } from '@affine/core/components/blocksuite/block-suite-editor/specs/preview';
 import { AINetworkSearchService } from '@affine/core/modules/ai-button/services/network-search';
 import { DocDisplayMetaService } from '@affine/core/modules/doc-display-meta';
 import { DocSearchMenuService } from '@affine/core/modules/doc-search-menu/services';
@@ -83,6 +84,8 @@ export const EditorChatPanel = forwardRef(function EditorChatPanel(
           );
         },
       };
+      chatPanelRef.current.previewSpecBuilder =
+        createPageModePreviewSpecs(framework);
     } else {
       chatPanelRef.current.host = editor.host;
       chatPanelRef.current.doc = editor.doc;

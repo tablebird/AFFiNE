@@ -64,16 +64,16 @@ function getTelemetryExtension(): ExtensionType {
   };
 }
 
-function getThemeExtension(framework: FrameworkProvider) {
+export function getThemeExtension(framework: FrameworkProvider) {
   class AffineThemeExtension
     extends LifeCycleWatcher
     implements ThemeExtension
   {
     static override readonly key = 'affine-theme';
 
-    private readonly themes: Map<string, Signal<ColorScheme>> = new Map();
+    readonly themes: Map<string, Signal<ColorScheme>> = new Map();
 
-    protected readonly disposables: (() => void)[] = [];
+    readonly disposables: (() => void)[] = [];
 
     static override setup(di: Container) {
       super.setup(di);
@@ -104,7 +104,11 @@ function getThemeExtension(framework: FrameworkProvider) {
     getEdgelessTheme(docId?: string) {
       const doc =
         (docId && framework.get(DocsService).list.doc$(docId).getValue()) ||
-        framework.get(DocService).doc;
+        framework.getOptional(DocService)?.doc;
+
+      if (!doc) {
+        return this.getAppTheme();
+      }
 
       const cache = this.themes.get(doc.id);
       if (cache) return cache;
