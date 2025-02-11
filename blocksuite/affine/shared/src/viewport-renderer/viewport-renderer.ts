@@ -1,44 +1,64 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import {
+  type BlockStdScope,
+  LifeCycleWatcher,
+  LifeCycleWatcherIdentifier,
+  StdIdentifier,
+} from '@blocksuite/block-std';
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
+import { type Container, type ServiceIdentifier } from '@blocksuite/global/di';
 
 import { getSentenceRects, segmentSentences } from './text-utils.js';
 import { type ParagraphLayout, type SectionLayout } from './types.js';
 
-export class ViewportTurboRenderer {
+export const ViewportTurboRendererIdentifier = LifeCycleWatcherIdentifier(
+  'ViewportTurboRenderer'
+) as ServiceIdentifier<ViewportTurboRendererExtension>;
+
+export class ViewportTurboRendererExtension extends LifeCycleWatcher {
+  static override key = 'ViewportTurboRenderer';
+
+  static override setup(di: Container) {
+    di.addImpl(ViewportTurboRendererIdentifier, this, [StdIdentifier]);
+  }
+
   public readonly canvas: HTMLCanvasElement = document.createElement('canvas');
   private readonly worker: Worker;
-  private readonly targetContainer: HTMLElement;
-  private host!: EditorHost;
   private lastZoom: number | null = null;
   private lastSection: SectionLayout | null = null;
   private lastBitmap: ImageBitmap | null = null;
 
-  constructor(targetContainer: HTMLElement) {
-    this.targetContainer = targetContainer;
-
+  constructor(std: BlockStdScope) {
+    super(std);
     this.worker = new Worker(new URL('./painter.worker.ts', import.meta.url), {
       type: 'module',
     });
+  }
 
-    if (!this.targetContainer.querySelector('canvas')) {
-      this.targetContainer.append(this.canvas);
+  override mounted() {
+    const targetContainer = document.querySelector('#right-column')!;
+    if (!targetContainer.querySelector('canvas')) {
+      targetContainer.append(this.canvas);
     }
   }
 
-  setHost(host: EditorHost) {
-    this.host = host;
+  override unmounted() {
+    if (this.lastBitmap) {
+      this.lastBitmap.close();
+    }
+    this.worker.terminate();
+    this.canvas.remove();
   }
 
   get viewport() {
-    return this.host.std.get(GfxControllerIdentifier).viewport;
+    return this.std.get(GfxControllerIdentifier).viewport;
   }
 
   getHostRect() {
-    return this.host.getBoundingClientRect();
+    return this.std.host.getBoundingClientRect();
   }
 
   getHostLayout() {
-    const paragraphBlocks = this.host.querySelectorAll(
+    const paragraphBlocks = this.std.host.querySelectorAll(
       '.affine-paragraph-rich-text-wrapper [data-v-text="true"]'
     );
 
@@ -207,6 +227,7 @@ export class ViewportTurboRenderer {
 
   public async render(): Promise<void> {
     const hostLayout = this.getHostLayout();
+
     if (!hostLayout) return;
 
     const { section } = hostLayout;
@@ -219,12 +240,5 @@ export class ViewportTurboRenderer {
       this.initSectionRenderer(section.rect.w, section.rect.h);
       await this.renderSection(section);
     }
-  }
-
-  public destroy() {
-    if (this.lastBitmap) {
-      this.lastBitmap.close();
-    }
-    this.worker.terminate();
   }
 }

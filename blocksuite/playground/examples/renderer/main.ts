@@ -1,4 +1,4 @@
-import { ViewportTurboRenderer } from '@blocksuite/affine-shared/viewport-renderer';
+import { ViewportTurboRendererIdentifier } from '@blocksuite/affine-shared/viewport-renderer';
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
 import { nextTick } from '@blocksuite/global/utils';
 import { Text } from '@blocksuite/store';
@@ -8,11 +8,8 @@ import { doc, editor } from './editor.js';
 
 type DocMode = 'page' | 'edgeless';
 
-const rightColumn = document.querySelector('#right-column') as HTMLElement;
-const renderer = new ViewportTurboRenderer(rightColumn);
-
 async function handleToCanvasClick() {
-  renderer.setHost(editor.host!);
+  const renderer = editor.std.get(ViewportTurboRendererIdentifier);
   await renderer.render();
   const viewport = editor.std.get(GfxControllerIdentifier).viewport;
   viewport.viewportUpdated.on(async () => {
@@ -23,7 +20,8 @@ async function handleToCanvasClick() {
 async function handleModeChange(mode: DocMode) {
   editor.mode = mode;
   await nextTick();
-  renderer.setHost(editor.host!);
+
+  const renderer = editor.std.get(ViewportTurboRendererIdentifier);
   await renderer.render();
 }
 
