@@ -2,6 +2,8 @@ import { getDomain, getSubdomain } from 'tldts';
 
 import { imageProxyBuilder } from './proxy';
 
+const localhost = new Set(['localhost', '127.0.0.1']);
+
 export function fixUrl(url?: string): URL | null {
   if (typeof url !== 'string') {
     return null;
@@ -24,7 +26,7 @@ export function fixUrl(url?: string): URL | null {
     if (
       ['http:', 'https:'].includes(parsed.protocol) &&
       // check hostname is a valid domain
-      fullDomain === parsed.hostname
+      (fullDomain === parsed.hostname || localhost.has(parsed.hostname))
     ) {
       return parsed;
     }

@@ -11,6 +11,7 @@ import type { Request, Response } from 'express';
 import { HTMLRewriter } from 'htmlrewriter';
 
 import { BadRequest, Cache, Config, URLHelper } from '../../base';
+import { Public } from '../../core/auth';
 import type { LinkPreviewRequest, LinkPreviewResponse } from './types';
 import {
   appendUrl,
@@ -24,6 +25,7 @@ import {
   reduceUrls,
 } from './utils';
 
+@Public()
 @Controller('/api/worker')
 export class WorkerController {
   private readonly logger = new Logger(WorkerController.name);

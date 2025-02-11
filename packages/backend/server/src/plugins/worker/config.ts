@@ -11,5 +11,5 @@ declare module '../config' {
 }
 
 defineStartupConfig('plugins.worker', {
-  allowedOrigin: [],
+  allowedOrigin: ['localhost', '127.0.0.1'],
 });
