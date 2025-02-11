@@ -15,7 +15,7 @@ import {
   findClosestBlockComponent,
   getBlockProps,
   getClosestBlockComponentByPoint,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import type { BlockComponent, EditorHost } from '@blocksuite/block-std';
 import { Point, Rect } from '@blocksuite/global/utils';
@@ -220,7 +220,7 @@ export const getDropResult = (
 
   const model = closestBlock.model;
 
-  const isDatabase = matchFlavours(model, [DatabaseBlockModel]);
+  const isDatabase = matchModels(model, [DatabaseBlockModel]);
   if (isDatabase) {
     return dropIndicator;
   }
@@ -236,7 +236,7 @@ export const getDropResult = (
 export function getDragHandleLeftPadding(blocks: BlockComponent[]) {
   const hasToggleList = blocks.some(
     block =>
-      (matchFlavours(block.model, [ListBlockModel]) &&
+      (matchModels(block.model, [ListBlockModel]) &&
         block.model.children.length > 0) ||
       (block instanceof ParagraphBlockComponent &&
         block.model.type.startsWith('h') &&

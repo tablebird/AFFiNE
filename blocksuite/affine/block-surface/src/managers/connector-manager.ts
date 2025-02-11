@@ -37,7 +37,7 @@ import { Overlay } from '../renderer/overlay.js';
 import { AStarRunner } from '../utils/a-star.js';
 
 export type Connectable = Exclude<
-  BlockSuite.EdgelessModel,
+  GfxModel,
   ConnectorElementModel | BrushElementModel | GroupElementModel
 >;
 

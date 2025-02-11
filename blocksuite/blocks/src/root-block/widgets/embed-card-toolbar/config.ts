@@ -52,12 +52,7 @@ export const BUILT_IN_GROUPS: MenuItemGroup<EmbedCardToolbarContext>[] = [
 
           const parent = doc.getParent(model);
           const index = parent?.children.indexOf(model);
-          doc.addBlock(
-            model.flavour as BlockSuite.Flavour,
-            duplicateProps,
-            parent,
-            index
-          );
+          doc.addBlock(model.flavour, duplicateProps, parent, index);
           close();
         },
       },

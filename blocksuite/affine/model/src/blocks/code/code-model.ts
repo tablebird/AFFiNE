@@ -33,11 +33,3 @@ export const CodeBlockSchema = defineBlockSchema({
 export class CodeBlockModel extends BlockModel<CodeBlockProps> {
   override text!: Text;
 }
-
-declare global {
-  namespace BlockSuite {
-    interface BlockModels {
-      'affine:code': CodeBlockModel;
-    }
-  }
-}

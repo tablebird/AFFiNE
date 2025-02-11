@@ -19,7 +19,7 @@ import {
   TelemetryProvider,
 } from '@blocksuite/affine-shared/services';
 import { LassoMode } from '@blocksuite/affine-shared/types';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import { SurfaceSelection, TextSelection } from '@blocksuite/block-std';
 import {
   GfxBlockElementModel,
@@ -134,7 +134,7 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
           if (
             selection.selectedElements.length === 1 &&
             selection.firstElement instanceof GfxBlockElementModel &&
-            matchFlavours(selection.firstElement as GfxBlockElementModel, [
+            matchModels(selection.firstElement as GfxBlockElementModel, [
               NoteBlockModel,
             ])
           ) {
@@ -260,7 +260,7 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
                   block =>
                     block.group === null &&
                     !(
-                      matchFlavours(block, [NoteBlockModel]) &&
+                      matchModels(block, [NoteBlockModel]) &&
                       block.displayMode === NoteDisplayMode.DocOnly
                     )
                 )

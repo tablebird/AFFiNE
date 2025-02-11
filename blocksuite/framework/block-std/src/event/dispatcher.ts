@@ -3,6 +3,7 @@ import { DisposableGroup } from '@blocksuite/global/utils';
 
 import { LifeCycleWatcher } from '../extension/index.js';
 import { KeymapIdentifier } from '../identifier.js';
+import type { BlockStdScope } from '../scope/index.js';
 import { type BlockComponent, EditorHost } from '../view/index.js';
 import {
   type UIEventHandler,
@@ -111,7 +112,7 @@ export class UIEventDispatcher extends LifeCycleWatcher {
     return this.std.host;
   }
 
-  constructor(std: BlockSuite.Std) {
+  constructor(std: BlockStdScope) {
     super(std);
     this._pointerControl = new PointerControl(this);
     this._keyboardControl = new KeyboardControl(this);

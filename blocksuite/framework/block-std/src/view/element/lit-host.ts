@@ -185,7 +185,7 @@ export class EditorHost extends SignalWatcher(
 
   @provide({ context: stdContext })
   @property({ attribute: false })
-  accessor std!: BlockSuite.Std;
+  accessor std!: BlockStdScope;
 }
 
 declare global {

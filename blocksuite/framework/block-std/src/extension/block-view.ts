@@ -22,7 +22,7 @@ import type { BlockViewType } from '../spec/type.js';
  * ```
  */
 export function BlockViewExtension(
-  flavour: BlockSuite.Flavour,
+  flavour: string,
   view: BlockViewType
 ): ExtensionType {
   return {

@@ -9,7 +9,7 @@ import { ThemeProvider } from '@blocksuite/affine-shared/services';
 import {
   getClosestBlockComponentByPoint,
   handleNativeRangeAtPoint,
-  matchFlavours,
+  matchModels,
   stopPropagation,
 } from '@blocksuite/affine-shared/utils';
 import {
@@ -100,10 +100,10 @@ export class EdgelessNoteBackground extends SignalWatcher(
 
     if (
       (!nearestModel.text ||
-        !matchFlavours(nearestModel, [ParagraphBlockModel, ListBlockModel])) &&
+        !matchModels(nearestModel, [ParagraphBlockModel, ListBlockModel])) &&
       (!siblingModel ||
         !siblingModel.text ||
-        !matchFlavours(siblingModel, [ParagraphBlockModel, ListBlockModel]))
+        !matchModels(siblingModel, [ParagraphBlockModel, ListBlockModel]))
     ) {
       const [pId] = this.doc.addSiblingBlocks(
         nearestModel,

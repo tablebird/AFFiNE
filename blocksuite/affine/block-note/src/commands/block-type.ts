@@ -14,7 +14,7 @@ import {
   getTextSelectionCommand,
 } from '@blocksuite/affine-shared/commands';
 import {
-  matchFlavours,
+  matchModels,
   mergeToCodeModel,
   transformModel,
 } from '@blocksuite/affine-shared/utils';
@@ -27,7 +27,7 @@ import {
 import type { BlockModel } from '@blocksuite/store';
 
 type UpdateBlockConfig = {
-  flavour: BlockSuite.Flavour;
+  flavour: string;
   props?: Record<string, unknown>;
 };
 
@@ -200,7 +200,7 @@ export const updateBlockType: Command<
         const newModels: BlockModel[] = [];
         blockModels.forEach(model => {
           if (
-            !matchFlavours(model, [
+            !matchModels(model, [
               ParagraphBlockModel,
               ListBlockModel,
               CodeBlockModel,

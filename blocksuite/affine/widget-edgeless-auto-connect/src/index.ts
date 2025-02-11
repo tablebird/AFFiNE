@@ -17,10 +17,7 @@ import {
   SurfaceRefBlockModel,
 } from '@blocksuite/affine-model';
 import { FeatureFlagService } from '@blocksuite/affine-shared/services';
-import {
-  matchFlavours,
-  stopPropagation,
-} from '@blocksuite/affine-shared/utils';
+import { matchModels, stopPropagation } from '@blocksuite/affine-shared/utils';
 import { WidgetComponent } from '@blocksuite/block-std';
 import {
   type GfxController,
@@ -195,7 +192,7 @@ export class EdgelessAutoConnectWidget extends WidgetComponent<RootBlockModel> {
 
     const pageVisibleBlocks = new Map<AutoConnectElement, number>();
     const notes = service.doc.root?.children.filter(child =>
-      matchFlavours(child, [NoteBlockModel])
+      matchModels(child, [NoteBlockModel])
     );
     const edgelessOnlyNotesSet = new Set<NoteBlockModel>();
 
@@ -209,7 +206,7 @@ export class EdgelessAutoConnectWidget extends WidgetComponent<RootBlockModel> {
       }
 
       note.children.forEach(model => {
-        if (matchFlavours(model, [SurfaceRefBlockModel])) {
+        if (matchModels(model, [SurfaceRefBlockModel])) {
           const reference = this._crud.getElementById(model.reference);
 
           if (!isAutoConnectElement(reference)) return;

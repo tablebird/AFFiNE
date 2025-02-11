@@ -39,14 +39,12 @@ import type { BlockModel } from '@blocksuite/store';
 
 import type { Connectable } from '../../../_common/utils/index.js';
 
-export function isMindmapNode(
-  element: GfxBlockElementModel | BlockSuite.EdgelessModel | null
-) {
+export function isMindmapNode(element: GfxBlockElementModel | GfxModel | null) {
   return element?.group instanceof MindmapElementModel;
 }
 
 export function isEdgelessTextBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EdgelessTextBlockModel {
   return (
     !!element &&
@@ -60,7 +58,7 @@ export function isFrameBlock(element: unknown): element is FrameBlockModel {
 }
 
 export function isImageBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is ImageBlockModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:image'
@@ -68,7 +66,7 @@ export function isImageBlock(
 }
 
 export function isAttachmentBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is AttachmentBlockModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:attachment'
@@ -76,7 +74,7 @@ export function isAttachmentBlock(
 }
 
 export function isBookmarkBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is BookmarkBlockModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:bookmark'
@@ -84,7 +82,7 @@ export function isBookmarkBlock(
 }
 
 export function isEmbeddedBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedBlockModel {
   return (
     !!element && 'flavour' in element && /affine:embed-*/.test(element.flavour)
@@ -98,9 +96,7 @@ export function isEmbeddedBlock(
  * Related issue: https://linear.app/affine-design/issue/BS-1009/
  * @deprecated
  */
-export function isAIChatBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
-) {
+export function isAIChatBlock(element: BlockModel | GfxModel | null) {
   return (
     !!element &&
     'flavour' in element &&
@@ -108,9 +104,7 @@ export function isAIChatBlock(
   );
 }
 
-export function isEmbeddedLinkBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
-) {
+export function isEmbeddedLinkBlock(element: BlockModel | GfxModel | null) {
   return (
     isEmbeddedBlock(element) &&
     !isEmbedSyncedDocBlock(element) &&
@@ -119,7 +113,7 @@ export function isEmbeddedLinkBlock(
 }
 
 export function isEmbedGithubBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedGithubModel {
   return (
     !!element &&
@@ -129,7 +123,7 @@ export function isEmbedGithubBlock(
 }
 
 export function isEmbedYoutubeBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedYoutubeModel {
   return (
     !!element &&
@@ -139,7 +133,7 @@ export function isEmbedYoutubeBlock(
 }
 
 export function isEmbedLoomBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedLoomModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:embed-loom'
@@ -147,7 +141,7 @@ export function isEmbedLoomBlock(
 }
 
 export function isEmbedFigmaBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedFigmaModel {
   return (
     !!element &&
@@ -157,7 +151,7 @@ export function isEmbedFigmaBlock(
 }
 
 export function isEmbedLinkedDocBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedLinkedDocModel {
   return (
     !!element &&
@@ -167,7 +161,7 @@ export function isEmbedLinkedDocBlock(
 }
 
 export function isEmbedSyncedDocBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedSyncedDocModel {
   return (
     !!element &&
@@ -177,7 +171,7 @@ export function isEmbedSyncedDocBlock(
 }
 
 export function isEmbedHtmlBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
+  element: BlockModel | GfxModel | null
 ): element is EmbedHtmlModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:embed-html'
@@ -191,7 +185,7 @@ export function isCanvasElement(
 }
 
 export function isCanvasElementWithText(
-  element: BlockSuite.EdgelessModel
+  element: GfxModel
 ): element is CanvasElementWithText {
   return (
     element instanceof TextElementModel || element instanceof ShapeElementModel
@@ -199,7 +193,7 @@ export function isCanvasElementWithText(
 }
 
 export function isConnectable(
-  element: BlockSuite.EdgelessModel | null
+  element: GfxModel | null
 ): element is Connectable {
   return !!element && element.connectable;
 }
@@ -253,7 +247,7 @@ export type SelectableProps = {
 };
 
 export function getSelectableBounds(
-  selected: BlockSuite.EdgelessModel[]
+  selected: GfxModel[]
 ): Map<string, SelectableProps> {
   const bounds = new Map();
   getElementsWithoutGroup(selected).forEach(ele => {

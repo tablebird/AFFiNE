@@ -2,7 +2,7 @@ import { DatabaseBlockModel } from '@blocksuite/affine-model';
 import {
   asyncGetBlockComponent,
   getCurrentNativeRange,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import {
   type BlockStdScope,
@@ -42,7 +42,7 @@ export function getInlineEditorByModel(
     typeof model === 'string'
       ? editorHost.std.store.getBlock(model)?.model
       : model;
-  if (!blockModel || matchFlavours(blockModel, [DatabaseBlockModel])) {
+  if (!blockModel || matchModels(blockModel, [DatabaseBlockModel])) {
     // Not support database model since it's may be have multiple inline editor instances.
     // Support to enter the editing state through the Enter key in the database.
     return null;

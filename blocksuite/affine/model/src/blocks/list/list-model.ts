@@ -41,11 +41,3 @@ export const ListBlockSchema = defineBlockSchema({
 export class ListBlockModel extends BlockModel<ListProps> {
   override text!: Text;
 }
-
-declare global {
-  namespace BlockSuite {
-    interface BlockModels {
-      'affine:list': ListBlockModel;
-    }
-  }
-}

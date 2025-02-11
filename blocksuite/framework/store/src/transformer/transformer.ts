@@ -506,12 +506,7 @@ export class Transformer {
 
       const actualIndex =
         startIndex !== undefined ? startIndex + index : undefined;
-      doc.addBlock(
-        flavour as BlockSuite.Flavour,
-        draft as object,
-        parentId,
-        actualIndex
-      );
+      doc.addBlock(flavour, draft as object, parentId, actualIndex);
 
       const model = doc.getBlock(id)?.model;
       if (!model) {

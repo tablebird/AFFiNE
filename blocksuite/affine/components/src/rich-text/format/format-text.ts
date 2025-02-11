@@ -22,10 +22,7 @@ export const formatTextCommand: Command<{
     .chain()
     .pipe(getSelectedBlocksCommand, {
       textSelection,
-      filter: el =>
-        FORMAT_TEXT_SUPPORT_FLAVOURS.includes(
-          el.model.flavour as BlockSuite.Flavour
-        ),
+      filter: el => FORMAT_TEXT_SUPPORT_FLAVOURS.includes(el.model.flavour),
       types: ['text'],
     })
     .pipe((ctx, next) => {

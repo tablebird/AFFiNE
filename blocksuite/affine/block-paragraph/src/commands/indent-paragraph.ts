@@ -3,7 +3,7 @@ import type { IndentContext } from '@blocksuite/affine-shared/types';
 import {
   calculateCollapsedSiblings,
   getNearestHeadingBefore,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import { type Command, TextSelection } from '@blocksuite/block-std';
 
@@ -37,7 +37,7 @@ export const canIndentParagraphCommand: Command<
   }
 
   const model = std.store.getBlock(blockId)?.model;
-  if (!model || !matchFlavours(model, [ParagraphBlockModel])) {
+  if (!model || !matchModels(model, [ParagraphBlockModel])) {
     return;
   }
 
@@ -95,7 +95,7 @@ export const indentParagraphCommand: Command<{
     const nearestHeading = getNearestHeadingBefore(model);
     if (
       nearestHeading &&
-      matchFlavours(nearestHeading, [ParagraphBlockModel]) &&
+      matchModels(nearestHeading, [ParagraphBlockModel]) &&
       nearestHeading.collapsed
     ) {
       store.updateBlock(nearestHeading, {
@@ -105,7 +105,7 @@ export const indentParagraphCommand: Command<{
   }
 
   if (
-    matchFlavours(model, [ParagraphBlockModel]) &&
+    matchModels(model, [ParagraphBlockModel]) &&
     model.type.startsWith('h') &&
     model.collapsed
   ) {
@@ -124,7 +124,7 @@ export const indentParagraphCommand: Command<{
     const nearestHeading = getNearestHeadingBefore(model);
     if (
       nearestHeading &&
-      matchFlavours(nearestHeading, [ParagraphBlockModel]) &&
+      matchModels(nearestHeading, [ParagraphBlockModel]) &&
       nearestHeading.collapsed
     ) {
       store.updateBlock(nearestHeading, {
@@ -135,7 +135,7 @@ export const indentParagraphCommand: Command<{
 
   // update collapsed state of affine list
   if (
-    matchFlavours(previousSibling, [ListBlockModel]) &&
+    matchModels(previousSibling, [ListBlockModel]) &&
     previousSibling.collapsed
   ) {
     store.updateBlock(previousSibling, {

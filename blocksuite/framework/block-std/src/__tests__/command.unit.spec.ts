@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { Command } from '../command/index.js';
 import { CommandManager } from '../command/index.js';
+import type { BlockStdScope } from '../scope/block-std-scope.js';
 
 type Command1 = Command<
   {
@@ -15,7 +16,7 @@ type Command1 = Command<
 type Command2 = Command<{ commandData1: string }, { commandData2: string }>;
 
 describe('CommandManager', () => {
-  let std: BlockSuite.Std;
+  let std: BlockStdScope;
   let commandManager: CommandManager;
 
   beforeEach(() => {

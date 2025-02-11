@@ -40,10 +40,6 @@ export class LatexBlockModel
 
 declare global {
   namespace BlockSuite {
-    interface BlockModels {
-      'affine:latex': LatexBlockModel;
-    }
-
     interface EdgelessBlockModelMap {
       'affine:latex': LatexBlockModel;
     }

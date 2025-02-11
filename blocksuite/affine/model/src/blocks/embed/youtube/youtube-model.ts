@@ -30,8 +30,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:embed-youtube': EmbedYoutubeModel;
     }
-    interface BlockModels {
-      'affine:embed-youtube': EmbedYoutubeModel;
-    }
   }
 }

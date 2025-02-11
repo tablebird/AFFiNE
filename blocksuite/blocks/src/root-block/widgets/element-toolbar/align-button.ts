@@ -16,6 +16,7 @@ import {
   SmallArrowDownIcon,
 } from '@blocksuite/affine-components/icons';
 import { MindmapElementModel } from '@blocksuite/affine-model';
+import type { GfxModel } from '@blocksuite/block-std/gfx';
 import { Bound, WithDisposable } from '@blocksuite/global/utils';
 import { AutoTidyUpIcon, ResizeTidyUpIcon } from '@blocksuite/icons/lit';
 import { css, html, LitElement, nothing, type TemplateResult } from 'lit';
@@ -271,7 +272,7 @@ export class EdgelessAlignButton extends WithDisposable(LitElement) {
     });
   }
 
-  private _updateXYWH(ele: BlockSuite.EdgelessModel, bound: Bound) {
+  private _updateXYWH(ele: GfxModel, bound: Bound) {
     const { updateElement } = this.edgeless.std.get(EdgelessCRUDIdentifier);
     const { updateBlock } = this.edgeless.doc;
     updateXYWH(ele, bound, updateElement, updateBlock);
@@ -333,7 +334,7 @@ export class EdgelessAlignButton extends WithDisposable(LitElement) {
 
 export function renderAlignButton(
   edgeless: EdgelessRootBlockComponent,
-  elements: BlockSuite.EdgelessModel[]
+  elements: GfxModel[]
 ) {
   if (elements.length < 2) return nothing;
   if (elements.some(e => e.group instanceof MindmapElementModel))

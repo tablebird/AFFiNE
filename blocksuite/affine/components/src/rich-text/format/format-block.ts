@@ -28,10 +28,7 @@ export const formatBlockCommand: Command<{
     .chain()
     .pipe(getSelectedBlocksCommand, {
       blockSelections,
-      filter: el =>
-        FORMAT_BLOCK_SUPPORT_FLAVOURS.includes(
-          el.model.flavour as BlockSuite.Flavour
-        ),
+      filter: el => FORMAT_BLOCK_SUPPORT_FLAVOURS.includes(el.model.flavour),
       types: ['block'],
     })
     .pipe((ctx, next) => {

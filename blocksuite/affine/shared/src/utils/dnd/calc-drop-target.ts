@@ -8,7 +8,7 @@ import {
   getClosestBlockComponentByElement,
   getRectByBlockComponent,
 } from '../dom/index.js';
-import { matchFlavours } from '../model/index.js';
+import { matchModels } from '../model/index.js';
 import { getDropRectByPoint } from './get-drop-rect-by-point.js';
 import { DropFlags, type DropPlacement, type DropTarget } from './types.js';
 
@@ -56,7 +56,7 @@ export function calcDropTarget(
       .every(m => children.includes(m.flavour));
   }
 
-  if (!shouldAppendToDatabase && !matchFlavours(model, [DatabaseBlockModel])) {
+  if (!shouldAppendToDatabase && !matchModels(model, [DatabaseBlockModel])) {
     const databaseBlockComponent =
       element.closest<BlockComponent>('affine-database');
     if (databaseBlockComponent) {
@@ -150,7 +150,7 @@ export function calcDropTarget(
     const hasChild = (element as BlockComponent).childBlocks.length;
     if (
       allowSublist &&
-      matchFlavours(model, [ListBlockModel]) &&
+      matchModels(model, [ListBlockModel]) &&
       !hasChild &&
       point.x > domRect.x + BLOCK_CHILDREN_CONTAINER_PADDING_LEFT
     ) {

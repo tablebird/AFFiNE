@@ -44,11 +44,3 @@ export class ParagraphBlockModel extends BlockModel<ParagraphProps> {
     return this.text$.value.length === 0 && this.children.length === 0;
   }
 }
-
-declare global {
-  namespace BlockSuite {
-    interface BlockModels {
-      'affine:paragraph': ParagraphBlockModel;
-    }
-  }
-}

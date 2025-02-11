@@ -164,7 +164,7 @@ export async function extractMarkdownFromDoc(
   const blockModels = getNoteBlockModels(doc);
   const textModels = blockModels.filter(
     model =>
-      !BlocksUtils.matchFlavours(model, [ImageBlockModel, DatabaseBlockModel])
+      !BlocksUtils.matchModels(model, [ImageBlockModel, DatabaseBlockModel])
   );
   const drafts = textModels.map(toDraftModel);
   const slice = Slice.fromModels(doc, drafts);

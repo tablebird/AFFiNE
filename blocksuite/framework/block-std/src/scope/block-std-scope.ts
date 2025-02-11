@@ -213,7 +213,5 @@ declare global {
 
     type ServiceKeys = string & keyof BlockServices;
     type ConfigKeys = string & keyof BlockConfigs;
-
-    type Std = BlockStdScope;
   }
 }

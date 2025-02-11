@@ -94,8 +94,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:attachment': AttachmentBlockModel;
     }
-    interface BlockModels {
-      'affine:attachment': AttachmentBlockModel;
-    }
   }
 }

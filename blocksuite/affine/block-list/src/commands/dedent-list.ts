@@ -1,6 +1,6 @@
 import { ListBlockModel } from '@blocksuite/affine-model';
 import type { IndentContext } from '@blocksuite/affine-shared/types';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import { type Command, TextSelection } from '@blocksuite/block-std';
 
 import { correctNumberedListsOrderToPrev } from './utils.js';
@@ -54,7 +54,7 @@ export const canDedentListCommand: Command<
    * ccc
    */
   const model = store.getBlock(blockId)?.model;
-  if (!model || !matchFlavours(model, [ListBlockModel])) {
+  if (!model || !matchModels(model, [ListBlockModel])) {
     return;
   }
   /**

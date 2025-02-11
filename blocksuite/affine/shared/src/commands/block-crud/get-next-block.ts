@@ -1,8 +1,12 @@
-import type { BlockComponent, Command } from '@blocksuite/block-std';
+import type {
+  BlockComponent,
+  BlockStdScope,
+  Command,
+} from '@blocksuite/block-std';
 
 import { getNextContentBlock } from '../../utils/index.js';
 
-function getNextBlock(std: BlockSuite.Std, path: string) {
+function getNextBlock(std: BlockStdScope, path: string) {
   const view = std.view;
   const model = std.store.getBlock(path)?.model;
   if (!model) return null;

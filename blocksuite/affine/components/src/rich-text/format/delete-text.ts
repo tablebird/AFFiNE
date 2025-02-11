@@ -1,5 +1,5 @@
 import { RootBlockModel } from '@blocksuite/affine-model';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import { type Command, TextSelection } from '@blocksuite/block-std';
 import type { Text } from '@blocksuite/store';
 
@@ -25,7 +25,7 @@ export const deleteTextCommand: Command<{
   if (!fromElement) return;
 
   let fromText: Text | undefined;
-  if (matchFlavours(fromElement.model, [RootBlockModel])) {
+  if (matchModels(fromElement.model, [RootBlockModel])) {
     fromText = fromElement.model.title;
   } else {
     fromText = fromElement.model.text;

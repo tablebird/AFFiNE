@@ -134,7 +134,7 @@ export async function getTextContentFromBlockModels(
   // Currently only filter out images and databases
   const selectedTextModels = models.filter(
     model =>
-      !BlocksUtils.matchFlavours(model, [ImageBlockModel, DatabaseBlockModel])
+      !BlocksUtils.matchModels(model, [ImageBlockModel, DatabaseBlockModel])
   );
   const drafts = selectedTextModels.map(toDraftModel);
   drafts.forEach(draft => traverse(draft, drafts));
@@ -286,9 +286,7 @@ export const getSelectedNoteAnchor = (host: EditorHost, id: string) => {
   return host.querySelector(`affine-edgeless-note[data-block-id="${id}"]`);
 };
 
-export function getCopilotSelectedElems(
-  host: EditorHost
-): BlockSuite.EdgelessModel[] {
+export function getCopilotSelectedElems(host: EditorHost): GfxModel[] {
   const service = getService(host);
   const copilotWidget = getEdgelessCopilotWidget(host);
 

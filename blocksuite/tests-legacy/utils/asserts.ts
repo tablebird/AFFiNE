@@ -556,7 +556,7 @@ export async function assertBlockType(
 export async function assertBlockFlavour(
   page: Page,
   id: string | number,
-  flavour: BlockSuite.Flavour
+  flavour: string
 ) {
   const actual = await page.evaluate(
     ({ id }) => {

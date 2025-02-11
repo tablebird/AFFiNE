@@ -1,6 +1,10 @@
 /* oxlint-disable @typescript-eslint/no-non-null-assertion */
 import type { PointerEventState } from '@blocksuite/block-std';
-import { BaseTool, MouseButton } from '@blocksuite/block-std/gfx';
+import {
+  BaseTool,
+  type GfxModel,
+  MouseButton,
+} from '@blocksuite/block-std/gfx';
 import { IS_MAC } from '@blocksuite/global/env';
 import {
   Bound,
@@ -141,10 +145,7 @@ export class CopilotTool extends BaseTool {
     this.gfx.tool.setTool('default');
   }
 
-  updateDragPointsWith(
-    selectedElements: BlockSuite.EdgelessModel[],
-    padding = 0
-  ) {
+  updateDragPointsWith(selectedElements: GfxModel[], padding = 0) {
     const bounds = getCommonBoundWithRotation(selectedElements).expand(
       padding / this.gfx.viewport.zoom
     );
@@ -153,10 +154,7 @@ export class CopilotTool extends BaseTool {
     this.dragLastPoint = bounds.br as [number, number];
   }
 
-  updateSelectionWith(
-    selectedElements: BlockSuite.EdgelessModel[],
-    padding = 0
-  ) {
+  updateSelectionWith(selectedElements: GfxModel[], padding = 0) {
     const { selection } = this.gfx;
 
     selection.clear();

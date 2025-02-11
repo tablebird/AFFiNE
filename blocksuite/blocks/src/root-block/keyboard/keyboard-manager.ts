@@ -10,7 +10,7 @@ import {
   draftSelectedModelsCommand,
   getSelectedModelsCommand,
 } from '@blocksuite/affine-shared/commands';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import {
   type BlockComponent,
   BlockSelection,
@@ -38,7 +38,7 @@ export class PageKeyboardManager {
       const model = block.model;
 
       if (
-        matchFlavours(model, [ParagraphBlockModel]) &&
+        matchModels(model, [ParagraphBlockModel]) &&
         model.type.startsWith('h') &&
         model.collapsed
       ) {
@@ -134,7 +134,7 @@ export class PageKeyboardManager {
     const selectedModels = ctx.selectedModels?.filter(
       block =>
         !block.flavour.startsWith('affine:embed-') &&
-        matchFlavours(doc.getParent(block), [NoteBlockModel])
+        matchModels(doc.getParent(block), [NoteBlockModel])
     );
 
     const draftedModels = ctx.draftedModels;

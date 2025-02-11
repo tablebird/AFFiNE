@@ -20,7 +20,7 @@ import { ConfigIdentifier } from '../identifier.js';
  * ```
  */
 export function ConfigExtension(
-  flavor: BlockSuite.Flavour,
+  flavor: string,
   config: Record<string, unknown>
 ): ExtensionType {
   return {

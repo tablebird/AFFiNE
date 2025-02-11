@@ -27,8 +27,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:embed-loom': EmbedLoomModel;
     }
-    interface BlockModels {
-      'affine:embed-loom': EmbedLoomModel;
-    }
   }
 }

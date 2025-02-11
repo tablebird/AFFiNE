@@ -658,7 +658,7 @@ export class Store {
     );
   }
 
-  getSchemaByFlavour(flavour: BlockSuite.Flavour) {
+  getSchemaByFlavour(flavour: string) {
     return this._schema.flavourSchemaMap.get(flavour);
   }
 

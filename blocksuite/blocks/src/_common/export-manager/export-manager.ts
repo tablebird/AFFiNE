@@ -15,7 +15,7 @@ import {
 } from '@blocksuite/affine-shared/consts';
 import {
   isInsidePageEditor,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import {
   type BlockStdScope,
@@ -458,7 +458,7 @@ export class ExportManager {
       edgeless?.service.gfx.getElementsByBound(bound, { type: 'block' }) ??
       [];
     for (const block of blocks) {
-      if (matchFlavours(block, [ImageBlockModel])) {
+      if (matchModels(block, [ImageBlockModel])) {
         if (!block.sourceId) return;
 
         const blob = await block.doc.blobSync.get(block.sourceId);
@@ -495,7 +495,7 @@ export class ExportManager {
         );
       }
 
-      if (matchFlavours(block, [FrameBlockModel])) {
+      if (matchModels(block, [FrameBlockModel])) {
         // TODO(@L-Sun): use children of frame instead of bound
         const blocksInsideFrame = getBlocksInFrameBound(this.doc, block, false);
         const frameBound = Bound.deserialize(block.xywh);

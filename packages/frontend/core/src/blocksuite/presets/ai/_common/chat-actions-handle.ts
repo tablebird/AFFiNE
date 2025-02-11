@@ -36,7 +36,7 @@ import { reportResponse } from '../utils/action-reporter';
 import { insertBelow, replace } from '../utils/editor-actions';
 import { BlockIcon, CreateIcon, InsertBelowIcon, ReplaceIcon } from './icons';
 
-const { matchFlavours } = BlocksUtils;
+const { matchModels } = BlocksUtils;
 
 type Selections = {
   text?: TextSelection;
@@ -232,7 +232,7 @@ const REPLACE_SELECTION = {
     if (currentTextSelection) {
       const { doc } = host;
       const block = doc.getBlock(currentTextSelection.blockId);
-      if (matchFlavours(block?.model ?? null, [ParagraphBlockModel])) {
+      if (matchModels(block?.model ?? null, [ParagraphBlockModel])) {
         block?.model.text?.replace(
           currentTextSelection.from.index,
           currentTextSelection.from.length,

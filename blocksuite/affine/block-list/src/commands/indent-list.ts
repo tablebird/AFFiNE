@@ -2,7 +2,7 @@ import { ListBlockModel, ParagraphBlockModel } from '@blocksuite/affine-model';
 import type { IndentContext } from '@blocksuite/affine-shared/types';
 import {
   getNearestHeadingBefore,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import { type Command, TextSelection } from '@blocksuite/block-std';
 
@@ -55,7 +55,7 @@ export const canIndentListCommand: Command<
    * ccc
    */
   const model = store.getBlock(blockId)?.model;
-  if (!model || !matchFlavours(model, [ListBlockModel])) {
+  if (!model || !matchModels(model, [ListBlockModel])) {
     return;
   }
   const schema = std.store.schema;
@@ -126,7 +126,7 @@ export const indentListCommand: Command<{
   const nearestHeading = getNearestHeadingBefore(model);
   if (
     nearestHeading &&
-    matchFlavours(nearestHeading, [ParagraphBlockModel]) &&
+    matchModels(nearestHeading, [ParagraphBlockModel]) &&
     nearestHeading.collapsed
   ) {
     store.updateBlock(nearestHeading, {

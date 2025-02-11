@@ -2,7 +2,7 @@ import { focusTextModel } from '@blocksuite/affine-components/rich-text';
 import { ListBlockModel } from '@blocksuite/affine-model';
 import {
   getNextContinuousNumberedLists,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import type { Command, EditorHost } from '@blocksuite/block-std';
 
@@ -18,7 +18,7 @@ export const splitListCommand: Command<{
   const doc = host.doc;
 
   const model = doc.getBlock(blockId)?.model;
-  if (!model || !matchFlavours(model, [ListBlockModel])) {
+  if (!model || !matchModels(model, [ListBlockModel])) {
     console.error(`block ${blockId} is not a list block`);
     return;
   }

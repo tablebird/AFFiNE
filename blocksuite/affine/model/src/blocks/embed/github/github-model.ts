@@ -39,8 +39,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:embed-github': EmbedGithubModel;
     }
-    interface BlockModels {
-      'affine:embed-github': EmbedGithubModel;
-    }
   }
 }

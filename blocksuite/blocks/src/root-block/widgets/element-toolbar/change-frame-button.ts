@@ -25,7 +25,7 @@ import {
 } from '@blocksuite/affine-model';
 import { FeatureFlagService } from '@blocksuite/affine-shared/services';
 import type { ColorEvent } from '@blocksuite/affine-shared/utils';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import { GfxExtensionIdentifier } from '@blocksuite/block-std/gfx';
 import {
   countBy,
@@ -93,7 +93,7 @@ export class EdgelessChangeFrameButton extends WithDisposable(LitElement) {
     const rootModel = this.edgeless.doc.root;
     const notes = rootModel.children.filter(
       model =>
-        matchFlavours(model, [NoteBlockModel]) &&
+        matchModels(model, [NoteBlockModel]) &&
         model.displayMode !== NoteDisplayMode.EdgelessOnly
     );
     const lastNote = notes[notes.length - 1];

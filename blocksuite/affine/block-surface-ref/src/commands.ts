@@ -3,7 +3,7 @@ import {
   FrameBlockModel,
   type SurfaceRefProps,
 } from '@blocksuite/affine-model';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import type { Command } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
@@ -41,7 +41,7 @@ export const insertSurfaceRefBlockCommand: Command<
 
   if (element?.type === 'group') {
     surfaceRefProps.refFlavour = 'group';
-  } else if (matchFlavours(blockModel, [FrameBlockModel])) {
+  } else if (matchModels(blockModel, [FrameBlockModel])) {
     surfaceRefProps.refFlavour = 'frame';
   } else {
     console.error(`reference not found ${reference}`);

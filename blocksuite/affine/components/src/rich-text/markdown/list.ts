@@ -3,7 +3,7 @@ import {
   type ListType,
   ParagraphBlockModel,
 } from '@blocksuite/affine-model';
-import { matchFlavours, toNumberedList } from '@blocksuite/affine-shared/utils';
+import { matchModels, toNumberedList } from '@blocksuite/affine-shared/utils';
 import type { BlockStdScope } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
@@ -17,7 +17,7 @@ export function toList(
   prefix: string,
   otherProperties?: Partial<ListProps>
 ) {
-  if (!matchFlavours(model, [ParagraphBlockModel])) {
+  if (!matchModels(model, [ParagraphBlockModel])) {
     return;
   }
   const { store: doc } = std;

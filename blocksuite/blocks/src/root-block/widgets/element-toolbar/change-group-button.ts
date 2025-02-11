@@ -11,7 +11,7 @@ import {
   NoteBlockModel,
   NoteDisplayMode,
 } from '@blocksuite/affine-model';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import {
   deserializeXYWH,
   serializeXYWH,
@@ -31,7 +31,7 @@ export class EdgelessChangeGroupButton extends WithDisposable(LitElement) {
     const rootModel = this.edgeless.doc.root;
     const notes = rootModel.children.filter(
       model =>
-        matchFlavours(model, [NoteBlockModel]) &&
+        matchModels(model, [NoteBlockModel]) &&
         model.displayMode !== NoteDisplayMode.EdgelessOnly
     );
     const lastNote = notes[notes.length - 1];

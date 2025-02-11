@@ -4,7 +4,7 @@ import {
   type DropTarget,
   getClosestBlockComponentByPoint,
   isInsidePageEditor,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import {
   type BlockComponent,
@@ -59,7 +59,7 @@ export class FileDropExtension extends LifeCycleWatcher {
     const model = element.model;
     const parent = this.std.store.getParent(model);
 
-    if (!matchFlavours(parent, [SurfaceBlockModel])) {
+    if (!matchModels(parent, [SurfaceBlockModel])) {
       const point = this.point$.value;
       target = point && calcDropTarget(point, model, element);
     }
@@ -75,7 +75,7 @@ export class FileDropExtension extends LifeCycleWatcher {
     if (!rootModel) return null;
 
     let lastNote = rootModel.children[rootModel.children.length - 1];
-    if (!lastNote || !matchFlavours(lastNote, [NoteBlockModel])) {
+    if (!lastNote || !matchModels(lastNote, [NoteBlockModel])) {
       const newNoteId = this.doc.addBlock('affine:note', {}, rootModel.id);
       const newNote = this.doc.getBlock(newNoteId)?.model;
       if (!newNote) return null;

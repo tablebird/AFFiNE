@@ -1,13 +1,13 @@
 import { MindmapElementModel } from '@blocksuite/affine-model';
-import type { Viewport } from '@blocksuite/block-std/gfx';
+import type { GfxModel, Viewport } from '@blocksuite/block-std/gfx';
 
-export function isSingleMindMapNode(els: BlockSuite.EdgelessModel[]) {
+export function isSingleMindMapNode(els: GfxModel[]) {
   return els.length === 1 && els[0].group instanceof MindmapElementModel;
 }
 
 export function isElementOutsideViewport(
   viewport: Viewport,
-  element: BlockSuite.EdgelessModel,
+  element: GfxModel,
   padding: [number, number] = [0, 0]
 ) {
   const elementBound = element.elementBound;
@@ -25,7 +25,7 @@ export function isElementOutsideViewport(
 
 export function getNearestTranslation(
   viewport: Viewport,
-  element: BlockSuite.EdgelessModel,
+  element: GfxModel,
   padding: [number, number] = [0, 0]
 ) {
   const viewportBound = viewport.viewportBounds;

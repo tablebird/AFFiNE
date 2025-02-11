@@ -31,9 +31,7 @@ export const formatNativeCommand: Command<{
     .filter(el => {
       const block = el.closest<BlockComponent>(`[${BLOCK_ID_ATTR}]`);
       if (block) {
-        return FORMAT_NATIVE_SUPPORT_FLAVOURS.includes(
-          block.model.flavour as BlockSuite.Flavour
-        );
+        return FORMAT_NATIVE_SUPPORT_FLAVOURS.includes(block.model.flavour);
       }
       return false;
     })

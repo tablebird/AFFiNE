@@ -1,6 +1,6 @@
 /* oxlint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="./effects.ts" />
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import { deserializeXYWH, Point } from '@blocksuite/global/utils';
 
 import { splitElements } from './root-block/edgeless/utils/clipboard-utils.js';
@@ -142,7 +142,7 @@ export {
   getLastNoteBlock,
   isInsideEdgelessEditor,
   isInsidePageEditor,
-  matchFlavours,
+  matchModels,
   on,
   once,
   openFileOrFiles,
@@ -155,7 +155,7 @@ export type { DragBlockPayload } from '@blocksuite/affine-widget-drag-handle';
 
 export const BlocksUtils = {
   splitElements,
-  matchFlavours,
+  matchModels,
   deserializeXYWH,
   isCanvasElement,
   Point,

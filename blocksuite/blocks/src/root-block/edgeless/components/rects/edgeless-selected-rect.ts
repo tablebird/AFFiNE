@@ -958,11 +958,7 @@ export class EdgelessSelectedRectWidget extends WidgetComponent<
    * Related issue: https://linear.app/affine-design/issue/BS-1009/
    * @deprecated
    */
-  #adjustAIChat(
-    element: BlockSuite.EdgelessModel,
-    bound: Bound,
-    direction: HandleDirection
-  ) {
+  #adjustAIChat(element: GfxModel, bound: Bound, direction: HandleDirection) {
     const curBound = Bound.deserialize(element.xywh);
 
     let scale = 1;
@@ -1165,7 +1161,7 @@ export class EdgelessSelectedRectWidget extends WidgetComponent<
   }
 
   #adjustProportional(
-    element: BlockSuite.EdgelessModel,
+    element: GfxModel,
     bound: Bound,
     direction: HandleDirection
   ) {
@@ -1263,7 +1259,7 @@ export class EdgelessSelectedRectWidget extends WidgetComponent<
   }
 
   #adjustUseFallback(
-    element: BlockSuite.EdgelessModel,
+    element: GfxModel,
     bound: Bound,
     _direction: HandleDirection
   ) {
@@ -1293,7 +1289,7 @@ export class EdgelessSelectedRectWidget extends WidgetComponent<
     );
   }
 
-  private _isProportionalElement(element: BlockSuite.EdgelessModel) {
+  private _isProportionalElement(element: GfxModel) {
     return (
       isAttachmentBlock(element) ||
       isImageBlock(element) ||
@@ -1306,7 +1302,7 @@ export class EdgelessSelectedRectWidget extends WidgetComponent<
     );
   }
 
-  private _shouldRenderSelection(elements?: BlockSuite.EdgelessModel[]) {
+  private _shouldRenderSelection(elements?: GfxModel[]) {
     elements = elements ?? this.selection.selectedElements;
     return elements.length > 0 && !this.selection.editing;
   }

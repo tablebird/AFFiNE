@@ -21,8 +21,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:embed-html': EmbedHtmlModel;
     }
-    interface BlockModels {
-      'affine:embed-html': EmbedHtmlModel;
-    }
   }
 }

@@ -390,7 +390,7 @@ export class EdgelessFrameManager extends GfxExtension {
       .map(id => this.gfx.getElementById(id))
       .filter(element => element !== null);
 
-    return childElements as BlockSuite.EdgelessModel[];
+    return childElements as GfxModel[];
   }
 
   /**

@@ -1,5 +1,6 @@
 import type { MenuItemGroup } from '@blocksuite/affine-components/toolbar';
 import { renderGroups } from '@blocksuite/affine-components/toolbar';
+import type { GfxModel } from '@blocksuite/block-std/gfx';
 import { WithDisposable } from '@blocksuite/global/utils';
 import { MoreHorizontalIcon, MoreVerticalIcon } from '@blocksuite/icons/lit';
 import { html, LitElement } from 'lit';
@@ -39,7 +40,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
   accessor edgeless!: EdgelessRootBlockComponent;
 
   @property({ attribute: false })
-  accessor elements: BlockSuite.EdgelessModel[] = [];
+  accessor elements: GfxModel[] = [];
 
   @property({ attribute: false })
   accessor groups!: MenuItemGroup<ElementToolbarMoreMenuContext>[];

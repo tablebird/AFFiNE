@@ -10,7 +10,7 @@ import {
 } from '@blocksuite/affine-model';
 import {
   calculateCollapsedSiblings,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import { KeymapExtension, TextSelection } from '@blocksuite/block-std';
 import { IS_MAC } from '@blocksuite/global/env';
@@ -40,7 +40,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
 
         const { store } = std;
         const model = store.getBlock(text.from.blockId)?.model;
-        if (!model || !matchFlavours(model, [ParagraphBlockModel])) return;
+        if (!model || !matchModels(model, [ParagraphBlockModel])) return;
 
         const event = ctx.get('keyboardState').raw;
         event.preventDefault();
@@ -71,7 +71,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
         const text = std.selection.find(TextSelection);
         if (!text) return;
         const model = store.getBlock(text.from.blockId)?.model;
-        if (!model || !matchFlavours(model, [ParagraphBlockModel])) return;
+        if (!model || !matchModels(model, [ParagraphBlockModel])) return;
         const inlineEditor = getInlineEditorByModel(
           std.host,
           text.from.blockId
@@ -98,7 +98,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
         const text = std.selection.find(TextSelection);
         if (!text) return;
         const model = store.getBlock(text.from.blockId)?.model;
-        if (!model || !matchFlavours(model, [ParagraphBlockModel])) return;
+        if (!model || !matchModels(model, [ParagraphBlockModel])) return;
         const inlineEditor = getInlineEditorByModel(
           std.host,
           text.from.blockId
@@ -151,7 +151,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
 
           const rightText = model.text.split(range.index);
           const newId = store.addBlock(
-            model.flavour as BlockSuite.Flavour,
+            model.flavour,
             { type: model.type, text: rightText },
             parent,
             index + collapsedSiblings.length + 1

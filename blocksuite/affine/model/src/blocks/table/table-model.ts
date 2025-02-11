@@ -56,11 +56,3 @@ export const TableBlockSchema = defineBlockSchema({
   },
   toModel: () => new TableBlockModel(),
 });
-
-declare global {
-  namespace BlockSuite {
-    interface BlockModels {
-      [TableModelFlavour]: TableBlockModel;
-    }
-  }
-}

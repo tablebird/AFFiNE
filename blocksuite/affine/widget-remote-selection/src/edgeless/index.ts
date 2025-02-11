@@ -7,7 +7,10 @@ import {
   requestThrottledConnectedFrame,
 } from '@blocksuite/affine-shared/utils';
 import { WidgetComponent } from '@blocksuite/block-std';
-import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
+import {
+  GfxControllerIdentifier,
+  type GfxModel,
+} from '@blocksuite/block-std/gfx';
 import { pickValues } from '@blocksuite/global/utils';
 import type { UserInfo } from '@blocksuite/store';
 import { css, html, nothing } from 'lit';
@@ -118,7 +121,7 @@ export class EdgelessRemoteSelectionWidget extends WidgetComponent<RootBlockMode
 
         const elements = selection.elements
           .map(id => this.crud.getElementById(id))
-          .filter(element => element) as BlockSuite.EdgelessModel[];
+          .filter(element => element) as GfxModel[];
         const rect = getSelectedRect(elements);
 
         if (rect.width === 0 || rect.height === 0) return;

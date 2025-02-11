@@ -21,7 +21,7 @@ import type { WidgetViewMapType } from '../spec/type.js';
  * });
  */
 export function WidgetViewMapExtension(
-  flavour: BlockSuite.Flavour,
+  flavour: string,
   widgetViewMap: WidgetViewMapType
 ): ExtensionType {
   return {

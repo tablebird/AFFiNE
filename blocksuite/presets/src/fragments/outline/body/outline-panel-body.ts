@@ -2,7 +2,7 @@ import { effects } from '@blocksuite/affine-block-note/effects';
 import { ShadowlessElement, SurfaceSelection } from '@blocksuite/block-std';
 import {
   changeNoteDisplayMode,
-  matchFlavours,
+  matchModels,
   NoteBlockModel,
   NoteDisplayMode,
 } from '@blocksuite/blocks';
@@ -155,7 +155,7 @@ export class OutlinePanelBody extends SignalWatcher(
 
     const noteIndex = new Map<NoteBlockModel, number>();
     children.forEach((block, index) => {
-      if (matchFlavours(block, [NoteBlockModel])) {
+      if (matchModels(block, [NoteBlockModel])) {
         noteIndex.set(block, index);
       }
     });
@@ -171,7 +171,7 @@ export class OutlinePanelBody extends SignalWatcher(
     if (targetIndex === null) return;
 
     const removeSelectedNoteFilter = (block: BlockModel) =>
-      !matchFlavours(block, [NoteBlockModel]) || !selected.includes(block);
+      !matchModels(block, [NoteBlockModel]) || !selected.includes(block);
 
     const leftPart = children
       .slice(0, targetIndex)
@@ -200,7 +200,7 @@ export class OutlinePanelBody extends SignalWatcher(
   private _selectNote(e: SelectEvent) {
     const { selected, id, multiselect } = e.detail;
     const note = this.doc.getBlock(id)?.model;
-    if (!note || !matchFlavours(note, [NoteBlockModel])) return;
+    if (!note || !matchModels(note, [NoteBlockModel])) return;
 
     let selectedNotes = this._selectedNotes$.peek();
 
@@ -231,7 +231,7 @@ export class OutlinePanelBody extends SignalWatcher(
         .filter(SurfaceSelection)
         .map(({ blockId }) => doc.getBlock(blockId)?.model)
         .filter(model => {
-          return !!model && matchFlavours(model, [NoteBlockModel]);
+          return !!model && matchModels(model, [NoteBlockModel]);
         });
 
       const preSelected = this._selectedNotes$.peek();

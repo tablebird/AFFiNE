@@ -4,7 +4,7 @@ import type {
 } from '@blocksuite/affine-block-surface';
 import { getSurfaceBlock, Overlay } from '@blocksuite/affine-block-surface';
 import type { ConnectorElementModel } from '@blocksuite/affine-model';
-import type { GfxController } from '@blocksuite/block-std/gfx';
+import type { GfxController, GfxModel } from '@blocksuite/block-std/gfx';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import { Bound, Point } from '@blocksuite/global/utils';
 
@@ -413,10 +413,7 @@ export class EdgelessSnapManager extends Overlay {
     });
   }
 
-  setupAlignables(
-    alignables: BlockSuite.EdgelessModel[],
-    exclude: BlockSuite.EdgelessModel[] = []
-  ): Bound {
+  setupAlignables(alignables: GfxModel[], exclude: GfxModel[] = []): Bound {
     if (alignables.length === 0) return new Bound();
 
     const connectors = alignables.filter(isConnectable).reduce((prev, el) => {
@@ -437,20 +434,17 @@ export class EdgelessSnapManager extends Overlay {
     const canvasElements = this.gfx.layer.canvasElements;
     const excludes = new Set([...alignables, ...exclude, ...connectors]);
     this._alignableBounds = [];
-    (
-      [
-        ...this.gfx.layer.blocks,
-        ...canvasElements,
-      ] as BlockSuite.EdgelessModel[]
-    ).forEach(alignable => {
-      const bounds = alignable.elementBound;
-      if (
-        viewportBounds.isOverlapWithBound(bounds) &&
-        !excludes.has(alignable)
-      ) {
-        this._alignableBounds.push(bounds);
+    ([...this.gfx.layer.blocks, ...canvasElements] as GfxModel[]).forEach(
+      alignable => {
+        const bounds = alignable.elementBound;
+        if (
+          viewportBounds.isOverlapWithBound(bounds) &&
+          !excludes.has(alignable)
+        ) {
+          this._alignableBounds.push(bounds);
+        }
       }
-    });
+    );
 
     return alignables.reduce((prev, element) => {
       const bounds = element.elementBound;

@@ -1,6 +1,6 @@
 import { correctNumberedListsOrderToPrev } from '@blocksuite/affine-block-list';
 import { ListBlockModel } from '@blocksuite/affine-model';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import type { BlockStdScope } from '@blocksuite/block-std';
 import type { TransformerMiddleware } from '@blocksuite/store';
 
@@ -10,10 +10,7 @@ export const reorderList =
     slots.afterImport.on(payload => {
       if (payload.type === 'block') {
         const model = payload.model;
-        if (
-          matchFlavours(model, [ListBlockModel]) &&
-          model.type === 'numbered'
-        ) {
+        if (matchModels(model, [ListBlockModel]) && model.type === 'numbered') {
           const next = std.store.getNext(model);
           correctNumberedListsOrderToPrev(std.store, model);
           if (next) {

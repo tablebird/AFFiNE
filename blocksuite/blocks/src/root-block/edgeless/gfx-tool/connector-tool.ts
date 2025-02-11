@@ -18,7 +18,7 @@ import {
 } from '@blocksuite/affine-model';
 import { TelemetryProvider } from '@blocksuite/affine-shared/services';
 import type { PointerEventState } from '@blocksuite/block-std';
-import { BaseTool } from '@blocksuite/block-std/gfx';
+import { BaseTool, type GfxModel } from '@blocksuite/block-std/gfx';
 import type { IBound, IVec } from '@blocksuite/global/utils';
 import { Bound } from '@blocksuite/global/utils';
 
@@ -189,7 +189,7 @@ export class ConnectorTool extends BaseTool<ConnectorToolOptions> {
     this._overlay?.clear();
   }
 
-  quickConnect(point: IVec, element: BlockSuite.EdgelessModel) {
+  quickConnect(point: IVec, element: GfxModel) {
     this._startPoint = this.gfx.viewport.toModelCoord(point[0], point[1]);
     this._mode = ConnectorToolMode.Quick;
     this._sourceBounds = Bound.deserialize(element.xywh);

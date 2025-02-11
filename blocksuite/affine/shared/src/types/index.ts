@@ -52,10 +52,7 @@ export type EmbedOptions = {
 export type IndentContext = {
   blockId: string;
   inlineIndex: number;
-  flavour: Extract<
-    keyof BlockSuite.BlockModels,
-    'affine:paragraph' | 'affine:list'
-  >;
+  flavour: string;
   type: 'indent' | 'dedent';
 };
 

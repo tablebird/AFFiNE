@@ -1,6 +1,6 @@
 import {
   BlocksUtils,
-  matchFlavours,
+  matchModels,
   NoteBlockModel,
   NoteDisplayMode,
   ParagraphBlockModel,
@@ -24,7 +24,7 @@ export function getNotesFromDoc(
   const notes: NoteBlockModel[] = [];
 
   rootModel.children.forEach(block => {
-    if (!matchFlavours(block, [NoteBlockModel])) return;
+    if (!matchModels(block, [NoteBlockModel])) return;
 
     if (modes.includes(block.displayMode$.value)) {
       notes.push(block);
@@ -35,14 +35,14 @@ export function getNotesFromDoc(
 }
 
 export function isRootBlock(block: BlockModel): block is RootBlockModel {
-  return BlocksUtils.matchFlavours(block, [RootBlockModel]);
+  return BlocksUtils.matchModels(block, [RootBlockModel]);
 }
 
 export function isHeadingBlock(
   block: BlockModel
 ): block is ParagraphBlockModel {
   return (
-    BlocksUtils.matchFlavours(block, [ParagraphBlockModel]) &&
+    BlocksUtils.matchModels(block, [ParagraphBlockModel]) &&
     headingKeys.has(block.type$.value)
   );
 }

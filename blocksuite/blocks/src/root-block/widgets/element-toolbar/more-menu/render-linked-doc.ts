@@ -4,7 +4,7 @@ import { NoteDisplayMode } from '@blocksuite/affine-model';
 import { DocModeProvider } from '@blocksuite/affine-shared/services';
 import { getBlockProps } from '@blocksuite/affine-shared/utils';
 import type { EditorHost } from '@blocksuite/block-std';
-import { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
+import { GfxBlockElementModel, type GfxModel } from '@blocksuite/block-std/gfx';
 import { type BlockModel, type Store, Text } from '@blocksuite/store';
 
 import {
@@ -17,11 +17,7 @@ import { isFrameBlock } from '../../../edgeless/utils/query.js';
 function addBlocksToDoc(targetDoc: Store, model: BlockModel, parentId: string) {
   // Add current block to linked doc
   const blockProps = getBlockProps(model);
-  const newModelId = targetDoc.addBlock(
-    model.flavour as BlockSuite.Flavour,
-    blockProps,
-    parentId
-  );
+  const newModelId = targetDoc.addBlock(model.flavour, blockProps, parentId);
   // Add children to linked doc, parent is the new model
   const children = model.children;
   if (children.length > 0) {
@@ -64,7 +60,7 @@ export function createLinkedDocFromNote(
 
 export function createLinkedDocFromEdgelessElements(
   host: EditorHost,
-  elements: BlockSuite.EdgelessModel[],
+  elements: GfxModel[],
   docTitle?: string
 ) {
   const linkedDoc = host.doc.workspace.createDoc({});
@@ -93,11 +89,7 @@ export function createLinkedDocFromEdgelessElements(
             mapFrameIds(blockProps as unknown as FrameBlockModel, ids);
           }
 
-          newId = linkedDoc.addBlock(
-            model.flavour as BlockSuite.Flavour,
-            blockProps,
-            surfaceId
-          );
+          newId = linkedDoc.addBlock(model.flavour, blockProps, surfaceId);
         }
       } else {
         const props = getElementProps(model, ids);

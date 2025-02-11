@@ -1,9 +1,6 @@
 import { CodeBlockModel } from '@blocksuite/affine-model';
 import { BRACKET_PAIRS } from '@blocksuite/affine-shared/consts';
-import {
-  createDefaultDoc,
-  matchFlavours,
-} from '@blocksuite/affine-shared/utils';
+import { createDefaultDoc, matchModels } from '@blocksuite/affine-shared/utils';
 import {
   type BlockStdScope,
   TextSelection,
@@ -29,7 +26,7 @@ export const bracketKeymap = (
           if (!textSelection) return;
           const model = doc.getBlock(textSelection.from.blockId)?.model;
           if (!model) return;
-          if (!matchFlavours(model, [CodeBlockModel])) return;
+          if (!matchModels(model, [CodeBlockModel])) return;
           const inlineEditor = getInlineEditorByModel(
             std.host,
             textSelection.from.blockId
@@ -56,7 +53,7 @@ export const bracketKeymap = (
           const model = doc.getBlock(textSelection.from.blockId)?.model;
           if (!model) return;
 
-          const isCodeBlock = matchFlavours(model, [CodeBlockModel]);
+          const isCodeBlock = matchModels(model, [CodeBlockModel]);
           // When selection is collapsed, only trigger auto complete in code block
           if (textSelection.isCollapsed() && !isCodeBlock) return;
           if (!textSelection.isInSameBlock()) return;

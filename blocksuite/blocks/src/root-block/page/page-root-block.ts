@@ -14,7 +14,7 @@ import {
   getClosestBlockComponentByPoint,
   getDocTitleInlineEditor,
   getScrollContainer,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import type { PointerEventState } from '@blocksuite/block-std';
 import {
@@ -128,11 +128,7 @@ export class PageRootBlockComponent extends BlockComponent<
   focusFirstParagraph = (): { id: string; created: boolean } => {
     const defaultNote = this._getDefaultNoteBlock();
     const firstText = defaultNote?.children.find(block =>
-      matchFlavours(block, [
-        ParagraphBlockModel,
-        ListBlockModel,
-        CodeBlockModel,
-      ])
+      matchModels(block, [ParagraphBlockModel, ListBlockModel, CodeBlockModel])
     );
     if (firstText) {
       focusTextModel(this.std, firstText.id);
@@ -248,7 +244,7 @@ export class PageRootBlockComponent extends BlockComponent<
       'Mod-a': () => {
         const blocks = this.model.children
           .filter(model => {
-            if (matchFlavours(model, [NoteBlockModel])) {
+            if (matchModels(model, [NoteBlockModel])) {
               if (model.displayMode === NoteDisplayMode.EdgelessOnly)
                 return false;
 
@@ -394,7 +390,7 @@ export class PageRootBlockComponent extends BlockComponent<
         .slice()
         .reverse()
         .find(child => {
-          const isNote = matchFlavours(child, [NoteBlockModel]);
+          const isNote = matchModels(child, [NoteBlockModel]);
           if (!isNote) return false;
           const displayOnDoc =
             !!child.displayMode &&
@@ -410,9 +406,7 @@ export class PageRootBlockComponent extends BlockComponent<
         const last = lastNote.children.at(-1);
         if (
           !last ||
-          !(
-            matchFlavours(last, [ParagraphBlockModel]) && last.text.length === 0
-          )
+          !(matchModels(last, [ParagraphBlockModel]) && last.text.length === 0)
         ) {
           if (readonly) return;
           const paragraphId = this.doc.addBlock(
@@ -452,7 +446,7 @@ export class PageRootBlockComponent extends BlockComponent<
   override firstUpdated() {
     this._initViewportResizeEffect();
     const noteModels = this.model.children.filter(model =>
-      matchFlavours(model, [NoteBlockModel])
+      matchModels(model, [NoteBlockModel])
     );
     noteModels.forEach(note => {
       this.disposables.add(
@@ -473,7 +467,7 @@ export class PageRootBlockComponent extends BlockComponent<
     )}`;
 
     const children = this.renderChildren(this.model, child => {
-      const isNote = matchFlavours(child, [NoteBlockModel]);
+      const isNote = matchModels(child, [NoteBlockModel]);
       const note = child as NoteBlockModel;
       const displayOnEdgeless =
         !!note.displayMode && note.displayMode === NoteDisplayMode.EdgelessOnly;

@@ -1,6 +1,6 @@
 import { NoteBlockModel, NoteDisplayMode } from '@blocksuite/affine-model';
 import { FeatureFlagService } from '@blocksuite/affine-shared/services';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import type { BlockStdScope } from '@blocksuite/block-std';
 
 /**
@@ -11,7 +11,7 @@ export function isPageBlock(std: BlockStdScope, note: NoteBlockModel) {
     std.get(FeatureFlagService).getFlag('enable_page_block') &&
     note.parent?.children.find(
       child =>
-        matchFlavours(child, [NoteBlockModel]) &&
+        matchModels(child, [NoteBlockModel]) &&
         child.displayMode !== NoteDisplayMode.EdgelessOnly
     ) === note
   );

@@ -25,8 +25,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:embed-figma': EmbedFigmaModel;
     }
-    interface BlockModels {
-      'affine:embed-figma': EmbedFigmaModel;
-    }
   }
 }

@@ -1,9 +1,10 @@
 import type { BlockComponent, EditorHost } from '@blocksuite/affine/block-std';
+import type { GfxModel } from '@blocksuite/affine/block-std/gfx';
 import {
   AFFINE_EDGELESS_COPILOT_WIDGET,
   type EdgelessCopilotWidget,
   type EdgelessRootService,
-  matchFlavours,
+  matchModels,
   MindmapElementModel,
   NoteBlockModel,
   RootBlockModel,
@@ -32,13 +33,13 @@ export function mindMapToMarkdown(mindmap: MindmapElementModel) {
   return markdownStr;
 }
 
-export function isMindMapRoot(ele: BlockSuite.EdgelessModel) {
+export function isMindMapRoot(ele: GfxModel) {
   const group = ele?.group;
 
   return group instanceof MindmapElementModel && group.tree.element === ele;
 }
 
-export function isMindmapChild(ele: BlockSuite.EdgelessModel) {
+export function isMindmapChild(ele: GfxModel) {
   return ele?.group instanceof MindmapElementModel && !isMindMapRoot(ele);
 }
 
@@ -65,10 +66,10 @@ export function getEdgelessCopilotWidget(
 export function findNoteBlockModel(blockElement: BlockComponent) {
   let curBlock = blockElement;
   while (curBlock) {
-    if (matchFlavours(curBlock.model, [NoteBlockModel])) {
+    if (matchModels(curBlock.model, [NoteBlockModel])) {
       return curBlock.model;
     }
-    if (matchFlavours(curBlock.model, [RootBlockModel, SurfaceBlockModel])) {
+    if (matchModels(curBlock.model, [RootBlockModel, SurfaceBlockModel])) {
       return null;
     }
     if (!curBlock.parentComponent) {

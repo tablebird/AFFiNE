@@ -8,7 +8,7 @@ type ModelList<T> =
       : never
     : never;
 
-export function matchFlavours<
+export function matchModels<
   const Model extends ConstructorType<BlockModel>[],
   U extends ModelList<Model>[number] = ModelList<Model>[number],
 >(model: unknown, expected: Model): model is U {

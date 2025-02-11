@@ -63,8 +63,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:bookmark': BookmarkBlockModel;
     }
-    interface BlockModels {
-      'affine:bookmark': BookmarkBlockModel;
-    }
   }
 }

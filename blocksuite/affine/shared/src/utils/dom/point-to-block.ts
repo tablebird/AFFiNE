@@ -6,7 +6,7 @@ import type { BlockModel } from '@blocksuite/store';
 
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../../consts/index.js';
 import { clamp } from '../math.js';
-import { matchFlavours } from '../model/checker.js';
+import { matchModels } from '../model/checker.js';
 
 const ATTR_SELECTOR = `[${BLOCK_ID_ATTR}]`;
 
@@ -36,7 +36,7 @@ function hasBlockId(element: Element): element is BlockComponent {
  * Returns `true` if element is default/edgeless page or note.
  */
 function isRootOrNoteOrSurface(element: BlockComponent) {
-  return matchFlavours(element.model, [
+  return matchModels(element.model, [
     RootBlockModel,
     NoteBlockModel,
     SurfaceBlockModel,

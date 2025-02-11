@@ -2,7 +2,6 @@ import type {
   GfxBlockElementModel,
   GfxGroupLikeElementModel,
   GfxLocalElementModel,
-  GfxModel,
   GfxPrimitiveElementModel,
 } from '@blocksuite/block-std/gfx';
 
@@ -13,8 +12,6 @@ declare global {
     type EdgelessBlockModelType =
       | EdgelessBlockModelMap[EdgelessBlockModelKeyType]
       | GfxBlockElementModel;
-
-    type EdgelessModel = GfxModel;
 
     interface EdgelessTextModelMap {}
     type EdgelessTextModelKeyType = keyof EdgelessTextModelMap;

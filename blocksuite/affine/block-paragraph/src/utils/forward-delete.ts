@@ -11,7 +11,7 @@ import {
 import { EMBED_BLOCK_MODEL_LIST } from '@blocksuite/affine-shared/consts';
 import {
   getNextContentBlock,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import {
   BlockSelection,
@@ -25,7 +25,7 @@ export function forwardDelete(std: BlockStdScope) {
   if (!text) return;
   const isCollapsed = text.isCollapsed();
   const model = store.getBlock(text.from.blockId)?.model;
-  if (!model || !matchFlavours(model, [ParagraphBlockModel])) return;
+  if (!model || !matchModels(model, [ParagraphBlockModel])) return;
   const isEnd = isCollapsed && text.from.index === model.text.length;
   if (!isEnd) return;
   const parent = store.getParent(model);
@@ -34,7 +34,7 @@ export function forwardDelete(std: BlockStdScope) {
   const nextSibling = store.getNext(model);
 
   if (
-    matchFlavours(nextSibling, [
+    matchModels(nextSibling, [
       AttachmentBlockModel,
       BookmarkBlockModel,
       DatabaseBlockModel,
@@ -50,7 +50,7 @@ export function forwardDelete(std: BlockStdScope) {
     return true;
   }
 
-  if (matchFlavours(nextSibling, [ParagraphBlockModel, ListBlockModel])) {
+  if (matchModels(nextSibling, [ParagraphBlockModel, ListBlockModel])) {
     model.text.join(nextSibling.text);
     if (nextSibling.children) {
       const parent = store.getParent(nextSibling);

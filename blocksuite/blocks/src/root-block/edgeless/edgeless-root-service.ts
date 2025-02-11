@@ -169,7 +169,7 @@ export class EdgelessRootService extends RootService implements SurfaceContext {
     );
   }
 
-  createGroup(elements: BlockSuite.EdgelessModel[] | string[]) {
+  createGroup(elements: GfxModel[] | string[]) {
     const groups = this.elements.filter(
       el => el.type === 'group'
     ) as GroupElementModel[];
@@ -277,7 +277,7 @@ export class EdgelessRootService extends RootService implements SurfaceContext {
     return this.layer.generateIndex();
   }
 
-  getConnectors(element: BlockSuite.EdgelessModel | string) {
+  getConnectors(element: GfxModel | string) {
     const id = typeof element === 'string' ? element : element.id;
 
     return this.surface.getConnectors(id) as ConnectorElementModel[];
@@ -298,11 +298,11 @@ export class EdgelessRootService extends RootService implements SurfaceContext {
     x: number,
     y: number,
     options?: PointTestOptions
-  ): BlockSuite.EdgelessModel | null {
+  ): GfxModel | null {
     return this.gfx.getElementInGroup(x, y, options);
   }
 
-  removeElement(id: string | BlockSuite.EdgelessModel) {
+  removeElement(id: string | GfxModel) {
     id = typeof id === 'string' ? id : id.id;
 
     const el = this.crud.getElementById(id);
@@ -323,10 +323,7 @@ export class EdgelessRootService extends RootService implements SurfaceContext {
     }
   }
 
-  reorderElement(
-    element: BlockSuite.EdgelessModel,
-    direction: ReorderingDirection
-  ) {
+  reorderElement(element: GfxModel, direction: ReorderingDirection) {
     const index = this.layer.getReorderedIndex(element, direction);
 
     // block should be updated in transaction

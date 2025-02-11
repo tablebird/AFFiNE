@@ -15,11 +15,3 @@ type Props = {
 };
 
 export class DividerBlockModel extends BlockModel<Props> {}
-
-declare global {
-  namespace BlockSuite {
-    interface BlockModels {
-      'affine:divider': DividerBlockModel;
-    }
-  }
-}

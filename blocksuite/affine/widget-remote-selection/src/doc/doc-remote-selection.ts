@@ -8,7 +8,7 @@ import {
 } from '@blocksuite/affine-model';
 import { getSelectionRectsCommand } from '@blocksuite/affine-shared/commands';
 import { EMBED_BLOCK_MODEL_LIST } from '@blocksuite/affine-shared/consts';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import {
   BlockSelection,
   TextSelection,
@@ -76,7 +76,7 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
   private get _config(): DocRemoteSelectionConfig {
     return {
       blockSelectionBackgroundTransparent: block => {
-        return matchFlavours(block, [
+        return matchModels(block, [
           CodeBlockModel,
           DatabaseBlockModel,
           ImageBlockModel,

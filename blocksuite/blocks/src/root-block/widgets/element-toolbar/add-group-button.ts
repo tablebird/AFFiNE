@@ -3,6 +3,7 @@ import {
   GroupElementModel,
   MindmapElementModel,
 } from '@blocksuite/affine-model';
+import type { GfxModel } from '@blocksuite/block-std/gfx';
 import { WithDisposable } from '@blocksuite/global/utils';
 import { css, html, LitElement, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
@@ -39,7 +40,7 @@ export class EdgelessAddGroupButton extends WithDisposable(LitElement) {
 
 export function renderAddGroupButton(
   edgeless: EdgelessRootBlockComponent,
-  elements: BlockSuite.EdgelessModel[]
+  elements: GfxModel[]
 ) {
   if (elements.length < 2) return nothing;
   if (elements[0] instanceof GroupElementModel) return nothing;

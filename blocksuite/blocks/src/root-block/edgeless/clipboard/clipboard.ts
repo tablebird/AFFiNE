@@ -29,7 +29,7 @@ import {
   isInsidePageEditor,
   isTopLevelBlock,
   isUrlInClipboard,
-  matchFlavours,
+  matchModels,
   referenceToNode,
 } from '@blocksuite/affine-shared/utils';
 import type {
@@ -41,6 +41,7 @@ import type {
 import {
   compareLayer,
   type GfxCompatibleProps,
+  type GfxModel,
   type SerializedElement,
   SortOrder,
 } from '@blocksuite/block-std/gfx';
@@ -995,7 +996,7 @@ export class EdgelessClipboardController extends PageClipboard {
     for (const nodeElement of nodeElements) {
       await _drawTopLevelBlock(nodeElement);
 
-      if (matchFlavours(nodeElement, [FrameBlockModel])) {
+      if (matchModels(nodeElement, [FrameBlockModel])) {
         const blocksInsideFrame: BlockSuite.EdgelessBlockModelType[] = [];
         this.edgeless.service.frame
           .getElementsInFrameBound(nodeElement, false)
@@ -1153,21 +1154,21 @@ export class EdgelessClipboardController extends PageClipboard {
   }
 
   private _updatePastedElementsIndex(
-    elements: BlockSuite.EdgelessModel[],
+    elements: GfxModel[],
     originalIndexes: Map<string, string>
   ) {
-    function compare(a: BlockSuite.EdgelessModel, b: BlockSuite.EdgelessModel) {
+    function compare(a: GfxModel, b: GfxModel) {
       if (a instanceof SurfaceGroupLikeModel && a.hasDescendant(b)) {
         return SortOrder.BEFORE;
       } else if (b instanceof SurfaceGroupLikeModel && b.hasDescendant(a)) {
         return SortOrder.AFTER;
       } else {
-        const aGroups = a.groups as BlockSuite.SurfaceGroupLikeModel[];
-        const bGroups = b.groups as BlockSuite.SurfaceGroupLikeModel[];
+        const aGroups = a.groups as SurfaceGroupLikeModel[];
+        const bGroups = b.groups as SurfaceGroupLikeModel[];
 
         let i = 1;
-        let aGroup: BlockSuite.EdgelessModel | undefined = nToLast(aGroups, i);
-        let bGroup: BlockSuite.EdgelessModel | undefined = nToLast(bGroups, i);
+        let aGroup: GfxModel | undefined = nToLast(aGroups, i);
+        let bGroup: GfxModel | undefined = nToLast(bGroups, i);
 
         while (aGroup === bGroup && aGroup) {
           ++i;
@@ -1246,7 +1247,7 @@ export class EdgelessClipboardController extends PageClipboard {
 
     const blockModels: BlockSuite.EdgelessBlockModelType[] = [];
     const canvasElements: BlockSuite.SurfaceModel[] = [];
-    const allElements: BlockSuite.EdgelessModel[] = [];
+    const allElements: GfxModel[] = [];
 
     for (const data of elementsRawData) {
       const { data: blockSnapshot } = BlockSnapshotSchema.safeParse(data);
@@ -1371,7 +1372,7 @@ export class EdgelessClipboardController extends PageClipboard {
 }
 
 export async function prepareClipboardData(
-  selectedAll: BlockSuite.EdgelessModel[],
+  selectedAll: GfxModel[],
   std: BlockStdScope
 ) {
   const job = new Transformer({

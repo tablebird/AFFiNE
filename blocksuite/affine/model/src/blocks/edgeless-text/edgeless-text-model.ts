@@ -82,10 +82,6 @@ export class EdgelessTextBlockModel
 
 declare global {
   namespace BlockSuite {
-    interface BlockModels {
-      'affine:edgeless-text': EdgelessTextBlockModel;
-    }
-
     interface EdgelessBlockModelMap {
       'affine:edgeless-text': EdgelessTextBlockModel;
     }

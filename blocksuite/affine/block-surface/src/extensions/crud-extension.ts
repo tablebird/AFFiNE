@@ -1,6 +1,9 @@
 import { EditPropsStore } from '@blocksuite/affine-shared/services';
 import { type BlockStdScope, StdIdentifier } from '@blocksuite/block-std';
-import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
+import {
+  GfxControllerIdentifier,
+  type GfxModel,
+} from '@blocksuite/block-std/gfx';
 import { type Container, createIdentifier } from '@blocksuite/global/di';
 import { type BlockModel, Extension } from '@blocksuite/store';
 
@@ -30,7 +33,7 @@ export class EdgelessCRUDExtension extends Extension {
     return this._gfx.surface as SurfaceBlockModel | null;
   }
 
-  deleteElements = (elements: BlockSuite.EdgelessModel[]) => {
+  deleteElements = (elements: GfxModel[]) => {
     const surface = this._surface;
     if (!surface) {
       console.error('surface is not initialized');
@@ -134,7 +137,7 @@ export class EdgelessCRUDExtension extends Extension {
     }
   };
 
-  getElementById(id: string): BlockSuite.EdgelessModel | null {
+  getElementById(id: string): GfxModel | null {
     const surface = this._surface;
     if (!surface) {
       return null;

@@ -28,7 +28,7 @@ import {
   getBlockComponentsExcludeSubtrees,
   getRectByBlockComponent,
   getScrollContainer,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import {
   type BlockComponent,
@@ -161,17 +161,17 @@ export class DragEventWatcher {
       !snapshot ||
       snapshot.content.length === 0 ||
       !dragPayload?.from ||
-      matchFlavours(model, [DatabaseBlockModel])
+      matchModels(model, [DatabaseBlockModel])
     )
       return null;
 
-    const isDropOnNoteBlock = matchFlavours(model, [NoteBlockModel]);
+    const isDropOnNoteBlock = matchModels(model, [NoteBlockModel]);
 
     const edge = dropPayload.edge;
     const scale = this.widget.scale.peek();
     let result: DropResult;
 
-    if (edge === 'right' && matchFlavours(dropBlock.model, [ListBlockModel])) {
+    if (edge === 'right' && matchModels(dropBlock.model, [ListBlockModel])) {
       const domRect = getRectByBlockComponent(dropBlock);
       const placement = 'in';
       const rect = Rect.fromLWTH(
@@ -373,7 +373,7 @@ export class DragEventWatcher {
       result.placement === 'in' ? model : this.std.store.getParent(model);
 
     if (!parent) return;
-    if (matchFlavours(parent, [SurfaceBlockModel])) {
+    if (matchModels(parent, [SurfaceBlockModel])) {
       return;
     }
 
@@ -383,7 +383,7 @@ export class DragEventWatcher {
         : parent.children.indexOf(model) +
           (result.placement === 'before' ? 0 : 1);
 
-    if (matchFlavours(parent, [NoteBlockModel])) {
+    if (matchModels(parent, [NoteBlockModel])) {
       const [first] = snapshot.content;
       if (first.flavour === 'affine:note') {
         if (parent.id !== first.id) {
@@ -685,7 +685,7 @@ export class DragEventWatcher {
       })
     );
 
-    if (matchFlavours(view.model, [AttachmentBlockModel, BookmarkBlockModel])) {
+    if (matchModels(view.model, [AttachmentBlockModel, BookmarkBlockModel])) {
       cleanups.push(this._makeDraggable(view));
     }
 

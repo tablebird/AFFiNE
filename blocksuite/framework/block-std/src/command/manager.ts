@@ -8,7 +8,7 @@ import type { Chain, Command, InitCommandCtx } from './types.js';
  * Commands are functions that take a context and a next function as arguments
  *
  * ```ts
- * const myCommand: Command<'count', 'count'> = (ctx, next) => {
+ * const myCommand: Command<input, output> = (ctx, next) => {
  *  const count = ctx.count || 0;
  *
  *  const success = someOperation();
@@ -19,38 +19,15 @@ import type { Chain, Command, InitCommandCtx } from './types.js';
  *  return;
  * ```
  *
- * You should always add the command to the global interface `BlockSuite.Commands`
- * ```ts
- * declare global {
- *   namespace BlockSuite {
- *     interface Commands {
- *       'myCommand': typeof myCommand
- *     }
- *   }
- * }
- * ```
- *
  * Command input and output data can be defined in the `Command` type
  *
  * ```ts
  * // input: ctx.firstName, ctx.lastName
  * // output: ctx.fullName
- * const myCommand: Command<'firstName' | 'lastName', 'fullName'> = (ctx, next) => {
+ * const myCommand: Command<{ firstName: string; lastName: string }, { fullName: string }> = (ctx, next) => {
  *   const { firstName, lastName } = ctx;
  *   const fullName = `${firstName} ${lastName}`;
  *   return next({ fullName });
- * }
- *
- * declare global {
- *   namespace BlockSuite {
- *     interface CommandContext {
- *       // All command input and output data should be defined here
- *       // The keys should be optional
- *       firstName?: string;
- *       lastName?: string;
- *       fullName?: string;
- *     }
- *   }
  * }
  *
  * ```
@@ -63,7 +40,7 @@ import type { Chain, Command, InitCommandCtx } from './types.js';
  * 1. Using `exec` method
  * `exec` is used to run a single command
  * ```ts
- * const { success, ...data } = commandManager.exec('myCommand', payload);
+ * const [result, data] = commandManager.exec(myCommand, payload);
  * ```
  *
  * 2. Using `chain` method
@@ -71,8 +48,8 @@ import type { Chain, Command, InitCommandCtx } from './types.js';
  * ```ts
  * const chain = commandManager.chain();
  * const [result, data] = chain
- *   .myCommand1()
- *   .myCommand2(payload)
+ *   .pipe(myCommand1)
+ *   .pipe(myCommand2, payload)
  *   .run();
  * ```
  *
@@ -83,8 +60,8 @@ import type { Chain, Command, InitCommandCtx } from './types.js';
  * ```ts
  * const chain = commandManager.chain();
  * const [result, data] = chain
- *   .myCommand1() <-- if this fail
- *   .myCommand2(payload) <- this won't run
+ *   .chain(myCommand1) <-- if this fail
+ *   .chain(myCommand2, payload) <- this won't run
  *   .run();
  *
  * result <- result will be `false`
@@ -95,9 +72,9 @@ import type { Chain, Command, InitCommandCtx } from './types.js';
  * const chain = commandManager.chain();
  * const [result, data] = chain
  *   .try(chain => [
- *     chain.myCommand1(), <- if this fail
- *     chain.myCommand2(), <- this will run, if this success
- *     chain.myCommand3(), <- this won't run
+ *     chain.pipe(myCommand1), <- if this fail
+ *     chain.pipe(myCommand2, payload), <- this will run, if this success
+ *     chain.pipe(myCommand3), <- this won't run
  *   ])
  *   .run();
  * ```
@@ -107,9 +84,9 @@ import type { Chain, Command, InitCommandCtx } from './types.js';
  * const chain = commandManager.chain();
  * const [result, data] = chain
  *   .try(chain => [
- *     chain.myCommand1(), <- if this success
- *     chain.myCommand2(), <- this will also run
- *     chain.myCommand3(), <- so will this
+ *     chain.pipe(myCommand1), <- if this success
+ *     chain.pipe(myCommand2), <- this will also run
+ *     chain.pipe(myCommand3), <- so will this
  *   ])
  *   .run();
  * ```

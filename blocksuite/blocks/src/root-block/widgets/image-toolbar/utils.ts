@@ -27,7 +27,7 @@ export function duplicate(
 
   const index = parent?.children.indexOf(model);
   const duplicateId = doc.addBlock(
-    model.flavour as BlockSuite.Flavour,
+    model.flavour,
     duplicateProps,
     parent,
     index + 1

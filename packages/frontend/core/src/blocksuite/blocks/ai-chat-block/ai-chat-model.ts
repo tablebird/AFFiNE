@@ -41,8 +41,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:embed-ai-chat': AIChatBlockModel;
     }
-    interface BlockModels {
-      'affine:embed-ai-chat': AIChatBlockModel;
-    }
   }
 }

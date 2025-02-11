@@ -1,7 +1,7 @@
 import { ParagraphBlockModel } from '@blocksuite/affine-model';
 import {
   calculateCollapsedSiblings,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import { type Command, TextSelection } from '@blocksuite/block-std';
 
@@ -58,7 +58,7 @@ export const dedentBlocks: Command<{
     const model = store.getBlock(id)?.model;
     if (!model) return;
     if (
-      matchFlavours(model, [ParagraphBlockModel]) &&
+      matchModels(model, [ParagraphBlockModel]) &&
       model.type.startsWith('h') &&
       model.collapsed
     ) {

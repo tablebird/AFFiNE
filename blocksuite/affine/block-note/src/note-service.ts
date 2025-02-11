@@ -12,7 +12,7 @@ import {
   getPrevBlockCommand,
   getTextSelectionCommand,
 } from '@blocksuite/affine-shared/commands';
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchModels } from '@blocksuite/affine-shared/utils';
 import {
   type BlockComponent,
   BlockSelection,
@@ -155,7 +155,7 @@ export class NoteBlockService extends BlockService {
     const doc = this._std.store;
     let parent = doc.getBlock(blockId)?.model ?? null;
     while (parent) {
-      if (matchFlavours(parent, [NoteBlockModel])) {
+      if (matchModels(parent, [NoteBlockModel])) {
         return parent;
       }
       parent = doc.getParent(parent);
@@ -194,7 +194,7 @@ export class NoteBlockService extends BlockService {
             }
 
             if (
-              !matchFlavours(nextBlock.model, [
+              !matchModels(nextBlock.model, [
                 ParagraphBlockModel,
                 ListBlockModel,
                 CodeBlockModel,
@@ -230,7 +230,7 @@ export class NoteBlockService extends BlockService {
 
             event.preventDefault();
             if (
-              matchFlavours(nextBlock.model, [
+              matchModels(nextBlock.model, [
                 ParagraphBlockModel,
                 ListBlockModel,
                 CodeBlockModel,
@@ -284,7 +284,7 @@ export class NoteBlockService extends BlockService {
             }
 
             if (
-              !matchFlavours(prevBlock.model, [
+              !matchModels(prevBlock.model, [
                 ParagraphBlockModel,
                 ListBlockModel,
                 CodeBlockModel,
@@ -318,7 +318,7 @@ export class NoteBlockService extends BlockService {
             }
 
             if (
-              matchFlavours(prevBlock.model, [
+              matchModels(prevBlock.model, [
                 ParagraphBlockModel,
                 ListBlockModel,
                 CodeBlockModel,

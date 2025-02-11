@@ -24,7 +24,7 @@ import {
 import type { Viewport } from '@blocksuite/affine-shared/types';
 import {
   isTouchPadPinchEvent,
-  matchFlavours,
+  matchModels,
   requestConnectedFrame,
   requestThrottledConnectedFrame,
 } from '@blocksuite/affine-shared/utils';
@@ -350,7 +350,7 @@ export class EdgelessRootBlockComponent extends BlockComponent<
       const primaryMode = std.get(DocModeProvider).getPrimaryMode(this.doc.id);
       const note = this.model.children.find(
         (child): child is NoteBlockModel =>
-          matchFlavours(child, [NoteBlockModel]) &&
+          matchModels(child, [NoteBlockModel]) &&
           child.displayMode !== NoteDisplayMode.EdgelessOnly
       );
 

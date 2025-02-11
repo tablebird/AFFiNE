@@ -150,8 +150,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:frame': FrameBlockModel;
     }
-    interface BlockModels {
-      'affine:frame': FrameBlockModel;
-    }
   }
 }

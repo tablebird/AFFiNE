@@ -1,6 +1,7 @@
 import { FrameIcon } from '@blocksuite/affine-components/icons';
 import { MindmapElementModel } from '@blocksuite/affine-model';
 import { TelemetryProvider } from '@blocksuite/affine-shared/services';
+import type { GfxModel } from '@blocksuite/block-std/gfx';
 import { Bound, WithDisposable } from '@blocksuite/global/utils';
 import { css, html, LitElement, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
@@ -48,7 +49,7 @@ export class EdgelessAddFrameButton extends WithDisposable(LitElement) {
 
 export function renderAddFrameButton(
   edgeless: EdgelessRootBlockComponent,
-  elements: BlockSuite.EdgelessModel[]
+  elements: GfxModel[]
 ) {
   if (elements.length < 2) return nothing;
   if (elements.some(e => e.group instanceof MindmapElementModel))

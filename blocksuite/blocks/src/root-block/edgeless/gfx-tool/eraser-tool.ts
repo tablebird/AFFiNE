@@ -5,7 +5,7 @@ import {
 } from '@blocksuite/affine-block-surface';
 import { isTopLevelBlock } from '@blocksuite/affine-shared/utils';
 import type { PointerEventState } from '@blocksuite/block-std';
-import { BaseTool } from '@blocksuite/block-std/gfx';
+import { BaseTool, type GfxModel } from '@blocksuite/block-std/gfx';
 import {
   Bound,
   getStroke,
@@ -28,11 +28,11 @@ class EraserOverlay extends Overlay {
 export class EraserTool extends BaseTool {
   static override toolName = 'eraser';
 
-  private _erasable = new Set<BlockSuite.EdgelessModel>();
+  private _erasable = new Set<GfxModel>();
 
   private _eraserPoints: IVec[] = [];
 
-  private readonly _eraseTargets = new Set<BlockSuite.EdgelessModel>();
+  private readonly _eraseTargets = new Set<GfxModel>();
 
   private readonly _loop = () => {
     const now = Date.now();

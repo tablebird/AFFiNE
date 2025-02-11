@@ -7,7 +7,7 @@ import {
 } from '@blocksuite/affine-shared/services';
 import {
   isInsideEdgelessEditor,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import { BlockService } from '@blocksuite/block-std';
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
@@ -26,7 +26,7 @@ export const ImageDropOption = FileDropConfigExtension({
 
     const maxFileSize = std.store.get(FileSizeLimitService).maxFileSize;
 
-    if (targetModel && !matchFlavours(targetModel, [SurfaceBlockModel])) {
+    if (targetModel && !matchModels(targetModel, [SurfaceBlockModel])) {
       addSiblingImageBlock(
         std.host,
         imageFiles,

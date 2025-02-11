@@ -6,7 +6,7 @@ import {
   getSelectedModelsCommand,
   ImageBlockModel,
   ListBlockModel,
-  matchFlavours,
+  matchModels,
   ParagraphBlockModel,
 } from '@blocksuite/affine/blocks';
 
@@ -107,7 +107,7 @@ const textBlockShowWhen = (chain: Chain<InitCommandCtx>) => {
   if (!selectedModels || selectedModels.length === 0) return false;
 
   return selectedModels.some(model =>
-    matchFlavours(model, [ParagraphBlockModel, ListBlockModel])
+    matchModels(model, [ParagraphBlockModel, ListBlockModel])
   );
 };
 
@@ -121,7 +121,7 @@ const codeBlockShowWhen = (chain: Chain<InitCommandCtx>) => {
   if (!selectedModels || selectedModels.length > 1) return false;
 
   const model = selectedModels[0];
-  return matchFlavours(model, [CodeBlockModel]);
+  return matchModels(model, [CodeBlockModel]);
 };
 
 const imageBlockShowWhen = (chain: Chain<InitCommandCtx>) => {
@@ -134,7 +134,7 @@ const imageBlockShowWhen = (chain: Chain<InitCommandCtx>) => {
   if (!selectedModels || selectedModels.length > 1) return false;
 
   const model = selectedModels[0];
-  return matchFlavours(model, [ImageBlockModel]);
+  return matchModels(model, [ImageBlockModel]);
 };
 
 const EditAIGroup: AIItemGroupConfig = {
@@ -282,7 +282,7 @@ const GenerateWithAIGroup: AIItemGroupConfig = {
 
         return selectedModels.every(
           model =>
-            matchFlavours(model, [ParagraphBlockModel, ListBlockModel]) &&
+            matchModels(model, [ParagraphBlockModel, ListBlockModel]) &&
             !model.type.startsWith('h')
         );
       },

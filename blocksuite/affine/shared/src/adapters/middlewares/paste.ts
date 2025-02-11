@@ -35,7 +35,7 @@ import {
   TelemetryProvider,
 } from '../../services';
 import type { AffineTextAttributes } from '../../types';
-import { matchFlavours, referenceToNode } from '../../utils';
+import { matchModels, referenceToNode } from '../../utils';
 
 function findLastMatchingNode(
   root: BlockSnapshot[],
@@ -293,7 +293,7 @@ class PasteTr {
           return;
         }
         if (!cursorModel.text) {
-          if (matchFlavours(cursorModel, [ImageBlockModel])) {
+          if (matchModels(cursorModel, [ImageBlockModel])) {
             const selection = this.std.selection.create(ImageSelection, {
               blockId: target.blockId,
             });
@@ -358,7 +358,7 @@ class PasteTr {
     if (
       this.firstSnapshot !== this.lastSnapshot &&
       this.lastSnapshot.props.text &&
-      !matchFlavours(this.pointState.model, [CodeBlockModel])
+      !matchModels(this.pointState.model, [CodeBlockModel])
     ) {
       const text = fromJSON(this.lastSnapshot.props.text) as Text;
       const doc = new Y.Doc();

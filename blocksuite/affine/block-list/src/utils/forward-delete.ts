@@ -1,7 +1,7 @@
 import { ListBlockModel } from '@blocksuite/affine-model';
 import {
   getNextContentBlock,
-  matchFlavours,
+  matchModels,
 } from '@blocksuite/affine-shared/utils';
 import { type BlockStdScope, TextSelection } from '@blocksuite/block-std';
 import type { Text } from '@blocksuite/store';
@@ -26,7 +26,7 @@ export function forwardDelete(std: BlockStdScope): true | undefined {
   const isCollapsed = text.isCollapsed();
   const doc = std.store;
   const model = doc.getBlock(text.from.blockId)?.model;
-  if (!model || !matchFlavours(model, [ListBlockModel])) return;
+  if (!model || !matchModels(model, [ListBlockModel])) return;
   const isEnd = isCollapsed && text.from.index === model.text.length;
   if (!isEnd) return;
   // Has children in list

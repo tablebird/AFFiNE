@@ -211,7 +211,7 @@ export class TemplateJob {
         assertExists(modelData);
 
         doc.addBlock(
-          modelData.flavour as BlockSuite.Flavour,
+          modelData.flavour,
           {
             ...modelData.props,
             id: modelData.id,

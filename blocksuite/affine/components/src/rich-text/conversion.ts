@@ -21,7 +21,7 @@ import {
  * which are also used for registering hotkeys for converting block flavours.
  */
 export interface TextConversionConfig {
-  flavour: BlockSuite.Flavour;
+  flavour: string;
   type?: string;
   name: string;
   description?: string;

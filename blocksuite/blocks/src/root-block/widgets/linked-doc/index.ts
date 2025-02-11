@@ -120,12 +120,7 @@ export class AffineLinkedDocWidget extends WidgetComponent<
       const block = containerElement.closest<BlockComponent>(
         `[${BLOCK_ID_ATTR}]`
       );
-      if (
-        !block ||
-        this.config.ignoreBlockTypes.includes(
-          block.flavour as keyof BlockSuite.BlockModels
-        )
-      )
+      if (!block || this.config.ignoreBlockTypes.includes(block.flavour))
         return;
 
       const inlineRoot = containerElement.closest<InlineRootElement>(

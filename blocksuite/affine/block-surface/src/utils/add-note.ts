@@ -96,7 +96,7 @@ export function addNote(
   const doc = std.store;
 
   const blockId = doc.addBlock(
-    options.childFlavour as BlockSuite.Flavour,
+    options.childFlavour,
     { type: options.childType },
     noteId
   );

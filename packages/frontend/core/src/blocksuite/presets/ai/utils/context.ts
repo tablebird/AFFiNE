@@ -1,10 +1,11 @@
+import type { GfxModel } from '@blocksuite/affine/block-std/gfx';
 import type { MindmapStyle } from '@blocksuite/affine/blocks';
 import type { SerializedXYWH } from '@blocksuite/affine/global/utils';
 
 import type { TemplateImage } from '../slides/template';
 
 export interface ContextValue {
-  selectedElements?: BlockSuite.EdgelessModel[];
+  selectedElements?: GfxModel[];
   content?: string;
   // make it real
   width?: number;

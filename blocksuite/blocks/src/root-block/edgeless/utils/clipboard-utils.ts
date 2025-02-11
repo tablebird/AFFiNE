@@ -10,6 +10,7 @@ import type {
 import { getElementsWithoutGroup } from '@blocksuite/affine-shared/utils';
 import {
   generateKeyBetweenV2,
+  type GfxModel,
   type SerializedElement,
 } from '@blocksuite/block-std/gfx';
 import { getCommonBoundWithRotation, groupBy } from '@blocksuite/global/utils';
@@ -28,7 +29,7 @@ import {
 const offset = 10;
 export async function duplicate(
   edgeless: EdgelessRootBlockComponent,
-  elements: BlockSuite.EdgelessModel[],
+  elements: GfxModel[],
   select = true
 ) {
   const { clipboardController } = edgeless;
@@ -54,7 +55,7 @@ export async function duplicate(
     });
   }
 }
-export const splitElements = (elements: BlockSuite.EdgelessModel[]) => {
+export const splitElements = (elements: GfxModel[]) => {
   const { notes, frames, shapes, images, edgelessTexts, embedSyncedDocs } =
     groupBy(getElementsWithoutGroup(elements), element => {
       if (isNoteBlock(element)) {

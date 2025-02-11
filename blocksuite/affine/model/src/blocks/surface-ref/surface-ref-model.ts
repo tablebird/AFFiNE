@@ -22,11 +22,3 @@ export const SurfaceRefBlockSchema = defineBlockSchema({
 });
 
 export class SurfaceRefBlockModel extends BlockModel<SurfaceRefProps> {}
-
-declare global {
-  namespace BlockSuite {
-    interface BlockModels {
-      'affine:surface-ref': SurfaceRefBlockModel;
-    }
-  }
-}

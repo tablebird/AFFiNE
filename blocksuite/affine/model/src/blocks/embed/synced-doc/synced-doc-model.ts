@@ -21,8 +21,5 @@ declare global {
     interface EdgelessBlockModelMap {
       'affine:embed-synced-doc': EmbedSyncedDocModel;
     }
-    interface BlockModels {
-      'affine:embed-synced-doc': EmbedSyncedDocModel;
-    }
   }
 }

@@ -45,9 +45,6 @@ export class ImageBlockModel
 
 declare global {
   namespace BlockSuite {
-    interface BlockModels {
-      'affine:image': ImageBlockModel;
-    }
     interface EdgelessBlockModelMap {
       'affine:image': ImageBlockModel;
     }

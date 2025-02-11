@@ -41,6 +41,7 @@ import {
   GfxBlockElementModel,
   GfxControllerIdentifier,
   GfxExtension,
+  type GfxModel,
 } from '@blocksuite/block-std/gfx';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import {
@@ -249,7 +250,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<SurfaceRefBlockMode
   private readonly _previewSpec =
     SpecProvider.getInstance().getSpec('edgeless:preview');
 
-  private _referencedModel: BlockSuite.EdgelessModel | null = null;
+  private _referencedModel: GfxModel | null = null;
 
   private _referenceXYWH: SerializedXYWH | null = null;
 
@@ -321,10 +322,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<SurfaceRefBlockMode
     const surfaceModel = getSurfaceBlock(this.doc);
     this._surfaceModel = surfaceModel;
 
-    const findReferencedModel = (): [
-      BlockSuite.EdgelessModel | null,
-      string,
-    ] => {
+    const findReferencedModel = (): [GfxModel | null, string] => {
       if (!this.model.reference) return [null, this.doc.id];
 
       if (this.doc.getBlock(this.model.reference)) {
@@ -541,10 +539,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<SurfaceRefBlockMode
     viewport.setViewportByBound(Bound.deserialize(this._referenceXYWH));
   }
 
-  private _renderMask(
-    referencedModel: BlockSuite.EdgelessModel,
-    flavourOrType: string
-  ) {
+  private _renderMask(referencedModel: GfxModel, flavourOrType: string) {
     const title = 'title' in referencedModel ? referencedModel.title : '';
 
     return html`
@@ -561,7 +556,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<SurfaceRefBlockMode
     `;
   }
 
-  private _renderRefContent(referencedModel: BlockSuite.EdgelessModel) {
+  private _renderRefContent(referencedModel: GfxModel) {
     const [, , w, h] = deserializeXYWH(referencedModel.xywh);
     const flavourOrType =
       'flavour' in referencedModel
