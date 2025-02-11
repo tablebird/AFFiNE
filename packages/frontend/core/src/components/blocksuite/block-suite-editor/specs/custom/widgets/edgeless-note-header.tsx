@@ -44,8 +44,18 @@ const EdgelessNoteToggleButton = ({ note }: { note: NoteBlockModel }) => {
   );
 
   useEffect(() => {
-    setCollapsed(note.edgeless.collapse);
-  }, [note.edgeless.collapse]);
+    return note.edgeless$.subscribe(({ collapse, collapsedHeight }) => {
+      if (
+        collapse &&
+        collapsedHeight &&
+        Math.abs(collapsedHeight - styles.headerHeight) < 1
+      ) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    });
+  }, [note.edgeless$]);
 
   useEffect(() => {
     if (!gfx) return;

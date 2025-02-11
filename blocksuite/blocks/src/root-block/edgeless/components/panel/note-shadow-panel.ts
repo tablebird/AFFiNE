@@ -118,6 +118,7 @@ export class EdgelessNoteShadowPanel extends WithDisposable(LitElement) {
           >
             <edgeless-tool-icon-button
               class="item-icon"
+              data-testid=${shadow.type.replace('--', '')}
               .tooltip=${shadow.tooltip}
               .tipPosition=${'bottom'}
               .iconContainerPadding=${0}

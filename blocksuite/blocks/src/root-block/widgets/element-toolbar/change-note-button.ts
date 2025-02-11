@@ -99,6 +99,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     this.notes.forEach(note => {
       const props = {
         edgeless: {
+          ...note.edgeless,
           style: {
             ...note.edgeless.style,
             borderRadius,
@@ -275,6 +276,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     this.notes.forEach(note => {
       const props = {
         edgeless: {
+          ...note.edgeless,
           style: {
             ...note.edgeless.style,
             shadowType,
@@ -289,6 +291,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     this.notes.forEach(note => {
       const props = {
         edgeless: {
+          ...note.edgeless,
           style: {
             ...note.edgeless.style,
             borderStyle,
@@ -303,6 +306,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     this.notes.forEach(note => {
       const props = {
         edgeless: {
+          ...note.edgeless,
           style: {
             ...note.edgeless.style,
             borderSize,

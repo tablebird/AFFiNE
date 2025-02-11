@@ -22,6 +22,11 @@ import {
   type,
   waitForEditorLoad,
 } from '@affine-test/kit/utils/page-logic';
+import type { AffineEditorContainer } from '@blocksuite/affine/presets';
+import type {
+  EdgelessRootBlockComponent,
+  NoteBlockModel,
+} from '@blocksuite/blocks';
 import { expect, type Page } from '@playwright/test';
 
 const title = 'Edgeless Note Header Test';
@@ -278,5 +283,90 @@ test.describe('edgeless note element toolbar', () => {
       'affine-outline-note-card > [data-status="selected"]'
     );
     expect(highlightNoteCards).toHaveCount(1);
+  });
+
+  test('note edgeless styles', async ({ page }) => {
+    const getNoteEdgelessProps = async (page: Page, noteId: string) => {
+      const container = locateEditorContainer(page);
+      return await container.evaluate(
+        (container: AffineEditorContainer, noteId) => {
+          const root = container.querySelector(
+            'affine-edgeless-root'
+          ) as EdgelessRootBlockComponent;
+          const note = root.gfx.getElementById(noteId) as NoteBlockModel;
+          return note.edgeless;
+        },
+        noteId
+      );
+    };
+
+    const toolbar = locateElementToolbar(page);
+
+    await selectAllByKeyboard(page);
+    const noteId = (await getEdgelessSelectedIds(page))[0];
+
+    expect(await getNoteEdgelessProps(page, noteId)).toEqual({
+      style: {
+        borderRadius: 8,
+        borderSize: 4,
+        borderStyle: 'none',
+        shadowType: '--affine-note-shadow-box',
+      },
+    });
+
+    await toolbar.getByRole('button', { name: 'Shadow style' }).click();
+    await toolbar.getByTestId('affine-note-shadow-film').click();
+
+    expect(await getNoteEdgelessProps(page, noteId)).toEqual({
+      style: {
+        borderRadius: 8,
+        borderSize: 4,
+        borderStyle: 'none',
+        shadowType: '--affine-note-shadow-film',
+      },
+    });
+
+    await toolbar.getByRole('button', { name: 'Border style' }).click();
+    await toolbar.locator('.mode-solid').click();
+    await toolbar.getByRole('button', { name: 'Border style' }).click();
+    await toolbar.locator('edgeless-line-width-panel').getByLabel('8').click();
+
+    expect(await getNoteEdgelessProps(page, noteId)).toEqual({
+      style: {
+        borderRadius: 8,
+        borderSize: 8,
+        borderStyle: 'solid',
+        shadowType: '--affine-note-shadow-film',
+      },
+    });
+
+    await toolbar.getByRole('button', { name: 'Corners' }).click();
+    await toolbar.locator('edgeless-size-panel').getByText('Large').click();
+
+    expect(await getNoteEdgelessProps(page, noteId)).toEqual({
+      style: {
+        borderRadius: 24,
+        borderSize: 8,
+        borderStyle: 'solid',
+        shadowType: '--affine-note-shadow-film',
+      },
+    });
+
+    const headerToolbar = page.getByTestId('edgeless-page-block-header');
+    const toggleButton = headerToolbar.getByTestId(
+      'edgeless-note-toggle-button'
+    );
+    await toggleButton.click();
+
+    expect(await getNoteEdgelessProps(page, noteId)).toEqual({
+      collapse: true,
+      collapsedHeight: 48,
+      style: {
+        borderRadius: 24,
+        borderSize: 8,
+        borderStyle: 'solid',
+        shadowType: '--affine-note-shadow-film',
+      },
+    });
   });
 });
