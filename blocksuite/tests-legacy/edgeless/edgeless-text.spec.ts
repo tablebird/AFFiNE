@@ -172,7 +172,7 @@ test.describe('edgeless text block', () => {
     await assertEdgelessTextModelRect(
       page,
       '4',
-      new Bound(-25, -25, 412.6, 73.3)
+      new Bound(-25, -25, 395, 73.3)
     );
 
     // blur, max width set to true
@@ -190,7 +190,7 @@ test.describe('edgeless text block', () => {
     await assertEdgelessTextModelRect(
       page,
       '4',
-      new Bound(-25, -25, 412.6, 97.3)
+      new Bound(-25, -25, 395, 97.3)
     );
   });
 
