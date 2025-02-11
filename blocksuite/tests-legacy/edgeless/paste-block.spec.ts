@@ -78,6 +78,7 @@ test.describe('pasting blocks', () => {
     await pressEscape(page, 3);
     await page.mouse.click(130, 140);
     await copyByKeyboard(page);
+    await page.mouse.move(500, 500);
     await pasteByKeyboard(page);
     const textIds = await getAllEdgelessTextIds(page);
     expect(textIds.length).toBe(2);

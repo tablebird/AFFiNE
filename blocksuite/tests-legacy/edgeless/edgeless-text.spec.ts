@@ -12,6 +12,7 @@ import {
   getPageSnapshot,
   initEmptyEdgelessState,
   pasteByKeyboard,
+  pressArrowDown,
   pressArrowLeft,
   pressArrowRight,
   pressArrowUp,
@@ -154,20 +155,37 @@ test.describe('edgeless text block', () => {
       delay: 100,
     });
     await waitNextFrame(page);
-    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 50, 26));
+    await assertEdgelessTextModelRect(
+      page,
+      '4',
+      new Bound(-25, -25, 220, 25.3)
+    );
 
-    await type(page, 'aaaaaaaaaa');
+    await type(page, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     await waitNextFrame(page, 1000);
     // just width changed
-    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 83, 26));
+    await assertEdgelessTextModelRect(
+      page,
+      '4',
+      new Bound(-25, -25, 340.6, 25.3)
+    );
 
     await type(page, '\nbbb');
     // width not changed, height changed
-    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 83, 50));
-    await type(page, '\ncccccccccccccccc');
+    await assertEdgelessTextModelRect(
+      page,
+      '4',
+      new Bound(-25, -25, 340.6, 49.3)
+    );
+    await type(page, '\nccccccccccccccccccccccccccccccccccccccccccccccccc');
+    await waitNextFrame(page, 1000);
 
     // width and height changed
-    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 131, 74));
+    await assertEdgelessTextModelRect(
+      page,
+      '4',
+      new Bound(-25, -25, 412.6, 73.3)
+    );
 
     // blur, max width set to true
     await page.mouse.click(point[0] - 50, point[1], {
@@ -176,9 +194,16 @@ test.describe('edgeless text block', () => {
     await page.mouse.dblclick(point[0], point[1], {
       delay: 100,
     });
+    // to end of line
+    await pressArrowDown(page, 3);
     await type(page, 'dddddddddddddddddddd');
+    await waitNextFrame(page, 1000);
     // width not changed, height changed
-    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 131, 98));
+    await assertEdgelessTextModelRect(
+      page,
+      '4',
+      new Bound(-25, -25, 412.6, 97.3)
+    );
   });
 
   test('edgeless text width fixed when drag moving', async ({ page }) => {
@@ -369,7 +394,7 @@ test.describe('edgeless text block', () => {
     await page.mouse.dblclick(point[0], point[1], {
       delay: 100,
     });
-    await waitNextFrame(page);
+    await waitNextFrame(page, 2000);
 
     expect(await getPageSnapshot(page, true)).toMatchSnapshot(
       `${testInfo.title}_init.json`
@@ -567,7 +592,7 @@ test('press backspace at the start of first line when edgeless text exist', asyn
   await page.mouse.dblclick(point[0], point[1], {
     delay: 100,
   });
-  await waitNextFrame(page);
+  await waitNextFrame(page, 2000);
   await type(page, 'aaa');
 
   await waitNextFrame(page);

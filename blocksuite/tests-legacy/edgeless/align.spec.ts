@@ -112,12 +112,12 @@ test.describe('auto arrange align', () => {
     await page.mouse.click(0, 0);
 
     await selectAllByKeyboard(page);
-    await assertEdgelessSelectedModelRect(page, [0, -125, 225, 225]);
+    await assertEdgelessSelectedModelRect(page, [0, -125, 395, 225]);
 
     // arrange
     await triggerComponentToolbarAction(page, 'autoArrange');
     await waitNextFrame(page, 200);
-    await assertEdgelessSelectedModelRect(page, [0, 0, 170, 100]);
+    await assertEdgelessSelectedModelRect(page, [0, 0, 340, 100]);
   });
 
   test('arrange note', async ({ page }) => {
@@ -317,12 +317,12 @@ test.describe('auto resize align', () => {
     await page.mouse.click(0, 0);
 
     await selectAllByKeyboard(page);
-    await assertEdgelessSelectedModelRect(page, [0, -125, 225, 225]);
+    await assertEdgelessSelectedModelRect(page, [0, -125, 395, 225]);
 
     // arrange
     await triggerComponentToolbarAction(page, 'autoResize');
     await waitNextFrame(page, 200);
-    await assertEdgelessSelectedModelRect(page, [0, 0, 604.6, 200]);
+    await assertEdgelessSelectedModelRect(page, [0, 0, 1956.8, 200]);
   });
 
   test('resize and arrange note', async ({ page }) => {
@@ -430,6 +430,6 @@ test.describe('auto resize align', () => {
     // arrange
     await triggerComponentToolbarAction(page, 'autoResize');
     await waitNextFrame(page, 200);
-    await assertEdgelessSelectedModelRect(page, [0, 0, 1421.5, 420]);
+    await assertEdgelessSelectedModelRect(page, [0, 0, 2396.8, 420]);
   });
 });
