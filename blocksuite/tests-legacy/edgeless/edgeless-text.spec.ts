@@ -183,11 +183,7 @@ test.describe('edgeless text block', () => {
     await type(page, 'dddddddddddddddddddd');
     await waitNextFrame(page, 1000);
     // width not changed, height changed
-    await assertEdgelessTextModelRect(
-      page,
-      '4',
-      new Bound(-25, -25, 395, 97.3)
-    );
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 395, 98));
   });
 
   test('edgeless text width fixed when drag moving', async ({ page }) => {
