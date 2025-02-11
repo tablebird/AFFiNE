@@ -53,7 +53,7 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     const width = bound.w / scale + extraPadding * 2 + extraBorder;
     const height = bound.h / scale;
 
-    const rect = this._notePageContent?.getBoundingClientRect();
+    const rect = this._noteContent?.getBoundingClientRect();
     if (!rect) return nothing;
 
     const zoom = this.gfx.viewport.zoom;
@@ -163,14 +163,14 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     );
 
     const observer = new MutationObserver(() => {
-      const rect = this._notePageContent?.getBoundingClientRect();
+      const rect = this._noteContent?.getBoundingClientRect();
       if (!rect) return;
       const zoom = this.gfx.viewport.zoom;
       const scale = this.model.edgeless.scale ?? 1;
       this._noteFullHeight =
         rect.height / scale / zoom + 2 * EDGELESS_BLOCK_CHILD_PADDING;
     });
-    if (this._notePageContent) {
+    if (this._noteContent) {
       observer.observe(this, { childList: true, subtree: true });
       _disposables.add(() => observer.disconnect());
     }
@@ -239,19 +239,20 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
           .note=${this.model}
         ></edgeless-note-background>
 
-        <edgeless-page-block-title
-          .note=${this.model}
-        ></edgeless-page-block-title>
-
         <div
-          class="edgeless-note-page-content"
+          class=${styles.clipContainer}
           style=${styleMap({
-            width: '100%',
-            height: '100%',
             'overflow-y': this._isShowCollapsedContent ? 'initial' : 'clip',
           })}
         >
-          ${this.renderPageContent()}
+          <div>
+            <edgeless-page-block-title
+              .note=${this.model}
+            ></edgeless-page-block-title>
+            <div class="edgeless-note-page-content">
+              ${this.renderPageContent()}
+            </div>
+          </div>
         </div>
 
         <edgeless-note-mask
@@ -295,8 +296,8 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
   @state()
   private accessor _noteFullHeight = 0;
 
-  @query('.edgeless-note-page-content .affine-note-block-container')
-  private accessor _notePageContent: HTMLElement | null = null;
+  @query(`.${styles.clipContainer} > div`)
+  private accessor _noteContent: HTMLElement | null = null;
 
   @query('doc-title')
   private accessor _docTitle: DocTitle | null = null;

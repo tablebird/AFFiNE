@@ -150,11 +150,9 @@ test.describe('edgeless page block', () => {
     await expect(infoButton).toBeHidden();
   });
 
-  test('page title should show in note when page block is not collapsed', async ({
-    page,
-  }) => {
+  test('page title should be editable', async ({ page }) => {
     const note = page.locator('affine-edgeless-note');
-    const docTitle = note.locator('doc-title');
+    const docTitle = note.locator('edgeless-page-block-title');
     await expect(docTitle).toBeVisible();
     await expect(docTitle).toHaveText(title);
 

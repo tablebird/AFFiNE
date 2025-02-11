@@ -58,7 +58,7 @@ export const noteBackground = style({
   },
 });
 
-export const pageContent = style({
+export const clipContainer = style({
   width: '100%',
   height: '100%',
 });
